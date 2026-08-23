@@ -87,3 +87,9 @@
 - [x] Remove the Luma Selects supporting sentence beneath the promotion heading.
 - [x] Move filter controls away from the crowded left product-grid edge and into a clearer marketplace control location.
 - [x] Verify the refined hero, seller/promotion copy, and filter layout on desktop and mobile before delivery.
+- [x] Move the Luma Selects copy block lower within its promotion panel for a more balanced composition.
+- [x] Move the hero’s “Open studio edition” note and accompanying light-green visual treatment above the hero image composition.
+- [x] Align the search field, category chips, and sort control into a cleaner single discovery-control row.
+- [x] Redesign the desktop filter shelf so reset, category, price, colour, and visitor-rating controls are evenly grouped and readable.
+- [x] Verify the updated promotion, hero, discovery controls, and filter shelf on desktop and mobile before delivery.
+- [x] Move the light-green hero visual accent above the hero image together with the Open studio edition note, then verify the paired composition on desktop and mobile.
