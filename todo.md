@@ -123,3 +123,6 @@
 - [x] Reduce the gap between the desktop filter headings and their controls while retaining readable alignment.
 - [x] Further compact the desktop filter-shelf height without clipping content.
 - [x] Verify the denser filter shelf on desktop and mobile before delivery.
+- [x] Rebalance the desktop filter-panel widths and align Reset filters with the active content rows.
+- [x] Audit the current marketplace against the supplied project brief and document any remaining optional gaps.
+- [x] Verify the corrected filter shelf on desktop and mobile before delivery.

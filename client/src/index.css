@@ -490,3 +490,10 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
   .filter-sidebar .price-visual-range, .filter-sidebar .color-swatches { margin-top: 0; }
   .filter-sidebar small { margin-top: 5px; }
 }
+
+/* Use content-led panel widths so Reset, Category, Price, and Colour read as one compact filter group. */
+@media (min-width: 821px) {
+  .filter-sidebar { width: min(100%, 980px); margin: 0 auto 22px; grid-template-columns: 150px 210px 320px 300px; }
+  .filter-sidebar-heading.filter-sidebar-actions { align-items: flex-start; padding: 48px 14px 12px; }
+  .filter-sidebar fieldset:nth-of-type(1), .filter-sidebar fieldset:nth-of-type(2), .filter-sidebar fieldset:nth-of-type(3) { padding-inline: 14px; }
+}
