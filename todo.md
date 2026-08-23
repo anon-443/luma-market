@@ -111,3 +111,6 @@
 - [x] Interactively test the simplified filter flow in an actual mobile viewport, including category, price, colour, and reset behavior.
 - [x] Restore the full sort-control label and tighten its text and box spacing without losing usability.
 - [x] Verify the corrected sort control at desktop and mobile widths before delivery.
+- [x] Add clear colour emphasis to the Category, Price Range, and Colour panel text without reducing readability.
+- [x] Lower the complete Category, Price Range, and Colour content groups within the desktop filter shelf.
+- [x] Verify the coloured and repositioned filter panels on desktop and mobile before delivery.
