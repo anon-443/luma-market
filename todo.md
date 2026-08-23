@@ -13,3 +13,7 @@
 - [x] Add persistent recent-search history for voice and typed natural-language discovery queries.
 - [x] Add native/share-link product sharing actions to product detail panels.
 - [x] Verify mobile gestures, saved history, and share fallback behavior before saving a delivery checkpoint.
+- [x] Add a slide-out shopping cart with line-item controls and live subtotal calculation.
+- [x] Add related product recommendations to the bottom of each product detail panel.
+- [x] Add a lightweight quick-view modal to product grid cards.
+- [x] Verify cart totals, related-product navigation, and quick-view flows before saving a delivery checkpoint.
