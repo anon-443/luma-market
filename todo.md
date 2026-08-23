@@ -93,3 +93,8 @@
 - [x] Redesign the desktop filter shelf so reset, category, price, colour, and visitor-rating controls are evenly grouped and readable.
 - [x] Verify the updated promotion, hero, discovery controls, and filter shelf on desktop and mobile before delivery.
 - [x] Move the light-green hero visual accent above the hero image together with the Open studio edition note, then verify the paired composition on desktop and mobile.
+- [x] Remove the specified hero ornament while retaining the hero image and essential promotional content.
+- [x] Move the Open studio edition accent upward and reduce its size without disrupting the hero image.
+- [x] Lower the category, price, and colour content inside the desktop filter-shelf panels for consistent vertical rhythm.
+- [x] Lower the visitor-rating title, choices, and helper message inside its filter-shelf panel.
+- [x] Verify the refined hero accent and filter-shelf alignment on desktop and mobile before delivery.
