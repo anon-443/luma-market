@@ -98,3 +98,14 @@
 - [x] Lower the category, price, and colour content inside the desktop filter-shelf panels for consistent vertical rhythm.
 - [x] Lower the visitor-rating title, choices, and helper message inside its filter-shelf panel.
 - [x] Verify the refined hero accent and filter-shelf alignment on desktop and mobile before delivery.
+- [x] Center the Luma footer brand and tagline composition within the footer.
+- [x] Increase seller-row typography and avatar scale for clearer seller scanning.
+- [x] Increase the Market Radar strip’s overall scale and text size.
+- [x] Increase desktop discovery-control size for the search input, category chips, and sort control.
+- [x] Verify the footer, seller rows, Market Radar, and discovery controls on desktop and mobile before delivery.
+- [x] Remove the Visitor Rating filter controls, helper message, and rating-based filtering behavior.
+- [x] Rebalance the reset, category, price, and colour panels after removing the rating column.
+- [x] Verify remaining filter behavior and the simplified filter shelf on desktop and mobile before delivery.
+- [x] Interactively verify the desktop reset, category, price, and colour filters after removing Visitor Rating.
+- [x] Interactively verify the simplified mobile reset, category, price, and colour filter flow after removing Visitor Rating.
+- [x] Interactively test the simplified filter flow in an actual mobile viewport, including category, price, colour, and reset behavior.

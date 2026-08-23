@@ -357,3 +357,76 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
   .filter-sidebar fieldset:nth-of-type(4) { padding-top: 30px; gap: 12px; }
 }
 @media (max-width: 820px) { .hero-note { top: 8px; padding: 5px 9px; font-size: 9px; } }
+
+/* With Visitor Rating removed, the remaining filters form one clean four-part shelf. */
+@media (min-width: 821px) {
+  .filter-sidebar { grid-template-areas: "actions category price colour"; grid-template-columns: 0.74fr 1.04fr 1.2fr 1.2fr; grid-template-rows: 1fr; min-height: 236px; }
+  .filter-sidebar-heading.filter-sidebar-actions { border-bottom: 0; border-right: 1px solid var(--line); }
+  .filter-sidebar fieldset:nth-of-type(1), .filter-sidebar fieldset:nth-of-type(2), .filter-sidebar fieldset:nth-of-type(3) { min-height: 100%; }
+  .filter-sidebar fieldset:nth-of-type(4) { display: none; }
+}
+
+/* Emphasize the independent-seller layer and keep the footer identity centered as one clear signature. */
+@media (min-width: 821px) {
+  .vendors-section .vendor-card { grid-template-columns: 62px 84px minmax(0, 1.45fr) minmax(164px, 1fr) 48px; gap: 18px; padding: 28px 12px; }
+  .vendors-section .vendor-card:hover { padding-left: 22px; padding-right: 22px; }
+  .vendors-section .vendor-number { font-size: 13px; }
+  .vendors-section .vendor-mark { width: 60px; height: 60px; font-size: 37px; }
+  .vendors-section .vendor-details { gap: 5px; }
+  .vendors-section .vendor-details b { font-size: 29px; }
+  .vendors-section .vendor-details small, .vendors-section .vendor-category { font-size: 13px; line-height: 1.55; }
+  .vendors-section .vendor-arrow { width: 24px; height: 24px; }
+
+  .site-footer { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); min-height: 104px; padding: 26px 50px; align-items: center; }
+  .site-footer .footer-identity { grid-column: 2; display: flex; align-items: center; justify-content: center; gap: 13px; white-space: nowrap; }
+  .site-footer .footer-brand { font-size: 33px; }
+  .site-footer .footer-brand img { width: 33px; height: 33px; }
+  .site-footer .footer-identity p { width: auto; max-width: none; margin: 0; font-size: 17px; }
+  .site-footer > .footer-columns { grid-column: 3; justify-self: end; margin-left: 0; }
+}
+
+@media (max-width: 820px) {
+  .site-footer { display: grid; grid-template-columns: 1fr; justify-items: start; }
+  .site-footer .footer-identity { display: grid; gap: 5px; }
+  .site-footer .footer-identity p { margin: 0; }
+  .site-footer > .footer-columns { justify-self: stretch; margin-left: 0; }
+  .vendors-section .vendor-card { grid-template-columns: 34px 58px minmax(0, 1fr) 28px; gap: 10px; padding: 20px 5px; }
+  .vendors-section .vendor-mark { width: 50px; height: 50px; font-size: 32px; }
+  .vendors-section .vendor-number { font-size: 12px; }
+  .vendors-section .vendor-details { gap: 4px; }
+  .vendors-section .vendor-details b { font-size: 24px; }
+  .vendors-section .vendor-details small { font-size: 12px; }
+}
+
+/* Give marketplace signals and desktop discovery controls the requested clearer, more touchable scale. */
+@media (min-width: 821px) {
+  .market-section .shop-tools { grid-template-columns: minmax(410px, 490px) minmax(0, 1fr); gap: 30px; margin-top: 42px; margin-bottom: 38px; }
+  .market-section .search-field { height: 58px; padding-inline: 18px; gap: 11px; }
+  .market-section .search-field input { font-size: 15px; }
+  .market-section .ai-search-button { width: 42px; height: 42px; flex-basis: 42px; }
+  .market-section .voice-search-button { width: 40px; height: 40px; flex-basis: 40px; }
+  .market-section .ai-search-label { margin-top: 9px; font-size: 12px; }
+  .market-section .filter-row { grid-template-columns: minmax(0, 1fr) 210px; gap: 24px; }
+  .market-section .category-pills { gap: 12px; }
+  .market-section .category-pills button { min-height: 48px; padding-inline: 17px; font-size: 15px; }
+  .market-section .sort-select { width: 210px; min-width: 210px; height: 48px; padding-inline: 12px; }
+  .market-section .sort-select select { font-size: 13px; }
+
+  .market-section .market-pulse { min-height: 118px; margin-top: 58px; padding: 22px 26px; grid-template-columns: 72px 1.25fr 1.25fr auto; gap: 24px; }
+  .market-section .pulse-orbit { width: 56px; height: 56px; }
+  .market-section .pulse-orbit i { width: 12px; height: 12px; right: -6px; top: 16px; }
+  .market-section .market-pulse { align-items: center; }
+  .market-section .market-pulse p { gap: 4px; }
+  .market-section .market-pulse b { font-size: 12px; }
+  .market-section .market-pulse p span { font-size: 19px; }
+  .market-section .market-pulse a { gap: 8px; font-size: 12px; padding-bottom: 4px; }
+}
+
+@media (max-width: 820px) {
+  .market-section .market-pulse { min-height: 146px; padding: 20px; }
+  .market-section .pulse-orbit { width: 50px; height: 50px; }
+  .market-section .pulse-orbit i { width: 11px; height: 11px; top: 14px; }
+  .market-section .market-pulse b { font-size: 11px; }
+  .market-section .market-pulse p span { font-size: 17px; }
+  .market-section .market-pulse a { font-size: 11px; }
+}

@@ -435,7 +435,6 @@ export default function Home() {
   const [sort, setSort] = useState("featured");
   const [priceFloor, setPriceFloor] = useState(20);
   const [priceCeiling, setPriceCeiling] = useState(200);
-  const [minimumRating, setMinimumRating] = useState(0);
   const [selectedColor, setSelectedColor] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
   const [cart, setCart] = useState<CartLine[]>(() => {
@@ -477,8 +476,6 @@ export default function Home() {
     onSuccess: (suggestion) => setAiSuggestion(suggestion),
     onError: () => toast.error("The market finder is taking a breath — try a few keywords instead"),
   });
-  const ratingSummaries = trpc.reviews.summaries.useQuery();
-
   useEffect(() => { localStorage.setItem("luma-wishlist", JSON.stringify(wishlist)); }, [wishlist]);
   useEffect(() => { localStorage.setItem("luma-cart", JSON.stringify(cart.map(({ id, quantity }) => ({ id, quantity })))); }, [cart]);
   useEffect(() => { localStorage.setItem("luma-search-history", JSON.stringify(searchHistory)); }, [searchHistory]);
@@ -495,8 +492,6 @@ export default function Home() {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const estimatedShipping = cart.length ? (cartTotal >= 100 ? 0 : 8) : 0;
   const cartGrandTotal = cartTotal + estimatedShipping;
-  const ratingsByProduct = useMemo(() => new Map((ratingSummaries.data ?? []).map(summary => [summary.productId, summary])), [ratingSummaries.data]);
-
   useEffect(() => {
     if (!cartCount) return;
     setCartPulse(true);
@@ -512,17 +507,15 @@ export default function Home() {
       const categoryMatch = category === "All" || product.category === category;
       const priceMatch = product.price >= priceFloor && product.price <= priceCeiling;
       const colorMatch = selectedColor === "All" || product.color === selectedColor;
-      const ratingMatch = !minimumRating || (ratingsByProduct.get(product.id)?.averageRating ?? 0) >= minimumRating;
-      return searchMatch && categoryMatch && priceMatch && colorMatch && ratingMatch;
+      return searchMatch && categoryMatch && priceMatch && colorMatch;
     });
 
     return [...result].sort((a, b) => {
       if (sort === "price-low") return a.price - b.price;
       if (sort === "price-high") return b.price - a.price;
-      if (sort === "rating") return (ratingsByProduct.get(b.id)?.averageRating ?? 0) - (ratingsByProduct.get(a.id)?.averageRating ?? 0);
       return a.id - b.id;
     });
-  }, [aiSuggestion, category, minimumRating, priceCeiling, priceFloor, query, ratingsByProduct, selectedColor, sort]);
+  }, [aiSuggestion, category, priceCeiling, priceFloor, query, selectedColor, sort]);
 
   const addToCart = (product: Product, options: { openCart?: boolean } = {}) => {
     setCart((current) => {
@@ -695,7 +688,7 @@ export default function Home() {
               <div className="category-pills" aria-label="Filter by category">
                 {categories.map((item) => <button className={category === item ? "selected" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}
               </div>
-              <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="rating">Highest visitor rating</option></select></label>
+              <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
             </div>
           </div>
           {aiSuggestion && <div className="ai-suggestion"><div><Sparkles size={17} /><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}<small>{aiSuggestion.inventoryNote}</small></span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
@@ -703,11 +696,10 @@ export default function Home() {
           <button className="filter-toggle" onClick={() => setShowFilters((visible) => !visible)} aria-expanded={showFilters} aria-controls="product-filters"><SlidersHorizontal size={16} />{showFilters ? "Hide filters" : "Refine products"}</button>
           <div className="catalog-layout">
           <aside className={`filter-sidebar ${showFilters ? "is-open" : ""}`} id="product-filters" aria-label="Filter products">
-            <div className="filter-sidebar-heading filter-sidebar-actions"><button onClick={() => { setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); setMinimumRating(0); }}>Reset filters</button></div>
+            <div className="filter-sidebar-heading filter-sidebar-actions"><button onClick={() => { setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); }}>Reset filters</button></div>
             <fieldset><legend>Category</legend>{categories.map((item) => <label className="filter-choice" key={item}><input type="radio" name="category-filter" checked={category === item} onChange={() => setCategory(item)} /><span>{item}</span></label>)}</fieldset>
             <fieldset><legend>Price range <b>{money.format(priceFloor)}–{money.format(priceCeiling)}</b></legend><div className="price-visual-range"><div className="price-track" style={{ "--from": `${((priceFloor - 20) / 180) * 100}%`, "--to": `${100 - ((priceCeiling - 20) / 180) * 100}%` } as React.CSSProperties} /><input aria-label="Minimum price" type="range" min="20" max="190" step="10" value={priceFloor} onChange={(event) => setPriceFloor(Math.min(Number(event.target.value), priceCeiling - 10))} /><input aria-label="Maximum price" type="range" min="30" max="200" step="10" value={priceCeiling} onChange={(event) => setPriceCeiling(Math.max(Number(event.target.value), priceFloor + 10))} /></div><div className="range-labels"><span>$20</span><span>$200+</span></div></fieldset>
             <fieldset><legend>Colour</legend><div className="color-swatches"><button className={selectedColor === "All" ? "selected" : ""} onClick={() => setSelectedColor("All")} aria-pressed={selectedColor === "All"} aria-label="All colours">All</button>{colorSwatches.map((swatch) => <button key={swatch.value} className={selectedColor === swatch.value ? "selected" : ""} onClick={() => setSelectedColor(swatch.value)} aria-pressed={selectedColor === swatch.value} aria-label={`Filter by ${swatch.value}`} title={swatch.value}><i style={{ background: swatch.color }} /></button>)}</div><small>{selectedColor === "All" ? "Choose an object colour to narrow the market" : selectedColor}</small></fieldset>
-            <fieldset><legend>Visitor rating</legend><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 0} onChange={() => setMinimumRating(0)} /><span>Any rating</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 4} onChange={() => setMinimumRating(4)} /><span>4 stars & up</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 5} onChange={() => setMinimumRating(5)} /><span>5 stars</span></label><small>{ratingSummaries.data?.length ? "Filters reflect published visitor notes only" : "Ratings will appear once visitors add notes"}</small></fieldset>
           </aside>
           <div className="product-results"><div className="product-rail" id="product-rail">
             {filteredProducts.map((product, index) => (
@@ -726,7 +718,7 @@ export default function Home() {
                 {product.badge && <span className="product-badge">{product.badge}</span>}
               </article>
             ))}
-            {!filteredProducts.length && <div className="empty-products"><Search size={21} /><p>No market finds match that search yet.</p><button onClick={() => { setQuery(""); setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); setMinimumRating(0); }}>Clear filters</button></div>}
+            {!filteredProducts.length && <div className="empty-products"><Search size={21} /><p>No market finds match that search yet.</p><button onClick={() => { setQuery(""); setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); }}>Clear filters</button></div>}
           </div></div></div>
           <div className="market-pulse" aria-label="Live marketplace signals">
             <span className="pulse-orbit"><i /></span>
@@ -768,8 +760,10 @@ export default function Home() {
       </main>
 
       <footer className="site-footer">
-        <div className="footer-brand"><img src="/manus-storage/luma-split-sun-logo_8bd655e3.png" alt="" /><span>Luma</span></div>
-        <p>Find a new favourite seller</p>
+        <div className="footer-identity">
+          <div className="footer-brand"><img src="/manus-storage/luma-split-sun-logo_8bd655e3.png" alt="" /><span>Luma</span></div>
+          <p>Find a new favourite seller</p>
+        </div>
         <div className="footer-columns">
           <section><b>Shop</b><a href="#shop">Home</a><button onClick={() => { setCategory("Accessories"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Accessories</button><button onClick={() => { setCategory("Tech"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Tech</button><button onClick={() => { setCategory("Stationery"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Stationery</button></section>
           <section><b>Sellers</b><a href="#makers">Become a maker</a><button onClick={() => setShowProfile(true)}>Seller dashboard</button><a href="#story">Our standards</a></section>
