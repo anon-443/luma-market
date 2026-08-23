@@ -11,9 +11,12 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleUserRound,
+  Expand,
   Heart,
   LampDesk,
   Menu,
+  Mic,
+  MicOff,
   Minus,
   Moon,
   Package,
@@ -25,6 +28,8 @@ import {
   Star,
   Sun,
   X,
+  ZoomIn,
+  ZoomOut,
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -45,10 +50,16 @@ type Product = {
   specs: string[];
   Icon: LucideIcon;
   badge?: string;
+  inventoryStatus: "inStock" | "lowStock";
+  remaining: number;
 };
 
 type CartLine = Product & { quantity: number };
 type VisitorReview = { id: number; authorName: string; rating: number; comment: string; createdAt: Date | string };
+type GalleryImage = { src: string; alt: string; position?: string };
+type WebSpeechEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
+type WebSpeechRecognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; onresult: ((event: WebSpeechEvent) => void) | null; onerror: (() => void) | null; onend: (() => void) | null };
+type WebSpeechConstructor = new () => WebSpeechRecognition;
 
 const products: Product[] = [
   {
@@ -65,6 +76,8 @@ const products: Product[] = [
     specs: ["Aluminium & steel", "Warm LED, 2700K", "2-year maker warranty"],
     Icon: LampDesk,
     badge: "Just landed",
+    inventoryStatus: "inStock",
+    remaining: 18,
   },
   {
     id: 2,
@@ -80,6 +93,8 @@ const products: Product[] = [
     specs: ["Recycled canvas", "Magnetic closure", "Interior pocket"],
     Icon: ShoppingBag,
     badge: "Small batch",
+    inventoryStatus: "lowStock",
+    remaining: 4,
   },
   {
     id: 3,
@@ -94,6 +109,8 @@ const products: Product[] = [
     description: "A hand-finished stoneware mug with a generous curve, designed for unhurried tea and ample weekend coffee.",
     specs: ["Stoneware", "350 ml capacity", "Dishwasher safe"],
     Icon: Sparkles,
+    inventoryStatus: "inStock",
+    remaining: 27,
   },
   {
     id: 4,
@@ -109,6 +126,8 @@ const products: Product[] = [
     specs: ["30-hour battery", "Wireless Bluetooth", "Soft vegan leather"],
     Icon: CircleUserRound,
     badge: "Editor’s pick",
+    inventoryStatus: "lowStock",
+    remaining: 3,
   },
   {
     id: 5,
@@ -123,6 +142,8 @@ const products: Product[] = [
     description: "An undated daily book with prompts for planning, remembering and making slightly more room for good ideas.",
     specs: ["176 recycled pages", "Lay-flat binding", "A5 format"],
     Icon: Package,
+    inventoryStatus: "inStock",
+    remaining: 44,
   },
   {
     id: 6,
@@ -137,8 +158,19 @@ const products: Product[] = [
     description: "A generous cotton throw woven in an irregular stripe with a weighted, lived-in feel from day one.",
     specs: ["100% cotton", "130 × 180 cm", "Machine washable"],
     Icon: Heart,
+    inventoryStatus: "lowStock",
+    remaining: 6,
   },
 ];
+
+const productGallery: Record<number, GalleryImage[]> = {
+  1: [{ src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Lumen Table Lamp front view", position: "80% 40%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Lumen Table Lamp material detail", position: "18% 50%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Lumen Table Lamp styled room view", position: "64% 50%" }],
+  2: [{ src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Flora Carryall product view", position: "center" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Flora Carryall textile detail", position: "70% 56%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Flora Carryall styled context", position: "84% 44%" }],
+  3: [{ src: "/manus-storage/luma-product-ceramic_6dbcb79f.jpg", alt: "Cloud Ritual Mug ceramic view", position: "center 34%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Cloud Ritual Mug material detail", position: "18% 66%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Cloud Ritual Mug table setting", position: "40% 52%" }],
+  4: [{ src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Daytrip Headphones product view", position: "center" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Daytrip Headphones desk setup", position: "76% 36%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Daytrip Headphones colour detail", position: "20% 55%" }],
+  5: [{ src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Notion Daily Book cover view", position: "13% 62%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Notion Daily Book paper detail", position: "64% 56%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Notion Daily Book desk context", position: "48% 54%" }],
+  6: [{ src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Coastline Throw woven texture", position: "73% 58%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Coastline Throw colour detail", position: "68% 50%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Coastline Throw living space", position: "94% 46%" }],
+};
 
 const vendors = [
   { name: "Maison Sora", description: "Small rituals for the table.", category: "Ceramics & home", products: 18, palette: "sora" },
@@ -161,6 +193,28 @@ function ProductVisual({ product }: { product: Product }) {
       <span className="visual-shadow" />
     </div>
   );
+}
+
+function ProductGallery({ product, onOpenLightbox }: { product: Product; onOpenLightbox: (index: number) => void }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
+  const [origin, setOrigin] = useState("50% 50%");
+  const gallery = productGallery[product.id] ?? [{ src: product.image, alt: product.name, position: product.imagePosition }];
+  const activeImage = gallery[activeIndex] ?? gallery[0];
+
+  useEffect(() => { setActiveIndex(0); setZoomed(false); }, [product.id]);
+
+  return <div className="product-gallery"><button className="gallery-stage" onClick={() => onOpenLightbox(activeIndex)} onMouseMove={(event) => { const box = event.currentTarget.getBoundingClientRect(); setOrigin(`${((event.clientX - box.left) / box.width) * 100}% ${((event.clientY - box.top) / box.height) * 100}%`); }} onMouseEnter={() => setZoomed(true)} onMouseLeave={() => setZoomed(false)} aria-label={`Open ${product.name} image ${activeIndex + 1} in lightbox`}><img src={activeImage.src} alt={activeImage.alt} style={{ objectPosition: activeImage.position, transformOrigin: origin, transform: zoomed ? "scale(1.34)" : "scale(1)" }} /><span className="gallery-enlarge"><Expand size={16} /> Click to inspect</span></button><div className="gallery-thumbnails" aria-label={`${product.name} image views`}>{gallery.map((image, index) => <button key={`${image.src}-${index}`} className={index === activeIndex ? "selected" : ""} onClick={() => setActiveIndex(index)} aria-label={`Show ${product.name} image ${index + 1}`}><img src={image.src} alt="" style={{ objectPosition: image.position }} /></button>)}</div></div>;
+}
+
+function ImageLightbox({ product, imageIndex, onClose }: { product: Product; imageIndex: number; onClose: () => void }) {
+  const gallery = productGallery[product.id] ?? [{ src: product.image, alt: product.name, position: product.imagePosition }];
+  const [activeIndex, setActiveIndex] = useState(imageIndex);
+  const [zoom, setZoom] = useState(1);
+  const image = gallery[activeIndex] ?? gallery[0];
+  const changeImage = (direction: number) => { setActiveIndex((current) => (current + direction + gallery.length) % gallery.length); setZoom(1); };
+
+  return <div className="lightbox-overlay" role="presentation" onMouseDown={onClose}><section className="image-lightbox" role="dialog" aria-modal="true" aria-label={`${product.name} image gallery`} onMouseDown={(event) => event.stopPropagation()}><button className="lightbox-close" onClick={onClose} aria-label="Close image lightbox"><X size={22} /></button><div className="lightbox-image-wrap"><img src={image.src} alt={image.alt} style={{ objectPosition: image.position, transform: `scale(${zoom})` }} /></div><div className="lightbox-footer"><div className="lightbox-controls"><button onClick={() => setZoom((value) => Math.max(1, value - 0.3))} disabled={zoom <= 1} aria-label="Zoom out"><ZoomOut size={18} /></button><span>{Math.round(zoom * 100)}%</span><button onClick={() => setZoom((value) => Math.min(2.4, value + 0.3))} disabled={zoom >= 2.4} aria-label="Zoom in"><ZoomIn size={18} /></button></div><p>{activeIndex + 1} / {gallery.length} · {product.name}</p><div className="lightbox-controls"><button onClick={() => changeImage(-1)} aria-label="Previous image"><ChevronLeft size={18} /></button><button onClick={() => changeImage(1)} aria-label="Next image"><ChevronRight size={18} /></button></div></div></section></div>;
 }
 
 function ProductReviews({ product }: { product: Product }) {
@@ -199,7 +253,8 @@ function ProductReviews({ product }: { product: Product }) {
 }
 
 function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onToggleWishlist }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; isWishlisted: boolean; onToggleWishlist: (product: Product) => void }) {
-  return <div className="overlay product-overlay" role="presentation" onMouseDown={onClose}><section className="product-modal" role="dialog" aria-modal="true" aria-label={product.name} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose} aria-label="Close product details"><X size={20} /></button><ProductVisual product={product} /><div className="product-detail-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><div className="detail-title-row"><h3>{product.name}</h3><button className={`detail-heart ${isWishlisted ? "is-saved" : ""}`} onClick={() => onToggleWishlist(product)} aria-pressed={isWishlisted} aria-label={`${isWishlisted ? "Remove" : "Save"} ${product.name} from wishlist`}><Heart size={19} fill={isWishlisted ? "currentColor" : "transparent"} /></button></div><p className="detail-price">{money.format(product.price)}</p><p>{product.description}</p><ul>{product.specs.map((spec) => <li key={spec}><Check size={15} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); onClose(); }}>Add to bag <Plus size={18} /></button><ProductReviews product={product} /></div></section></div>;
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  return <><div className="overlay product-overlay" role="presentation" onMouseDown={onClose}><section className="product-modal" role="dialog" aria-modal="true" aria-label={product.name} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose} aria-label="Close product details"><X size={20} /></button><ProductGallery product={product} onOpenLightbox={setLightboxIndex} /><div className="product-detail-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><div className="detail-title-row"><h3>{product.name}</h3><button className={`detail-heart ${isWishlisted ? "is-saved" : ""}`} onClick={() => onToggleWishlist(product)} aria-pressed={isWishlisted} aria-label={`${isWishlisted ? "Remove" : "Save"} ${product.name} from wishlist`}><Heart size={19} fill={isWishlisted ? "currentColor" : "transparent"} /></button></div><p className="detail-price">{money.format(product.price)}</p><p className={`detail-stock ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Low stock · ${product.remaining} remaining` : `${product.remaining} ready to ship`}</p><p>{product.description}</p><ul>{product.specs.map((spec) => <li key={spec}><Check size={15} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); onClose(); }}>Add to bag <Plus size={18} /></button><ProductReviews product={product} /></div></section></div>{lightboxIndex !== null && <ImageLightbox product={product} imageIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />}</>;
 }
 
 export default function Home() {
@@ -217,7 +272,9 @@ export default function Home() {
   const [wishlist, setWishlist] = useState<number[]>(() => {
     try { return JSON.parse(localStorage.getItem("luma-wishlist") ?? "[]") as number[]; } catch { return []; }
   });
-  const [aiSuggestion, setAiSuggestion] = useState<{ productIds: number[]; shortReason: string; source: "ai" | "catalog" } | null>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<{ productIds: number[]; shortReason: string; inventoryNote: string; source: "ai" | "catalog" } | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceSupported] = useState(() => typeof window !== "undefined" && Boolean((window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor }).SpeechRecognition || (window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor }).webkitSpeechRecognition));
   const aiSearch = trpc.discovery.suggest.useMutation({
     onSuccess: (suggestion) => setAiSuggestion(suggestion),
     onError: () => toast.error("The market finder is taking a breath. Try a few keywords instead."),
@@ -291,6 +348,27 @@ export default function Home() {
 
   const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") { event.preventDefault(); submitNaturalSearch(); }
+  };
+
+  const startVoiceSearch = () => {
+    const voiceWindow = window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor };
+    const Recognition = voiceWindow.SpeechRecognition ?? voiceWindow.webkitSpeechRecognition;
+    if (!Recognition) { toast.info("Voice search is not available in this browser. You can still describe what you need in the search field."); return; }
+    const recognition = new Recognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results).map(result => result[0]?.transcript ?? "").join(" ").trim();
+      if (!transcript) return;
+      setQuery(transcript);
+      setAiSuggestion(null);
+      aiSearch.mutate({ query: transcript });
+    };
+    recognition.onerror = () => toast.error("We couldn’t hear that clearly. Please try again or type your search.");
+    recognition.onend = () => setIsListening(false);
+    setIsListening(true);
+    recognition.start();
   };
 
   const wishlistProducts = products.filter((product) => wishlist.includes(product.id));
@@ -373,7 +451,7 @@ export default function Home() {
           </div>
 
           <div className="shop-tools">
-            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className="ai-search-button" onClick={submitNaturalSearch} disabled={aiSearch.isPending} aria-label="Ask the AI product finder"><Sparkles size={16} className={aiSearch.isPending ? "sparkle-spin" : ""} /></button></div><p className="ai-search-label"><Sparkles size={12} /> Ask by mood, material, room, or ritual</p></div>
+            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button><button className="ai-search-button" onClick={submitNaturalSearch} disabled={aiSearch.isPending} aria-label="Ask the AI product finder"><Sparkles size={16} className={aiSearch.isPending ? "sparkle-spin" : ""} /></button></div><p className="ai-search-label">{voiceSupported ? <><Mic size={12} /> Speak or type a mood, material, room, or ritual</> : <><MicOff size={12} /> Voice search is unavailable here — type a natural description</>}</p></div>
             <div className="filter-row">
               <div className="category-pills" aria-label="Filter by category">
                 {categories.map((item) => <button className={category === item ? "selected" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}
@@ -381,7 +459,7 @@ export default function Home() {
               <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
             </div>
           </div>
-          {aiSuggestion && <div className="ai-suggestion"><div><Sparkles size={17} /><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}</span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
+          {aiSuggestion && <div className="ai-suggestion"><div><Sparkles size={17} /><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}<small>{aiSuggestion.inventoryNote}</small></span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
 
           <div className="product-rail" id="product-rail">
             {filteredProducts.map((product, index) => (
@@ -390,7 +468,7 @@ export default function Home() {
                 <button className={`product-heart ${wishlist.includes(product.id) ? "is-saved" : ""}`} onClick={() => toggleWishlist(product)} aria-label={`${wishlist.includes(product.id) ? "Remove" : "Save"} ${product.name} ${wishlist.includes(product.id) ? "from" : "to"} wishlist`} aria-pressed={wishlist.includes(product.id)}><Heart size={17} fill={wishlist.includes(product.id) ? "currentColor" : "transparent"} /></button>
                 <div className="product-meta">
                   <button className="product-name" onClick={() => setActiveProduct(product)}>{product.name}</button>
-                  <p>{product.vendor} <span>·</span> {product.category}</p>
+                  <p>{product.vendor} <span>·</span> {product.category}</p><span className={`stock-note ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`}</span>
                   <div className="product-price-row"><strong>{money.format(product.price)}</strong><button onClick={() => addToCart(product)} className="circle-add" aria-label={`Add ${product.name} to cart`}><Plus size={17} /></button></div>
                 </div>
                 {product.badge && <span className="product-badge">{product.badge}</span>}

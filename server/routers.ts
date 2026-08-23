@@ -9,7 +9,7 @@ import { publicProcedure, router } from "./_core/trpc";
 
 const productIdSchema = z.object({ productId: z.number().int().refine(id => PRODUCT_CATALOG.some(product => product.id === id), "Unknown product") });
 
-const catalogContext = PRODUCT_CATALOG.map(product => `${product.id}. ${product.name} — ${product.vendor}; ${product.category}; ${product.description}`).join("\n");
+const catalogContext = PRODUCT_CATALOG.map(product => `${product.id}. ${product.name} — ${product.vendor}; ${product.category}; ${product.description}; inventory: ${product.inventoryStatus === "lowStock" ? `low stock (${product.remaining} remaining)` : `${product.remaining} available`}.`).join("\n");
 
 export const appRouter = router({
   system: systemRouter,
@@ -27,7 +27,7 @@ export const appRouter = router({
           model: "gemini-3-flash-preview",
           maxTokens: 1024,
           messages: [
-            { role: "system", content: "You are Luma Market's precise product finder. Always select at least one and up to four relevant IDs only from the supplied catalog. Interpret descriptive shopping language, such as mood, material, room, or use case. Do not invent products or attributes." },
+            { role: "system", content: "You are Luma Market's precise product finder. Always select at least one and up to four relevant IDs only from the supplied catalog. Interpret descriptive shopping language, such as mood, material, room, or use case. Consider live inventory: make currently well-stocked relevant choices first, and clearly flag a low-stock match only when it is a particularly strong fit. Do not invent products or attributes." },
             { role: "user", content: `Catalog:\n${catalogContext}\n\nVisitor search: ${input.query}` },
           ],
           response_format: {
@@ -40,8 +40,9 @@ export const appRouter = router({
                 properties: {
                   productIds: { type: "array", items: { type: "integer" }, minItems: 1, maxItems: 4 },
                   shortReason: { type: "string", minLength: 1, maxLength: 180 },
+                  inventoryNote: { type: "string", minLength: 1, maxLength: 130 },
                 },
-                required: ["productIds", "shortReason"],
+                required: ["productIds", "shortReason", "inventoryNote"],
                 additionalProperties: false,
               },
             },
