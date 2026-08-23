@@ -17,3 +17,7 @@
 - [x] Add related product recommendations to the bottom of each product detail panel.
 - [x] Add a lightweight quick-view modal to product grid cards.
 - [x] Verify cart totals, related-product navigation, and quick-view flows before saving a delivery checkpoint.
+- [x] Persist cart line items to local storage and restore them safely on refresh.
+- [x] Personalize related-product ranking using recent searches and saved wishlist items.
+- [x] Add polished quick-view entrance/exit motion and a live cart-count badge animation.
+- [x] Verify cart restoration, personalized matches, and feedback animations before saving a delivery checkpoint.

@@ -277,23 +277,34 @@ function ProductReviews({ product }: { product: Product }) {
   );
 }
 
-function RelatedProducts({ product, onSelect, onAddToCart }: { product: Product; onSelect: (product: Product) => void; onAddToCart: (product: Product) => void }) {
+function RelatedProducts({ product, onSelect, onAddToCart, searchHistory, wishlist }: { product: Product; onSelect: (product: Product) => void; onAddToCart: (product: Product) => void; searchHistory: string[]; wishlist: number[] }) {
+  const intentTerms = searchHistory.join(" ").toLowerCase().split(/\s+/).filter((term) => term.length > 2);
+  const savedSignals = products.filter((item) => wishlist.includes(item.id));
   const related = products.filter((candidate) => candidate.id !== product.id).sort((left, right) => {
-    const leftScore = Number(left.category === product.category) * 2 + Number(left.vendor === product.vendor);
-    const rightScore = Number(right.category === product.category) * 2 + Number(right.vendor === product.vendor);
-    return rightScore - leftScore || left.id - right.id;
+    const score = (candidate: Product) => {
+      const searchable = `${candidate.name} ${candidate.vendor} ${candidate.category} ${candidate.description}`.toLowerCase();
+      const historyScore = intentTerms.reduce((total, term) => total + Number(searchable.includes(term)), 0);
+      const savedScore = savedSignals.reduce((total, saved) => total + Number(candidate.category === saved.category) * 2 + Number(candidate.vendor === saved.vendor), 0);
+      return Number(candidate.category === product.category) * 2 + Number(candidate.vendor === product.vendor) + historyScore + savedScore;
+    };
+    return score(right) - score(left) || left.id - right.id;
   }).slice(0, 2);
 
-  return <section className="related-products" aria-labelledby={`related-${product.id}`}><div className="related-heading"><div><p className="eyebrow"><span /> CONTINUE EXPLORING</p><h4 id={`related-${product.id}`}>You may also like</h4></div><Sparkles size={18} /></div><div className="related-grid">{related.map((item) => <article key={item.id}><button className="related-image" onClick={() => onSelect(item)} aria-label={`View ${item.name}`}><img src={item.image} alt="" style={{ objectPosition: item.imagePosition }} /></button><div><button onClick={() => onSelect(item)}>{item.name}</button><p>{item.vendor}</p><strong>{money.format(item.price)}</strong><button className="related-add" onClick={() => onAddToCart(item)} aria-label={`Add ${item.name} to cart`}><Plus size={14} /></button></div></article>)}</div></section>;
+  return <section className="related-products" aria-labelledby={`related-${product.id}`}><div className="related-heading"><div><p className="eyebrow"><span /> FOR YOUR MARKET TRAIL</p><h4 id={`related-${product.id}`}>You may also like</h4></div><Sparkles size={18} /></div><p className="related-rationale">Matched from this find, your recent searches, and saved pieces.</p><div className="related-grid">{related.map((item) => <article key={item.id}><button className="related-image" onClick={() => onSelect(item)} aria-label={`View ${item.name}`}><img src={item.image} alt="" style={{ objectPosition: item.imagePosition }} /></button><div><button onClick={() => onSelect(item)}>{item.name}</button><p>{item.vendor}</p><strong>{money.format(item.price)}</strong><button className="related-add" onClick={() => onAddToCart(item)} aria-label={`Add ${item.name} to cart`}><Plus size={14} /></button></div></article>)}</div></section>;
 }
 
 function QuickViewModal({ product, onClose, onAddToCart, onViewDetails }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; onViewDetails: (product: Product) => void }) {
-  return <div className="overlay quick-view-overlay" role="presentation" onMouseDown={onClose}><section className="quick-view-modal" role="dialog" aria-modal="true" aria-label={`Quick view: ${product.name}`} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose} aria-label="Close quick view"><X size={20} /></button><div className="quick-view-image"><img src={product.image} alt={product.name} style={{ objectPosition: product.imagePosition }} /><span className={`stock-note ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`}</span></div><div className="quick-view-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><h3>{product.name}</h3><p className="detail-price">{money.format(product.price)}</p><p>{product.description}</p><ul>{product.specs.slice(0, 2).map((spec) => <li key={spec}><Check size={14} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); onClose(); }}>Add to bag <Plus size={17} /></button><button className="quick-view-details" onClick={() => { onClose(); onViewDetails(product); }}>See full details <ArrowRight size={15} /></button></div></section></div>;
+  const [isLeaving, setIsLeaving] = useState(false);
+  const closeWithMotion = (afterClose?: () => void) => {
+    setIsLeaving(true);
+    window.setTimeout(() => { onClose(); afterClose?.(); }, 180);
+  };
+  return <div className={`overlay quick-view-overlay ${isLeaving ? "is-leaving" : ""}`} role="presentation" onMouseDown={() => closeWithMotion()}><section className="quick-view-modal" role="dialog" aria-modal="true" aria-label={`Quick view: ${product.name}`} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => closeWithMotion()} aria-label="Close quick view"><X size={20} /></button><div className="quick-view-image"><img src={product.image} alt={product.name} style={{ objectPosition: product.imagePosition }} /><span className={`stock-note ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`}</span></div><div className="quick-view-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><h3>{product.name}</h3><p className="detail-price">{money.format(product.price)}</p><p>{product.description}</p><ul>{product.specs.slice(0, 2).map((spec) => <li key={spec}><Check size={14} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); closeWithMotion(); }}>Add to bag <Plus size={17} /></button><button className="quick-view-details" onClick={() => closeWithMotion(() => onViewDetails(product))}>See full details <ArrowRight size={15} /></button></div></section></div>;
 }
 
-function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onToggleWishlist, onShare, onSelectProduct }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; isWishlisted: boolean; onToggleWishlist: (product: Product) => void; onShare: (product: Product) => void; onSelectProduct: (product: Product) => void }) {
+function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onToggleWishlist, onShare, onSelectProduct, searchHistory, wishlist }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; isWishlisted: boolean; onToggleWishlist: (product: Product) => void; onShare: (product: Product) => void; onSelectProduct: (product: Product) => void; searchHistory: string[]; wishlist: number[] }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  return <><div className="overlay product-overlay" role="presentation" onMouseDown={onClose}><section className="product-modal" role="dialog" aria-modal="true" aria-label={product.name} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose} aria-label="Close product details"><X size={20} /></button><ProductGallery product={product} onOpenLightbox={setLightboxIndex} /><div className="product-detail-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><div className="detail-title-row"><h3>{product.name}</h3><div className="detail-actions"><button className="detail-share" onClick={() => onShare(product)} aria-label={`Share ${product.name}`}><Share2 size={18} /></button><button className={`detail-heart ${isWishlisted ? "is-saved" : ""}`} onClick={() => onToggleWishlist(product)} aria-pressed={isWishlisted} aria-label={`${isWishlisted ? "Remove" : "Save"} ${product.name} from wishlist`}><Heart size={19} fill={isWishlisted ? "currentColor" : "transparent"} /></button></div></div><p className="detail-price">{money.format(product.price)}</p><p className={`detail-stock ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Low stock · ${product.remaining} remaining` : `${product.remaining} ready to ship`}</p><p>{product.description}</p><ul>{product.specs.map((spec) => <li key={spec}><Check size={15} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); onClose(); }}>Add to bag <Plus size={18} /></button><ProductReviews product={product} /><RelatedProducts product={product} onSelect={(item) => { setLightboxIndex(null); onSelectProduct(item); }} onAddToCart={onAddToCart} /></div></section></div>{lightboxIndex !== null && <ImageLightbox product={product} imageIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />}</>;
+  return <><div className="overlay product-overlay" role="presentation" onMouseDown={onClose}><section className="product-modal" role="dialog" aria-modal="true" aria-label={product.name} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose} aria-label="Close product details"><X size={20} /></button><ProductGallery product={product} onOpenLightbox={setLightboxIndex} /><div className="product-detail-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><div className="detail-title-row"><h3>{product.name}</h3><div className="detail-actions"><button className="detail-share" onClick={() => onShare(product)} aria-label={`Share ${product.name}`}><Share2 size={18} /></button><button className={`detail-heart ${isWishlisted ? "is-saved" : ""}`} onClick={() => onToggleWishlist(product)} aria-pressed={isWishlisted} aria-label={`${isWishlisted ? "Remove" : "Save"} ${product.name} from wishlist`}><Heart size={19} fill={isWishlisted ? "currentColor" : "transparent"} /></button></div></div><p className="detail-price">{money.format(product.price)}</p><p className={`detail-stock ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Low stock · ${product.remaining} remaining` : `${product.remaining} ready to ship`}</p><p>{product.description}</p><ul>{product.specs.map((spec) => <li key={spec}><Check size={15} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); onClose(); }}>Add to bag <Plus size={18} /></button><ProductReviews product={product} /><RelatedProducts product={product} onSelect={(item) => { setLightboxIndex(null); onSelectProduct(item); }} onAddToCart={onAddToCart} searchHistory={searchHistory} wishlist={wishlist} /></div></section></div>{lightboxIndex !== null && <ImageLightbox product={product} imageIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />}</>;
 }
 
 export default function Home() {
@@ -301,7 +312,16 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("featured");
-  const [cart, setCart] = useState<CartLine[]>([]);
+  const [cart, setCart] = useState<CartLine[]>(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("luma-cart") ?? "[]") as Array<{ id?: number; quantity?: number }>;
+      return stored.flatMap((line) => {
+        const product = products.find((candidate) => candidate.id === line.id);
+        const quantity = Number.isInteger(line.quantity) && line.quantity && line.quantity > 0 ? Math.min(line.quantity, 99) : 0;
+        return product && quantity ? [{ ...product, quantity }] : [];
+      });
+    } catch { return []; }
+  });
   const [showCart, setShowCart] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
@@ -314,6 +334,7 @@ export default function Home() {
   });
   const [aiSuggestion, setAiSuggestion] = useState<{ productIds: number[]; shortReason: string; inventoryNote: string; source: "ai" | "catalog" } | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [cartPulse, setCartPulse] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem("luma-search-history") ?? "[]") as string[]; } catch { return []; }
   });
@@ -324,6 +345,7 @@ export default function Home() {
   });
 
   useEffect(() => { localStorage.setItem("luma-wishlist", JSON.stringify(wishlist)); }, [wishlist]);
+  useEffect(() => { localStorage.setItem("luma-cart", JSON.stringify(cart.map(({ id, quantity }) => ({ id, quantity })))); }, [cart]);
   useEffect(() => { localStorage.setItem("luma-search-history", JSON.stringify(searchHistory)); }, [searchHistory]);
   useEffect(() => {
     const productId = Number(new URLSearchParams(window.location.search).get("product"));
@@ -334,6 +356,13 @@ export default function Home() {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const estimatedShipping = cart.length ? (cartTotal >= 100 ? 0 : 8) : 0;
   const cartGrandTotal = cartTotal + estimatedShipping;
+
+  useEffect(() => {
+    if (!cartCount) return;
+    setCartPulse(true);
+    const timeout = window.setTimeout(() => setCartPulse(false), 420);
+    return () => window.clearTimeout(timeout);
+  }, [cartCount]);
 
   const filteredProducts = useMemo(() => {
     if (aiSuggestion) return aiSuggestion.productIds.map((id) => products.find((product) => product.id === id)).filter((product): product is Product => Boolean(product));
@@ -460,9 +489,9 @@ export default function Home() {
             <span className="theme-orbit"><span /></span>
             <Moon className={theme === "dark" ? "active" : ""} size={14} />
           </button>
-          <button className="bag-button" onClick={() => setShowCart(true)} aria-label={`Open cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}>
+          <button className={`bag-button ${cartCount ? "has-items" : ""} ${cartPulse ? "cart-bump" : ""}`} onClick={() => setShowCart(true)} aria-label={`Open cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}>
             <ShoppingBag size={19} />
-            <span>{cartCount}</span>
+            {cartCount > 0 && <span className="cart-count-badge" key={cartCount}>{cartCount}</span>}
           </button>
           <button className={`wishlist-button ${wishlist.length ? "has-saves" : ""}`} onClick={() => setShowWishlist(true)} aria-label={`Open wishlist with ${wishlist.length} item${wishlist.length === 1 ? "" : "s"}`}><Heart size={18} fill={wishlist.length ? "currentColor" : "transparent"} /><span>{wishlist.length}</span></button>
           <button className="menu-button" onClick={() => setShowMenu((open) => !open)} aria-label="Toggle navigation"><Menu size={21} /></button>
@@ -621,7 +650,7 @@ export default function Home() {
         </div>
       )}
 
-      {activeProduct && <ProductDetailModal product={activeProduct} onClose={() => setActiveProduct(null)} onAddToCart={addToCart} isWishlisted={wishlist.includes(activeProduct.id)} onToggleWishlist={toggleWishlist} onShare={shareProduct} onSelectProduct={setActiveProduct} />}
+      {activeProduct && <ProductDetailModal product={activeProduct} onClose={() => setActiveProduct(null)} onAddToCart={addToCart} isWishlisted={wishlist.includes(activeProduct.id)} onToggleWishlist={toggleWishlist} onShare={shareProduct} onSelectProduct={setActiveProduct} searchHistory={searchHistory} wishlist={wishlist} />}
 
       {quickViewProduct && <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onViewDetails={setActiveProduct} />}
 
