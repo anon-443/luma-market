@@ -118,3 +118,5 @@
 - [x] Verify the compacted desktop filter shelf and unchanged mobile filter drawer before delivery.
 - [x] Lower the Category, Price Range, Colour headings and the price amount together within the desktop filter shelf.
 - [x] Verify the lowered filter-panel heading alignment before delivery.
+- [x] Compact the desktop filter-panel boxes and remove remaining unused spacing without crowding controls.
+- [x] Verify the compacted filter panels on desktop and mobile before delivery.
