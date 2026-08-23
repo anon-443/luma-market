@@ -109,3 +109,5 @@
 - [x] Interactively verify the desktop reset, category, price, and colour filters after removing Visitor Rating.
 - [x] Interactively verify the simplified mobile reset, category, price, and colour filter flow after removing Visitor Rating.
 - [x] Interactively test the simplified filter flow in an actual mobile viewport, including category, price, colour, and reset behavior.
+- [x] Restore the full sort-control label and tighten its text and box spacing without losing usability.
+- [x] Verify the corrected sort control at desktop and mobile widths before delivery.

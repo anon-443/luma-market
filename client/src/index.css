@@ -430,3 +430,20 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
   .market-section .market-pulse p span { font-size: 17px; }
   .market-section .market-pulse a { font-size: 11px; }
 }
+
+/* Keep every discovery label intact, then make the compact sort control earn its width. */
+@media (min-width: 821px) {
+  .market-section .filter-row { grid-template-columns: minmax(0, 1fr) 178px; gap: 16px; }
+  .market-section .category-pills { display: flex; justify-content: flex-start; align-items: center; gap: 8px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .market-section .category-pills::-webkit-scrollbar { display: none; }
+  .market-section .category-pills button { flex: 0 0 auto; min-width: max-content; min-height: 42px; padding-inline: 12px; font-size: 14px; }
+  .market-section .sort-select { width: 178px; min-width: 178px; height: 42px; padding: 0 9px; gap: 8px; align-items: center; }
+  .market-section .sort-select select { flex: 1 1 auto; min-width: 0; width: 100%; font-size: 13px; }
+}
+
+@media (max-width: 820px) {
+  .market-section .category-pills { padding-bottom: 2px; }
+  .market-section .category-pills button { flex: 0 0 auto; min-width: max-content; }
+  .market-section .sort-select { gap: 8px; }
+  .market-section .sort-select select { min-width: 0; }
+}
