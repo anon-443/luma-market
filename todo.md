@@ -114,3 +114,7 @@
 - [x] Add clear colour emphasis to the Category, Price Range, and Colour panel text without reducing readability.
 - [x] Lower the complete Category, Price Range, and Colour content groups within the desktop filter shelf.
 - [x] Verify the coloured and repositioned filter panels on desktop and mobile before delivery.
+- [x] Remove the unused bottom space beneath the desktop filter-shelf content while preserving readable alignment.
+- [x] Verify the compacted desktop filter shelf and unchanged mobile filter drawer before delivery.
+- [x] Lower the Category, Price Range, Colour headings and the price amount together within the desktop filter shelf.
+- [x] Verify the lowered filter-panel heading alignment before delivery.
