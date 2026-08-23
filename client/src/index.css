@@ -254,3 +254,33 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
   .promo-copy p:not(.eyebrow), .story-copy p:not(.eyebrow), .vendors-heading p, .shop-heading-row p { text-align: justify; text-align-last: left; }.promo-copy p:not(.eyebrow), .vendors-heading p, .shop-heading-row p { white-space: nowrap; }
 }
 @media (max-width: 820px) { .hero-prompt { margin: 12px 0 4px; color: var(--muted-foreground); font-size: 14px; font-weight: 700; }.hero-stat { margin: 26px 0 28px; }.hero-stat span { display: grid; gap: 1px; }.hero-stat span b { font-size: 12px; }.hero-stat span small { font-size: 11px; }.category-ribbon { min-height: 70px; padding: 14px 24px; }.category-links { width: 100%; justify-content: space-between; gap: 12px; }.category-links button { font-size: 15px; }.hero-description, .shop-heading-row p, .vendors-heading p, .promo-copy p:not(.eyebrow) { white-space: normal; text-align: left; }.story-copy p:not(.eyebrow) { white-space: normal; text-align: justify; text-align-last: left; } }
+
+/* Landing hierarchy cleanup: lift the hero, align landing links right, and let the catalog breathe. */
+@media (min-width: 821px) {
+  .hero-copy { justify-content: flex-start; padding-top: 40px; }
+  .category-ribbon { justify-content: flex-end; }
+  .category-links { width: 100%; justify-content: flex-end; }
+  .catalog-layout { grid-template-columns: 196px minmax(0, 1fr); gap: 26px; }
+  .filter-sidebar { padding: 15px; }
+}
+.filter-sidebar-heading.filter-sidebar-actions { justify-content: flex-end; min-height: 0; padding: 0 0 10px; }
+.filter-sidebar-actions > button { font-size: 10px; }
+.hero h1 em { white-space: nowrap; }
+.promo-copy h2 em, .story-copy h2 em, .shop-heading-row h2 em, .vendors-heading h2 em { white-space: normal; }
+.hero-description, .shop-heading-row p, .vendors-heading p, .promo-copy p:not(.eyebrow), .story-copy p:not(.eyebrow), .product-detail-copy > p:not(.detail-price), .quick-view-copy > p:not(.eyebrow):not(.detail-price), .profile-hero > div > p:not(.eyebrow), .checkout-intro, .payment-state > p:not(.eyebrow), .review-summary > p { text-align: justify; text-align-last: left; }
+@media (max-width: 820px) {
+  .hero-copy { justify-content: flex-start; padding-top: 38px; }
+  .category-links { justify-content: flex-end; }
+  .catalog-layout { gap: 12px; }
+  .filter-sidebar { padding: 14px; }
+  .hero-description, .shop-heading-row p, .vendors-heading p, .promo-copy p:not(.eyebrow), .story-copy p:not(.eyebrow), .product-detail-copy > p:not(.detail-price), .quick-view-copy > p:not(.eyebrow):not(.detail-price), .profile-hero > div > p:not(.eyebrow), .checkout-intro, .payment-state > p:not(.eyebrow), .review-summary > p { text-align: left; }
+}
+
+/* The marketplace toolbar now owns category navigation; keep the hero accent intentionally quiet. */
+.hero-copy::after { width: 82px; height: 82px; right: -41px; bottom: 38px; }
+@media (max-width: 820px) { .hero-copy::after { width: 64px; height: 64px; right: -32px; bottom: 28px; } }
+
+/* Scale the actual hero ornaments down so the imagery and copy retain priority. */
+.hero-ring.ring-a { width: 330px; height: 330px; left: -122px; top: -78px; }
+.hero-ring.ring-b { width: 156px; height: 156px; right: -54px; bottom: -64px; }
+@media (max-width: 820px) { .hero-ring.ring-a { width: 246px; height: 246px; left: -96px; top: -64px; }.hero-ring.ring-b { width: 118px; height: 118px; right: -42px; bottom: -50px; } }

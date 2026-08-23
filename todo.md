@@ -64,3 +64,12 @@
 - [x] Verify the cart, wishlist, product, vendor, profile, review, and checkout interfaces after the final punctuation cleanup.
 - [x] Reopen the cart and checkout overlays after the final punctuation cleanup and verify their compact rendered copy.
 - [x] Reopen a product detail panel and review section after the final punctuation cleanup and verify their compact rendered copy.
+- [x] Move the hero copy block upward for a more intentional landing-page composition.
+- [x] Move the landing-page category links to the right and remove the separate category-ribbon treatment shown in the reference.
+- [x] Remove the “Find your fit” filter headline and its redundant treatment from the marketplace sidebar.
+- [x] Identify and reduce the remaining oversized visual element referenced by the user while preserving product readability.
+- [x] Audit all concise storefront copy again, remove unnecessary terminal periods, and apply readable alignment rules without stretching short single-line labels.
+- [x] Verify the revised landing, category, filter, and text treatment on desktop and mobile before delivery.
+- [x] Remove the standalone landing category ribbon so the category controls appear only once in the marketplace toolbar.
+- [x] Explicitly reduce the decorative hero-ring visual identified in the landing reference and verify the lighter hero composition across desktop and mobile.
+- [x] Reduce the actual hero-ring geometry in the hero visual and verify the less dominant ornament at desktop and mobile widths.

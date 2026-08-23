@@ -669,7 +669,7 @@ export default function Home() {
           <div className="hero-copy">
             <p className="eyebrow"><span /> MARKETPLACE / 24</p>
             <p className="hero-prompt">Find your next useful obsession</p>
-            <h1 id="hero-heading">The good kind <em>of too much.</em></h1>
+            <h1 id="hero-heading">The good kind <em>of too much</em></h1>
             <p className="hero-description">Thoughtful finds from independent studios</p>
             <div className="hero-stat"><strong>38</strong><span><b>independent sellers</b><small>now in the arcade</small></span></div>
             <div className="hero-cta-row">
@@ -683,12 +683,6 @@ export default function Home() {
             <div className="hero-image-frame"><img src="/manus-storage/luma-hero-market_87349503.jpg" alt="Curated homeware, accessories and daily objects arranged in a sunlit gallery" /></div>
             <div className="hero-sticker">NEW<br /><b>THIS WEEK</b></div>
             <div className="hero-note"><span className="note-dot" /> Open studio edition</div>
-          </div>
-        </section>
-
-        <section className="category-ribbon" aria-label="Product categories">
-          <div className="category-links">
-            {categories.slice(1).map((item) => <button key={item} onClick={() => { setCategory(item); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>{item}</button>)}
           </div>
         </section>
 
@@ -719,7 +713,7 @@ export default function Home() {
           <button className="filter-toggle" onClick={() => setShowFilters((visible) => !visible)} aria-expanded={showFilters} aria-controls="product-filters"><SlidersHorizontal size={16} />{showFilters ? "Hide filters" : "Refine products"}</button>
           <div className="catalog-layout">
           <aside className={`filter-sidebar ${showFilters ? "is-open" : ""}`} id="product-filters" aria-label="Filter products">
-            <div className="filter-sidebar-heading"><div><p className="eyebrow"><span /> REFINE THE FLOOR</p><h3>Find your fit.</h3></div><button onClick={() => { setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); setMinimumRating(0); }}>Reset</button></div>
+            <div className="filter-sidebar-heading filter-sidebar-actions"><button onClick={() => { setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); setMinimumRating(0); }}>Reset filters</button></div>
             <fieldset><legend>Category</legend>{categories.map((item) => <label className="filter-choice" key={item}><input type="radio" name="category-filter" checked={category === item} onChange={() => setCategory(item)} /><span>{item}</span></label>)}</fieldset>
             <fieldset><legend>Price range <b>{money.format(priceFloor)}–{money.format(priceCeiling)}</b></legend><div className="price-visual-range"><div className="price-track" style={{ "--from": `${((priceFloor - 20) / 180) * 100}%`, "--to": `${100 - ((priceCeiling - 20) / 180) * 100}%` } as React.CSSProperties} /><input aria-label="Minimum price" type="range" min="20" max="190" step="10" value={priceFloor} onChange={(event) => setPriceFloor(Math.min(Number(event.target.value), priceCeiling - 10))} /><input aria-label="Maximum price" type="range" min="30" max="200" step="10" value={priceCeiling} onChange={(event) => setPriceCeiling(Math.max(Number(event.target.value), priceFloor + 10))} /></div><div className="range-labels"><span>$20</span><span>$200+</span></div></fieldset>
             <fieldset><legend>Colour</legend><div className="color-swatches"><button className={selectedColor === "All" ? "selected" : ""} onClick={() => setSelectedColor("All")} aria-pressed={selectedColor === "All"} aria-label="All colours">All</button>{colorSwatches.map((swatch) => <button key={swatch.value} className={selectedColor === swatch.value ? "selected" : ""} onClick={() => setSelectedColor(swatch.value)} aria-pressed={selectedColor === swatch.value} aria-label={`Filter by ${swatch.value}`} title={swatch.value}><i style={{ background: swatch.color }} /></button>)}</div><small>{selectedColor === "All" ? "Choose an object colour to narrow the market" : selectedColor}</small></fieldset>
