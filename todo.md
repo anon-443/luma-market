@@ -45,3 +45,11 @@
 - [x] Rebalance the homepage hero composition and increase selected text sizes for clearer desktop readability.
 - [x] Refresh the site-wide font pairing while preserving the established editorial visual direction.
 - [x] Verify expanded catalog discovery and the revised homepage on desktop and mobile before saving a delivery checkpoint.
+- [x] Replace the thin site-wide type treatment with stronger, more readable display and interface fonts.
+- [x] Redesign the light theme with a clearer, warmer neutral background and refreshed accent balance.
+- [x] Redesign the dark theme with a deeper, more legible nighttime palette and matched surface colors.
+- [x] Verify typography and both theme palettes on desktop and mobile before saving a delivery checkpoint.
+- [x] Ensure every marketplace control inherits the new IBM Plex Sans and Bitter font system without legacy-font fallbacks.
+- [x] Review the refreshed typography and palette at a mobile viewport before delivery.
+- [x] Apply and audit a complete refreshed font cascade so no rendered interface text can fall back to a legacy font declaration.
+- [x] Re-check header, drawer, filtering, checkout, review, footer, and modal text surfaces after the final font-cascade audit.
