@@ -41,3 +41,7 @@
 - [x] Tighten the Luma Selects and Good Objects section spacing, typography, and decorative badge scale.
 - [x] Add compact Shop and Sellers link columns to the footer while preserving its minimal styling.
 - [x] Verify the precision refinements on desktop and mobile before saving a delivery checkpoint.
+- [x] Expand the catalog with additional well-structured products across existing market categories.
+- [x] Rebalance the homepage hero composition and increase selected text sizes for clearer desktop readability.
+- [x] Refresh the site-wide font pairing while preserving the established editorial visual direction.
+- [x] Verify expanded catalog discovery and the revised homepage on desktop and mobile before saving a delivery checkpoint.

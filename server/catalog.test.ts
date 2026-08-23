@@ -13,4 +13,9 @@ describe("normalizeAISearchResponse", () => {
     expect(result.productIds).toContain(1);
     expect(result.inventoryNote).toContain("inventory");
   });
+
+  it("accepts expanded-catalog product IDs returned by AI discovery", () => {
+    const result = normalizeAISearchResponse('{"productIds":[7,11,12],"shortReason":"Thoughtful pieces for a quieter home.","inventoryNote":"All three are available today."}', "useful home objects");
+    expect(result).toEqual({ productIds: [7, 11, 12], shortReason: "Thoughtful pieces for a quieter home.", inventoryNote: "All three are available today.", source: "ai" });
+  });
 });

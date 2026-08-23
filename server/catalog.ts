@@ -15,6 +15,12 @@ export const PRODUCT_CATALOG: CatalogProduct[] = [
   { id: 4, name: "Daytrip Headphones", vendor: "Acoustic Tide", category: "Tech", description: "Cushioned wireless over-ear headphones for relaxed listening.", inventoryStatus: "lowStock", remaining: 3 },
   { id: 5, name: "Notion Daily Book", vendor: "Paper Current", category: "Stationery", description: "An undated daily planner for planning and making room for good ideas.", inventoryStatus: "inStock", remaining: 44 },
   { id: 6, name: "Coastline Throw", vendor: "Onda Goods", category: "Home", description: "A generous cotton throw in an irregular oat and coral stripe.", inventoryStatus: "lowStock", remaining: 6 },
+  { id: 7, name: "Orbit Alarm Clock", vendor: "Field Theory", category: "Home", description: "A quietly graphic bedside clock with a soft-touch body and gentle alarm.", inventoryStatus: "inStock", remaining: 12 },
+  { id: 8, name: "Hush Desk Stand", vendor: "Acoustic Tide", category: "Tech", description: "A low-profile desktop stand for phones and small tablets.", inventoryStatus: "inStock", remaining: 21 },
+  { id: 9, name: "Second Sun Scarf", vendor: "Onda Goods", category: "Accessories", description: "A light woven scarf in a sun-washed stripe for in-between seasons.", inventoryStatus: "lowStock", remaining: 5 },
+  { id: 10, name: "Marginalia Pen Set", vendor: "Paper Current", category: "Stationery", description: "Four smooth-writing refillable pens in a reusable case.", inventoryStatus: "inStock", remaining: 36 },
+  { id: 11, name: "Daylight Pouch", vendor: "Onda Goods", category: "Accessories", description: "A softly structured pouch for small everyday objects.", inventoryStatus: "inStock", remaining: 19 },
+  { id: 12, name: "Sunday Serving Tray", vendor: "Maison Sora", category: "Home", description: "A hand-glazed serving tray for fruit, small rituals and slow breakfast gatherings.", inventoryStatus: "inStock", remaining: 14 },
 ];
 
 export type ProductSearchSuggestion = {
