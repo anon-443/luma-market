@@ -79,3 +79,6 @@
 - [x] Remove the teal-ring ornament associated with the sellers section heading.
 - [x] Remove the circular arrow-control ornament from the market section heading while retaining product browsing access through the grid and category filters.
 - [x] Verify the simplified market and sellers headings on desktop and mobile before delivery.
+- [x] Tighten the footer’s empty vertical space and improve alignment of the brand, tagline, and link columns.
+- [x] Remove terminal full stops from every visible storefront heading while retaining punctuation in descriptive paragraphs.
+- [x] Verify the updated footer and heading treatment on desktop and mobile before delivery.

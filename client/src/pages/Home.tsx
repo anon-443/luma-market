@@ -685,7 +685,7 @@ export default function Home() {
             <div className="section-kicker"><span>01</span> THE MARKET FLOOR</div>
             <div className="shop-heading-row">
               <div>
-                <h2 id="shop-heading">Made to become <em>yours.</em></h2>
+                <h2 id="shop-heading">Made to become <em>yours</em></h2>
               </div>
           </div>
 
@@ -739,7 +739,7 @@ export default function Home() {
         <section className="promo-section" aria-label="Marketplace promotion">
           <div className="promo-copy">
             <p className="eyebrow"><span /> LUMA SELECTS</p>
-            <h2>Room for the<br /><em>unexpected.</em></h2>
+            <h2>Room for the<br /><em>unexpected</em></h2>
             <p>Explore a handpicked collection from newer sellers building useful and beautiful things in small numbers</p>
             <button className="button dark-button" onClick={() => { setCategory("Accessories"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>See the edit <ArrowRight size={18} /></button>
           </div>
@@ -748,7 +748,7 @@ export default function Home() {
 
         <section className="vendors-section" id="makers" aria-labelledby="makers-heading">
           <div className="section-kicker"><span>02</span> SELLER STALLS</div>
-          <div className="vendors-heading"><h2 id="makers-heading">The people behind <em>the good stuff.</em></h2><p>Independent studios all in one welcoming place</p></div>
+          <div className="vendors-heading"><h2 id="makers-heading">The people behind <em>the good stuff</em></h2><p>Independent studios all in one welcoming place</p></div>
           <div className="vendor-list">
             {vendors.map((vendor, index) => (
               <button className={`vendor-card ${vendor.palette}`} key={vendor.name} onClick={() => setActiveVendor(vendor)}>
@@ -764,7 +764,7 @@ export default function Home() {
 
         <section className="story-section" id="story" aria-labelledby="story-heading">
           <div className="story-image"><img src="/manus-storage/luma-vendor-story_61e67283.jpg" alt="A sunlit independent ceramic studio with handmade tableware" /><div className="story-stamp">CURIOUSLY<br />COLLECTED</div></div>
-          <div className="story-copy"><p className="eyebrow"><span /> A DIFFERENT KIND OF CART</p><h2 id="story-heading">Good objects start with <em>good questions.</em></h2><p>We build a calmer place to browse the things people make with intention. Every seller brings their own point of view. Your cart just lets the conversation continue.</p><a href="#shop" className="text-link">Take a look around <ArrowRight size={16} /></a></div>
+          <div className="story-copy"><p className="eyebrow"><span /> A DIFFERENT KIND OF CART</p><h2 id="story-heading">Good objects start with <em>good questions</em></h2><p>We build a calmer place to browse the things people make with intention. Every seller brings their own point of view. Your cart just lets the conversation continue.</p><a href="#shop" className="text-link">Take a look around <ArrowRight size={16} /></a></div>
         </section>
       </main>
 
