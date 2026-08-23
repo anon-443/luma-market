@@ -21,3 +21,7 @@
 - [x] Personalize related-product ranking using recent searches and saved wishlist items.
 - [x] Add polished quick-view entrance/exit motion and a live cart-count badge animation.
 - [x] Verify cart restoration, personalized matches, and feedback animations before saving a delivery checkpoint.
+- [x] Add a checkout summary page with a clearly simulated payment-processing state and confirmation.
+- [x] Add a desktop and mobile-friendly product filtering sidebar for price, category, and rating, alongside sort controls.
+- [x] Standardize immediate toast feedback for cart and wishlist actions.
+- [x] Verify checkout, filters, sorting, and notifications before saving a delivery checkpoint.

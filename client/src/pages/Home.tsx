@@ -15,6 +15,7 @@ import {
   Expand,
   Heart,
   LampDesk,
+  Loader2,
   Menu,
   Mic,
   MicOff,
@@ -312,6 +313,9 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("featured");
+  const [priceCeiling, setPriceCeiling] = useState(200);
+  const [minimumRating, setMinimumRating] = useState(0);
+  const [showFilters, setShowFilters] = useState(false);
   const [cart, setCart] = useState<CartLine[]>(() => {
     try {
       const stored = JSON.parse(localStorage.getItem("luma-cart") ?? "[]") as Array<{ id?: number; quantity?: number }>;
@@ -328,6 +332,7 @@ export default function Home() {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [activeVendor, setActiveVendor] = useState<(typeof vendors)[number] | null>(null);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutStage, setCheckoutStage] = useState<"summary" | "processing" | "confirmed">("summary");
   const [showWishlist, setShowWishlist] = useState(false);
   const [wishlist, setWishlist] = useState<number[]>(() => {
     try { return JSON.parse(localStorage.getItem("luma-wishlist") ?? "[]") as number[]; } catch { return []; }
@@ -343,6 +348,7 @@ export default function Home() {
     onSuccess: (suggestion) => setAiSuggestion(suggestion),
     onError: () => toast.error("The market finder is taking a breath. Try a few keywords instead."),
   });
+  const ratingSummaries = trpc.reviews.summaries.useQuery();
 
   useEffect(() => { localStorage.setItem("luma-wishlist", JSON.stringify(wishlist)); }, [wishlist]);
   useEffect(() => { localStorage.setItem("luma-cart", JSON.stringify(cart.map(({ id, quantity }) => ({ id, quantity })))); }, [cart]);
@@ -356,6 +362,7 @@ export default function Home() {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const estimatedShipping = cart.length ? (cartTotal >= 100 ? 0 : 8) : 0;
   const cartGrandTotal = cartTotal + estimatedShipping;
+  const ratingsByProduct = useMemo(() => new Map((ratingSummaries.data ?? []).map(summary => [summary.productId, summary])), [ratingSummaries.data]);
 
   useEffect(() => {
     if (!cartCount) return;
@@ -365,20 +372,23 @@ export default function Home() {
   }, [cartCount]);
 
   const filteredProducts = useMemo(() => {
-    if (aiSuggestion) return aiSuggestion.productIds.map((id) => products.find((product) => product.id === id)).filter((product): product is Product => Boolean(product));
+    const candidates = aiSuggestion ? aiSuggestion.productIds.map((id) => products.find((product) => product.id === id)).filter((product): product is Product => Boolean(product)) : products;
     const normalized = query.trim().toLowerCase();
-    const result = products.filter((product) => {
+    const result = candidates.filter((product) => {
       const searchMatch = !normalized || [product.name, product.vendor, product.category].some((value) => value.toLowerCase().includes(normalized));
       const categoryMatch = category === "All" || product.category === category;
-      return searchMatch && categoryMatch;
+      const priceMatch = product.price <= priceCeiling;
+      const ratingMatch = !minimumRating || (ratingsByProduct.get(product.id)?.averageRating ?? 0) >= minimumRating;
+      return searchMatch && categoryMatch && priceMatch && ratingMatch;
     });
 
     return [...result].sort((a, b) => {
       if (sort === "price-low") return a.price - b.price;
       if (sort === "price-high") return b.price - a.price;
+      if (sort === "rating") return (ratingsByProduct.get(b.id)?.averageRating ?? 0) - (ratingsByProduct.get(a.id)?.averageRating ?? 0);
       return a.id - b.id;
     });
-  }, [aiSuggestion, category, query, sort]);
+  }, [aiSuggestion, category, minimumRating, priceCeiling, query, ratingsByProduct, sort]);
 
   const addToCart = (product: Product) => {
     setCart((current) => {
@@ -387,7 +397,7 @@ export default function Home() {
       return [...current, { ...product, quantity: 1 }];
     });
     setShowCart(true);
-    toast.success(`${product.name} is in your cart`);
+    toast.success("Added to your bag", { description: `${product.name} · ${money.format(product.price)}` });
   };
 
   const updateQuantity = (id: number, delta: number) => {
@@ -398,13 +408,24 @@ export default function Home() {
     }));
   };
 
-  const handleCheckout = (event: FormEvent<HTMLFormElement>) => {
+  const beginPayment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!cart.length) return;
-    setShowCheckout(false);
-    setShowCart(false);
+    setCheckoutStage("processing");
+    window.setTimeout(() => setCheckoutStage("confirmed"), 1400);
+  };
+
+  const completeCheckout = () => {
     setCart([]);
-    toast.success("Order request saved — sellers will confirm availability next.");
+    setShowCheckout(false);
+    setCheckoutStage("summary");
+    toast.success("Order request confirmed", { description: "Your sellers will receive the preparation details next." });
+  };
+
+  const openCheckout = () => {
+    setShowCart(false);
+    setCheckoutStage("summary");
+    setShowCheckout(true);
   };
 
   const moveCollection = (direction: "left" | "right") => {
@@ -415,7 +436,7 @@ export default function Home() {
   const toggleWishlist = (product: Product) => {
     setWishlist((current) => {
       const alreadySaved = current.includes(product.id);
-      toast.success(alreadySaved ? `${product.name} left your saved list` : `${product.name} is saved for later`);
+      toast.success(alreadySaved ? "Removed from saved finds" : "Saved for later", { description: product.name });
       return alreadySaved ? current.filter((id) => id !== product.id) : [...current, product.id];
     });
   };
@@ -553,12 +574,20 @@ export default function Home() {
               <div className="category-pills" aria-label="Filter by category">
                 {categories.map((item) => <button className={category === item ? "selected" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}
               </div>
-              <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
+              <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="rating">Highest visitor rating</option></select></label>
             </div>
           </div>
           {aiSuggestion && <div className="ai-suggestion"><div><Sparkles size={17} /><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}<small>{aiSuggestion.inventoryNote}</small></span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
 
-          <div className="product-rail" id="product-rail">
+          <button className="filter-toggle" onClick={() => setShowFilters((visible) => !visible)} aria-expanded={showFilters} aria-controls="product-filters"><SlidersHorizontal size={16} />{showFilters ? "Hide filters" : "Refine products"}</button>
+          <div className="catalog-layout">
+          <aside className={`filter-sidebar ${showFilters ? "is-open" : ""}`} id="product-filters" aria-label="Filter products">
+            <div className="filter-sidebar-heading"><div><p className="eyebrow"><span /> REFINE THE FLOOR</p><h3>Find your fit.</h3></div><button onClick={() => { setCategory("All"); setPriceCeiling(200); setMinimumRating(0); }}>Reset</button></div>
+            <fieldset><legend>Category</legend>{categories.map((item) => <label className="filter-choice" key={item}><input type="radio" name="category-filter" checked={category === item} onChange={() => setCategory(item)} /><span>{item}</span></label>)}</fieldset>
+            <fieldset><legend>Price ceiling <b>{money.format(priceCeiling)}</b></legend><input className="price-range" type="range" min="20" max="200" step="10" value={priceCeiling} onChange={(event) => setPriceCeiling(Number(event.target.value))} /><div className="range-labels"><span>$20</span><span>$200+</span></div></fieldset>
+            <fieldset><legend>Visitor rating</legend><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 0} onChange={() => setMinimumRating(0)} /><span>Any rating</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 4} onChange={() => setMinimumRating(4)} /><span>4 stars & up</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 5} onChange={() => setMinimumRating(5)} /><span>5 stars</span></label><small>{ratingSummaries.data?.length ? "Filters reflect published visitor notes only." : "Ratings will appear once visitors add notes."}</small></fieldset>
+          </aside>
+          <div className="product-results"><div className="product-rail" id="product-rail">
             {filteredProducts.map((product, index) => (
               <article className="product-card" style={{ "--index": index } as React.CSSProperties} key={product.id}>
                 <button className="product-visual-button" onClick={() => setActiveProduct(product)} aria-label={`View ${product.name}`}><ProductVisual product={product} /></button>
@@ -572,8 +601,8 @@ export default function Home() {
                 {product.badge && <span className="product-badge">{product.badge}</span>}
               </article>
             ))}
-            {!filteredProducts.length && <div className="empty-products"><Search size={21} /><p>No market finds match that search yet.</p><button onClick={() => { setQuery(""); setCategory("All"); }}>Clear filters</button></div>}
-          </div>
+            {!filteredProducts.length && <div className="empty-products"><Search size={21} /><p>No market finds match that search yet.</p><button onClick={() => { setQuery(""); setCategory("All"); setPriceCeiling(200); setMinimumRating(0); }}>Clear filters</button></div>}
+          </div></div></div>
           <div className="market-pulse" aria-label="Live marketplace signals">
             <span className="pulse-orbit"><i /></span>
             <p><b>Market radar</b> <span>Fresh drops from 7 studios today</span></p>
@@ -627,7 +656,7 @@ export default function Home() {
             <div className="cart-lines">
               {cart.length ? cart.map((item) => <div className="cart-line" key={item.id}><div className={`cart-thumb ${item.imageClass}`}><item.Icon size={22} /></div><div><b>{item.name}</b><p>{item.vendor}</p><div className="quantity"><button onClick={() => updateQuantity(item.id, -1)} aria-label={`Remove one ${item.name}`}><Minus size={13} /></button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label={`Add one ${item.name}`}><Plus size={13} /></button></div></div><strong>{money.format(item.price * item.quantity)}</strong></div>) : <div className="cart-empty"><ShoppingBag size={26} /><p>Your bag is ready when you are.</p><button onClick={() => setShowCart(false)}>Keep browsing</button></div>}
             </div>
-            <div className="cart-footer"><div className="cart-price-line"><span>Subtotal</span><b>{money.format(cartTotal)}</b></div><div className="cart-price-line"><span>Estimated delivery</span><b>{estimatedShipping ? money.format(estimatedShipping) : "Complimentary"}</b></div><div className="cart-grand-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><p>{cartTotal >= 100 ? "Complimentary delivery unlocked." : "Add a little more to unlock complimentary delivery."}</p><button className="button primary-button full-width" disabled={!cart.length} onClick={() => setShowCheckout(true)}>Continue to delivery <ArrowRight size={18} /></button></div>
+            <div className="cart-footer"><div className="cart-price-line"><span>Subtotal</span><b>{money.format(cartTotal)}</b></div><div className="cart-price-line"><span>Estimated delivery</span><b>{estimatedShipping ? money.format(estimatedShipping) : "Complimentary"}</b></div><div className="cart-grand-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><p>{cartTotal >= 100 ? "Complimentary delivery unlocked." : "Add a little more to unlock complimentary delivery."}</p><button className="button primary-button full-width" disabled={!cart.length} onClick={openCheckout}>Continue to delivery <ArrowRight size={18} /></button></div>
           </aside>
         </div>
       )}
@@ -636,16 +665,11 @@ export default function Home() {
 
       {showCheckout && (
         <div className="overlay checkout-overlay" role="presentation">
-          <section className="checkout-modal" role="dialog" aria-modal="true" aria-label="Delivery details">
-            <button className="modal-close" onClick={() => setShowCheckout(false)} aria-label="Close checkout"><X size={20} /></button>
-            <p className="eyebrow"><span /> DELIVERY DETAILS</p><h3>Nearly there.</h3><p className="checkout-intro">Add your information so the right sellers can prepare your order request.</p>
-            <form onSubmit={handleCheckout}>
-              <label>Full name<input required name="name" placeholder="Jordan Lee" /></label>
-              <label>Email address<input required type="email" name="email" placeholder="you@example.com" /></label>
-              <label>Delivery address<textarea required name="address" placeholder="Street, city, postal code" rows={3} /></label>
-              <div className="checkout-total"><span>Order request</span><b>{money.format(cartGrandTotal)}</b></div>
-              <button className="button primary-button full-width" type="submit">Save order request <Check size={18} /></button>
-            </form>
+          <section className={`checkout-modal checkout-${checkoutStage}`} role="dialog" aria-modal="true" aria-label="Checkout order summary">
+            {checkoutStage !== "processing" && <button className="modal-close" onClick={() => { setShowCheckout(false); setCheckoutStage("summary"); }} aria-label="Close checkout"><X size={20} /></button>}
+            {checkoutStage === "summary" && <><p className="eyebrow"><span /> ORDER SUMMARY</p><h3>Almost yours.</h3><p className="checkout-intro">Review your small-run finds, then try the simulated payment step. No money moves in this experience.</p><div className="checkout-lines">{cart.map((item) => <div key={item.id}><span>{item.quantity} × {item.name}</span><b>{money.format(item.price * item.quantity)}</b></div>)}</div><form onSubmit={beginPayment}><label>Full name<input required name="name" placeholder="Jordan Lee" /></label><label>Email address<input required type="email" name="email" placeholder="you@example.com" /></label><label>Delivery address<textarea required name="address" placeholder="Street, city, postal code" rows={3} /></label><div className="checkout-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><button className="button primary-button full-width" type="submit">Simulate payment <ArrowRight size={18} /></button></form></>}
+            {checkoutStage === "processing" && <div className="payment-state" aria-live="polite"><span className="payment-orbit"><Loader2 size={28} /></span><p className="eyebrow"><span /> PAYMENT SIMULATION</p><h3>Checking the light.</h3><p>Simulating a secure approval for your order estimate of {money.format(cartGrandTotal)}.</p></div>}
+            {checkoutStage === "confirmed" && <div className="payment-state confirmed" aria-live="polite"><span className="payment-orbit"><Check size={29} /></span><p className="eyebrow"><span /> SIMULATED APPROVAL</p><h3>It’s in motion.</h3><p>Your order request is ready for sellers to review. No payment was taken.</p><div className="checkout-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><button className="button primary-button full-width" onClick={completeCheckout}>Back to the market <ArrowRight size={18} /></button></div>}
           </section>
         </div>
       )}

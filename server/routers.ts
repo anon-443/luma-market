@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { COOKIE_NAME } from "../shared/const";
 import { PRODUCT_CATALOG, normalizeAISearchResponse } from "./catalog";
-import { createProductReview, listProductReviews } from "./db";
+import { createProductReview, listProductReviews, listReviewSummaries } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { invokeLLM } from "./_core/llm";
 import { systemRouter } from "./_core/systemRouter";
@@ -62,6 +62,7 @@ export const appRouter = router({
   }),
   reviews: router({
     list: publicProcedure.input(productIdSchema).query(({ input }) => listProductReviews(input.productId)),
+    summaries: publicProcedure.query(() => listReviewSummaries()),
     create: publicProcedure.input(productIdSchema.extend({
       authorName: z.string().trim().min(2).max(80),
       rating: z.number().int().min(1).max(5),

@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, productReviews, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -57,4 +57,19 @@ export async function createProductReview(input: { productId: number; authorName
   const db = await getDb();
   if (!db) throw new Error("Reviews are temporarily unavailable.");
   await db.insert(productReviews).values(input);
+}
+
+export async function listReviewSummaries() {
+  const db = await getDb();
+  if (!db) return [];
+  const summaries = await db.select({
+    productId: productReviews.productId,
+    reviewCount: sql<number>`count(*)`,
+    averageRating: sql<number>`avg(${productReviews.rating})`,
+  }).from(productReviews).groupBy(productReviews.productId);
+  return summaries.map(summary => ({
+    productId: summary.productId,
+    reviewCount: Number(summary.reviewCount),
+    averageRating: Number(summary.averageRating),
+  }));
 }
