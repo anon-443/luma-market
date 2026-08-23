@@ -126,3 +126,5 @@
 - [x] Rebalance the desktop filter-panel widths and align Reset filters with the active content rows.
 - [x] Audit the current marketplace against the supplied project brief and document any remaining optional gaps.
 - [x] Verify the corrected filter shelf on desktop and mobile before delivery.
+- [x] Lower the Category heading and all Category option text together within the desktop filter shelf.
+- [x] Verify the Category alignment remains correct on desktop and mobile before delivery.
