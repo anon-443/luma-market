@@ -128,3 +128,6 @@
 - [x] Verify the corrected filter shelf on desktop and mobile before delivery.
 - [x] Lower the Category heading and all Category option text together within the desktop filter shelf.
 - [x] Verify the Category alignment remains correct on desktop and mobile before delivery.
+- [x] Rebuild the desktop filter shelf to an 80–90px content-centered layout with the specified compact typography, controls, dividers, and reset column.
+- [x] Stack the mobile filter columns with 12px gaps and horizontal dividers while removing desktop vertical dividers.
+- [x] Verify the compact desktop shelf and mobile stacked filter drawer behavior before delivery.

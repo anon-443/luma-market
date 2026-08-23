@@ -502,3 +502,118 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
 @media (min-width: 821px) {
   .filter-sidebar fieldset:nth-of-type(1) > * { transform: translateY(10px); }
 }
+
+/* Compact filter shelf: content-centered cells with restrained controls and full-height dividers. */
+@media (min-width: 821px) {
+  .filter-sidebar {
+    width: min(100%, 1080px);
+    min-height: 88px;
+    height: 88px;
+    margin: 0 auto 22px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 120px minmax(300px, 1.15fr) minmax(250px, 1fr) minmax(250px, 1fr);
+    grid-template-areas: "actions category price colour";
+    align-items: stretch;
+    border: 1px solid #E5E0D8;
+    background: var(--surface);
+  }
+  .filter-sidebar-heading.filter-sidebar-actions {
+    grid-area: actions;
+    min-height: 0;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border: 0;
+  }
+  .filter-sidebar-heading > button {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .filter-sidebar fieldset {
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    padding: 16px 24px;
+    display: grid;
+    align-content: center;
+    gap: 6px;
+    border: 0;
+    border-left: 1px solid #E5E0D8;
+  }
+  .filter-sidebar fieldset:nth-of-type(1) { grid-area: category; grid-template-columns: repeat(5, max-content); grid-template-rows: auto auto; align-items: center; column-gap: 6px; row-gap: 6px; }
+  .filter-sidebar fieldset:nth-of-type(1) legend { grid-column: 1 / -1; }
+  .filter-sidebar fieldset:nth-of-type(2) { grid-area: price; grid-template-columns: 1fr; grid-template-rows: auto auto auto; gap: 4px; }
+  .filter-sidebar fieldset:nth-of-type(3) { grid-area: colour; grid-template-columns: 1fr; grid-template-rows: auto auto auto; gap: 5px; }
+  .filter-sidebar fieldset:nth-of-type(1) > *, .filter-sidebar fieldset:nth-of-type(2) > *, .filter-sidebar fieldset:nth-of-type(3) > * { transform: none; }
+  .filter-sidebar legend {
+    margin: 0;
+    color: var(--teal);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+  .filter-sidebar fieldset:nth-of-type(2) legend { color: var(--coral); }
+  .filter-sidebar legend b { color: var(--coral); font-size: 11px; letter-spacing: 0; }
+  .filter-choice { gap: 6px; color: var(--teal); font-size: 12px; font-weight: 600; line-height: 14px; white-space: nowrap; }
+  .filter-choice input {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    border: 1px solid var(--muted-foreground);
+    border-radius: 50%;
+    background: var(--surface);
+  }
+  .filter-choice input:checked { border-color: var(--coral); box-shadow: inset 0 0 0 3px var(--surface); background: var(--coral); }
+  .price-visual-range { height: 16px; margin: 0; }
+  .price-track { height: 2px; }
+  .price-visual-range input::-webkit-slider-thumb { width: 16px; height: 16px; border-width: 2px; }
+  .price-visual-range input::-moz-range-thumb { width: 12px; height: 12px; border-width: 2px; }
+  .range-labels { color: var(--muted-foreground); font-size: 11px; font-weight: 600; line-height: 1; }
+  .color-swatches { flex-wrap: nowrap; gap: 6px; margin: 0; }
+  .color-swatches button { width: 20px; height: 20px; padding: 1px; }
+  .color-swatches button:first-child { min-width: 0; width: auto; height: 26px; padding: 0 8px; color: var(--ink); font-size: 11px; font-weight: 700; }
+  .filter-sidebar small { margin: 0; color: var(--muted-foreground); font-size: 11px; font-weight: 500; line-height: 1.15; }
+}
+
+@media (max-width: 820px) {
+  .filter-sidebar.is-open {
+    width: 100%;
+    min-height: 0;
+    height: auto;
+    margin: 0 0 12px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: "actions" "category" "price" "colour";
+    background: var(--surface);
+    border: 1px solid #E5E0D8;
+  }
+  .filter-sidebar.is-open .filter-sidebar-heading.filter-sidebar-actions {
+    grid-area: actions;
+    min-height: 0;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    border: 0;
+  }
+  .filter-sidebar.is-open .filter-sidebar-heading > button { font-size: 12px; font-weight: 500; }
+  .filter-sidebar.is-open fieldset {
+    min-height: 0;
+    margin: 0;
+    padding: 12px 16px;
+    display: grid;
+    gap: 8px;
+    border: 0;
+    border-top: 1px solid #E5E0D8;
+  }
+  .filter-sidebar.is-open fieldset:nth-of-type(1) { grid-area: category; }
+  .filter-sidebar.is-open fieldset:nth-of-type(2) { grid-area: price; }
+  .filter-sidebar.is-open fieldset:nth-of-type(3) { grid-area: colour; }
+}
