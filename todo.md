@@ -73,3 +73,9 @@
 - [x] Remove the standalone landing category ribbon so the category controls appear only once in the marketplace toolbar.
 - [x] Explicitly reduce the decorative hero-ring visual identified in the landing reference and verify the lighter hero composition across desktop and mobile.
 - [x] Reduce the actual hero-ring geometry in the hero visual and verify the less dominant ornament at desktop and mobile widths.
+- [x] Remove the “Small-run finds from independent sellers ready to take home” supporting line from the market heading.
+- [x] Remove the “Speak or type a mood, material, room, or ritual” helper line while keeping search and voice controls available.
+- [x] Verify the simplified marketplace heading and search controls on desktop and mobile before delivery.
+- [x] Remove the teal-ring ornament associated with the sellers section heading.
+- [x] Remove the circular arrow-control ornament from the market section heading while retaining product browsing access through the grid and category filters.
+- [x] Verify the simplified market and sellers headings on desktop and mobile before delivery.

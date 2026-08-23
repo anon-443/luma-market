@@ -564,11 +564,6 @@ export default function Home() {
     setShowCheckout(true);
   };
 
-  const moveCollection = (direction: "left" | "right") => {
-    const rail = document.getElementById("product-rail");
-    rail?.scrollBy({ left: direction === "left" ? -320 : 320, behavior: "smooth" });
-  };
-
   const toggleWishlist = (product: Product) => {
     setWishlist((current) => {
       const alreadySaved = current.includes(product.id);
@@ -687,20 +682,15 @@ export default function Home() {
         </section>
 
         <section className="market-section" id="shop" aria-labelledby="shop-heading">
-          <div className="section-kicker"><span>01</span> THE MARKET FLOOR</div>
-          <div className="shop-heading-row">
-            <div>
-              <h2 id="shop-heading">Made to become <em>yours.</em></h2>
-              <p>Small-run finds from independent sellers ready to take home</p>
-            </div>
-            <div className="rail-controls" aria-label="Browse products">
-              <button onClick={() => moveCollection("left")} aria-label="Scroll products left"><ChevronLeft size={19} /></button>
-              <button onClick={() => moveCollection("right")} aria-label="Scroll products right"><ChevronRight size={19} /></button>
-            </div>
+            <div className="section-kicker"><span>01</span> THE MARKET FLOOR</div>
+            <div className="shop-heading-row">
+              <div>
+                <h2 id="shop-heading">Made to become <em>yours.</em></h2>
+              </div>
           </div>
 
           <div className="shop-tools">
-            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button><button className="ai-search-button" onClick={submitNaturalSearch} disabled={aiSearch.isPending} aria-label="Ask the AI product finder"><Sparkles size={16} className={aiSearch.isPending ? "sparkle-spin" : ""} /></button></div><p className="ai-search-label">{voiceSupported ? <><Mic size={12} /> Speak or type a mood, material, room, or ritual</> : <><MicOff size={12} /> Voice search is unavailable here — type a natural description</>}</p>{searchHistory.length > 0 && <div className="recent-searches"><span>Recent</span><div>{searchHistory.map((item) => <button key={item} onClick={() => { setQuery(item); setAiSuggestion(null); runDiscovery(item); }}>{item}</button>)}<button className="clear-history" onClick={() => setSearchHistory([])} aria-label="Clear recent searches"><X size={12} /></button></div></div>}</div>
+            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button><button className="ai-search-button" onClick={submitNaturalSearch} disabled={aiSearch.isPending} aria-label="Ask the AI product finder"><Sparkles size={16} className={aiSearch.isPending ? "sparkle-spin" : ""} /></button></div>{searchHistory.length > 0 && <div className="recent-searches"><span>Recent</span><div>{searchHistory.map((item) => <button key={item} onClick={() => { setQuery(item); setAiSuggestion(null); runDiscovery(item); }}>{item}</button>)}<button className="clear-history" onClick={() => setSearchHistory([])} aria-label="Clear recent searches"><X size={12} /></button></div></div>}</div>
             <div className="filter-row">
               <div className="category-pills" aria-label="Filter by category">
                 {categories.map((item) => <button className={category === item ? "selected" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}
