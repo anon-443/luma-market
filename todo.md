@@ -33,3 +33,6 @@
 - [x] Standardize product-card image aspect ratios and grid dimensions so cards do not stretch unpredictably.
 - [x] Refine responsive sizing and spacing across desktop, tablet, and mobile breakpoints.
 - [x] Verify the corrected hero and product grid at representative screen widths before saving a delivery checkpoint.
+- [x] Add an accessible secondary product image reveal on product-card hover and keyboard focus.
+- [x] Add a polished quick-add control that appears within product imagery and confirms cart additions.
+- [x] Verify hover, keyboard-focus, and touch-friendly fallback states before saving a delivery checkpoint.

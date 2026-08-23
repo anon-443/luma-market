@@ -196,9 +196,12 @@ const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD
 
 function ProductVisual({ product }: { product: Product }) {
   const { Icon } = product;
+  const gallery = productGallery[product.id] ?? [{ src: product.image, alt: product.name, position: product.imagePosition }];
+  const secondary = gallery[1] ?? gallery[0];
   return (
     <div className={`product-visual ${product.imageClass}`} aria-label={`${product.name} product artwork`}>
       <img className="product-photo" src={product.image} style={{ objectPosition: product.imagePosition }} alt="" />
+      <img className="product-photo product-photo-secondary" src={secondary.src} style={{ objectPosition: secondary.position }} alt="" />
       <div className="photo-vignette" />
       <div className="visual-orbit" />
       <span className="product-icon-badge"><Icon aria-hidden="true" /></span>
@@ -416,13 +419,13 @@ export default function Home() {
     });
   }, [aiSuggestion, category, minimumRating, priceCeiling, priceFloor, query, ratingsByProduct, selectedColor, sort]);
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, options: { openCart?: boolean } = {}) => {
     setCart((current) => {
       const line = current.find((item) => item.id === product.id);
       if (line) return current.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item));
       return [...current, { ...product, quantity: 1 }];
     });
-    setShowCart(true);
+    if (options.openCart ?? true) setShowCart(true);
     toast.success("Added to your bag", { description: `${product.name} · ${money.format(product.price)}` });
   };
 
@@ -620,9 +623,12 @@ export default function Home() {
           <div className="product-results"><div className="product-rail" id="product-rail">
             {filteredProducts.map((product, index) => (
               <article className="product-card" style={{ "--index": index } as React.CSSProperties} key={product.id}>
-                <button className="product-visual-button" onClick={() => setActiveProduct(product)} aria-label={`View ${product.name}`}><ProductVisual product={product} /></button>
-                <button className="quick-view-trigger" onClick={() => setQuickViewProduct(product)} aria-label={`Quick view ${product.name}`}><Eye size={16} /><span>Quick view</span></button>
-                <button className={`product-heart ${wishlist.includes(product.id) ? "is-saved" : ""}`} onClick={() => toggleWishlist(product)} aria-label={`${wishlist.includes(product.id) ? "Remove" : "Save"} ${product.name} ${wishlist.includes(product.id) ? "from" : "to"} wishlist`} aria-pressed={wishlist.includes(product.id)}><Heart size={17} fill={wishlist.includes(product.id) ? "currentColor" : "transparent"} /></button>
+                <div className="product-visual-wrap">
+                  <button className="product-visual-button" onClick={() => setActiveProduct(product)} aria-label={`View ${product.name}`}><ProductVisual product={product} /></button>
+                  <button className="card-quick-add" onClick={() => addToCart(product, { openCart: false })} aria-label={`Quick add ${product.name} to cart`}><Plus size={16} /><span>Quick add</span></button>
+                  <button className="quick-view-trigger" onClick={() => setQuickViewProduct(product)} aria-label={`Quick view ${product.name}`}><Eye size={16} /><span>Quick view</span></button>
+                  <button className={`product-heart ${wishlist.includes(product.id) ? "is-saved" : ""}`} onClick={() => toggleWishlist(product)} aria-label={`${wishlist.includes(product.id) ? "Remove" : "Save"} ${product.name} ${wishlist.includes(product.id) ? "from" : "to"} wishlist`} aria-pressed={wishlist.includes(product.id)}><Heart size={17} fill={wishlist.includes(product.id) ? "currentColor" : "transparent"} /></button>
+                </div>
                 <div className="product-meta">
                   <button className="product-name" onClick={() => setActiveProduct(product)}>{product.name}</button>
                   <p>{product.vendor} <span>·</span> {product.category}</p><span className={`stock-note ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`}</span>
