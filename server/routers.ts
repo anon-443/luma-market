@@ -63,6 +63,45 @@ export const appRouter = router({
   reviews: router({
     list: publicProcedure.input(productIdSchema).query(({ input }) => listProductReviews(input.productId)),
     summaries: publicProcedure.query(() => listReviewSummaries()),
+    summarize: publicProcedure.input(productIdSchema).query(async ({ input }) => {
+      const reviews = await listProductReviews(input.productId);
+      if (!reviews.length) return { status: "empty" as const, sourceCount: 0, positives: [], considerations: [] };
+
+      const sourceMaterial = reviews.map(review => `Rating: ${review.rating}/5\nComment: ${review.comment}`).join("\n\n---\n\n");
+      try {
+        const response = await invokeLLM({
+          model: "gemini-3-flash-preview",
+          maxTokens: 900,
+          messages: [
+            { role: "system", content: "You summarize only the provided visitor review comments for a marketplace product. Identify short themes that commenters explicitly praise and short considerations only when comments explicitly mention a drawback, limitation, or concern. Never invent facts, ratings, frequency, or sentiment. Do not identify reviewers. Return concise neutral phrases." },
+            { role: "user", content: `Authentic visitor reviews (${reviews.length} total):\n${sourceMaterial}` },
+          ],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "visitor_review_themes",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  positives: { type: "array", items: { type: "string" }, maxItems: 3 },
+                  considerations: { type: "array", items: { type: "string" }, maxItems: 3 },
+                },
+                required: ["positives", "considerations"],
+                additionalProperties: false,
+              },
+            },
+          },
+        });
+        const content = response.choices[0]?.message.content;
+        const parsed = typeof content === "string" ? JSON.parse(content) as { positives?: unknown; considerations?: unknown } : null;
+        const takeStrings = (value: unknown) => Array.isArray(value) ? value.filter((item): item is string => typeof item === "string").map(item => item.trim()).filter(Boolean).slice(0, 3) : [];
+        return { status: "ready" as const, sourceCount: reviews.length, positives: takeStrings(parsed?.positives), considerations: takeStrings(parsed?.considerations) };
+      } catch (error) {
+        console.warn("[Review summary] Unable to summarize authentic visitor notes", error);
+        return { status: "unavailable" as const, sourceCount: reviews.length, positives: [], considerations: [] };
+      }
+    }),
     create: publicProcedure.input(productIdSchema.extend({
       authorName: z.string().trim().min(2).max(80),
       rating: z.number().int().min(1).max(5),

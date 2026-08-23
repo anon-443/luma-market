@@ -25,3 +25,7 @@
 - [x] Add a desktop and mobile-friendly product filtering sidebar for price, category, and rating, alongside sort controls.
 - [x] Standardize immediate toast feedback for cart and wishlist actions.
 - [x] Verify checkout, filters, sorting, and notifications before saving a delivery checkpoint.
+- [x] Add a visual dual-handle price range control and product color swatches to the discovery sidebar.
+- [x] Add a shopper profile dashboard for local order history, wishlist management, and saved preferences.
+- [x] Add an AI review-summary section using only submitted visitor reviews; show an honest empty state when no reviews exist.
+- [x] Verify visual filters, profile controls, and review-summary states before saving a delivery checkpoint.

@@ -60,6 +60,7 @@ type Product = {
 type CartLine = Product & { quantity: number };
 type VisitorReview = { id: number; authorName: string; rating: number; comment: string; createdAt: Date | string };
 type GalleryImage = { src: string; alt: string; position?: string };
+type PastOrder = { id: string; createdAt: number; itemCount: number; total: number; items: Array<{ id: number; quantity: number }> };
 type WebSpeechEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
 type WebSpeechRecognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; onresult: ((event: WebSpeechEvent) => void) | null; onerror: (() => void) | null; onend: (() => void) | null };
 type WebSpeechConstructor = new () => WebSpeechRecognition;
@@ -182,6 +183,14 @@ const vendors = [
 ];
 
 const categories = ["All", "Home", "Accessories", "Tech", "Stationery"];
+const colorSwatches = [
+  { value: "Brushed brass", color: "#b18543" },
+  { value: "Persimmon", color: "#df704d" },
+  { value: "Cobalt glaze", color: "#284783" },
+  { value: "Sage grey", color: "#9eafa3" },
+  { value: "Ink blue", color: "#263d77" },
+  { value: "Oat & coral", color: "#d8c3a1" },
+];
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
@@ -248,12 +257,14 @@ function ProductReviews({ product }: { product: Product }) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const reviewsQuery = trpc.reviews.list.useQuery({ productId: product.id });
+  const reviewSummaryQuery = trpc.reviews.summarize.useQuery({ productId: product.id }, { staleTime: 10 * 60 * 1000 });
   const createReview = trpc.reviews.create.useMutation({
     onSuccess: async () => {
       setAuthorName("");
       setRating(0);
       setComment("");
       await reviewsQuery.refetch();
+      await reviewSummaryQuery.refetch();
       toast.success("Your review is now part of this product’s visitor notes.");
     },
     onError: (error) => toast.error(error.message || "We couldn’t save that review just yet."),
@@ -263,6 +274,7 @@ function ProductReviews({ product }: { product: Product }) {
   return (
     <section className="reviews-panel" aria-labelledby={`reviews-${product.id}`}>
       <div className="review-heading"><div><p className="eyebrow"><span /> VISITOR NOTES</p><h4 id={`reviews-${product.id}`}>Your take matters.</h4></div><span>{reviews.length} note{reviews.length === 1 ? "" : "s"}</span></div>
+      <section className="review-summary" aria-label="AI review themes"><div><Sparkles size={16} /><strong>AI review themes</strong><span>Built only from visitor notes</span></div>{reviewSummaryQuery.isLoading && reviews.length > 0 && <p>Reading the themes in submitted notes…</p>}{reviewSummaryQuery.data?.status === "empty" && <p>No notes yet, so there are no themes to summarize.</p>}{reviewSummaryQuery.data?.status === "unavailable" && <p>Visitor notes are here; an AI theme summary is temporarily unavailable.</p>}{reviewSummaryQuery.data?.status === "ready" && <div className="theme-columns"><div><b>Often appreciated</b>{reviewSummaryQuery.data.positives.length ? <ul>{reviewSummaryQuery.data.positives.map((item) => <li key={item}><Check size={13} />{item}</li>)}</ul> : <p>No repeated praise is clear yet.</p>}</div><div><b>Worth noting</b>{reviewSummaryQuery.data.considerations.length ? <ul>{reviewSummaryQuery.data.considerations.map((item) => <li key={item}><span>–</span>{item}</li>)}</ul> : <p>No recurring concerns are clear yet.</p>}</div></div>}</section>
       <div className="review-list">
         {reviewsQuery.isLoading && <p className="review-status">Finding recent notes…</p>}
         {!reviewsQuery.isLoading && !reviews.length && <p className="review-status">No visitor notes yet. Be the first to share a considered take.</p>}
@@ -313,8 +325,10 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("featured");
+  const [priceFloor, setPriceFloor] = useState(20);
   const [priceCeiling, setPriceCeiling] = useState(200);
   const [minimumRating, setMinimumRating] = useState(0);
+  const [selectedColor, setSelectedColor] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
   const [cart, setCart] = useState<CartLine[]>(() => {
     try {
@@ -334,9 +348,16 @@ export default function Home() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutStage, setCheckoutStage] = useState<"summary" | "processing" | "confirmed">("summary");
   const [showWishlist, setShowWishlist] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [wishlist, setWishlist] = useState<number[]>(() => {
     try { return JSON.parse(localStorage.getItem("luma-wishlist") ?? "[]") as number[]; } catch { return []; }
   });
+  const [orderHistory, setOrderHistory] = useState<PastOrder[]>(() => {
+    try { return JSON.parse(localStorage.getItem("luma-order-history") ?? "[]") as PastOrder[]; } catch { return []; }
+  });
+  const [profileName, setProfileName] = useState(() => localStorage.getItem("luma-profile-name") ?? "Market visitor");
+  const [personalizedDiscovery, setPersonalizedDiscovery] = useState(() => localStorage.getItem("luma-personalized-discovery") !== "false");
+  const [marketUpdates, setMarketUpdates] = useState(() => localStorage.getItem("luma-market-updates") === "true");
   const [aiSuggestion, setAiSuggestion] = useState<{ productIds: number[]; shortReason: string; inventoryNote: string; source: "ai" | "catalog" } | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [cartPulse, setCartPulse] = useState(false);
@@ -353,6 +374,10 @@ export default function Home() {
   useEffect(() => { localStorage.setItem("luma-wishlist", JSON.stringify(wishlist)); }, [wishlist]);
   useEffect(() => { localStorage.setItem("luma-cart", JSON.stringify(cart.map(({ id, quantity }) => ({ id, quantity })))); }, [cart]);
   useEffect(() => { localStorage.setItem("luma-search-history", JSON.stringify(searchHistory)); }, [searchHistory]);
+  useEffect(() => { localStorage.setItem("luma-order-history", JSON.stringify(orderHistory)); }, [orderHistory]);
+  useEffect(() => { localStorage.setItem("luma-profile-name", profileName); }, [profileName]);
+  useEffect(() => { localStorage.setItem("luma-personalized-discovery", String(personalizedDiscovery)); }, [personalizedDiscovery]);
+  useEffect(() => { localStorage.setItem("luma-market-updates", String(marketUpdates)); }, [marketUpdates]);
   useEffect(() => {
     const productId = Number(new URLSearchParams(window.location.search).get("product"));
     if (productId) setActiveProduct(products.find((product) => product.id === productId) ?? null);
@@ -377,9 +402,10 @@ export default function Home() {
     const result = candidates.filter((product) => {
       const searchMatch = !normalized || [product.name, product.vendor, product.category].some((value) => value.toLowerCase().includes(normalized));
       const categoryMatch = category === "All" || product.category === category;
-      const priceMatch = product.price <= priceCeiling;
+      const priceMatch = product.price >= priceFloor && product.price <= priceCeiling;
+      const colorMatch = selectedColor === "All" || product.color === selectedColor;
       const ratingMatch = !minimumRating || (ratingsByProduct.get(product.id)?.averageRating ?? 0) >= minimumRating;
-      return searchMatch && categoryMatch && priceMatch && ratingMatch;
+      return searchMatch && categoryMatch && priceMatch && colorMatch && ratingMatch;
     });
 
     return [...result].sort((a, b) => {
@@ -388,7 +414,7 @@ export default function Home() {
       if (sort === "rating") return (ratingsByProduct.get(b.id)?.averageRating ?? 0) - (ratingsByProduct.get(a.id)?.averageRating ?? 0);
       return a.id - b.id;
     });
-  }, [aiSuggestion, category, minimumRating, priceCeiling, query, ratingsByProduct, sort]);
+  }, [aiSuggestion, category, minimumRating, priceCeiling, priceFloor, query, ratingsByProduct, selectedColor, sort]);
 
   const addToCart = (product: Product) => {
     setCart((current) => {
@@ -416,6 +442,8 @@ export default function Home() {
   };
 
   const completeCheckout = () => {
+    const newOrder: PastOrder = { id: `LM-${Date.now().toString().slice(-6)}`, createdAt: Date.now(), itemCount: cartCount, total: cartGrandTotal, items: cart.map(({ id, quantity }) => ({ id, quantity })) };
+    setOrderHistory((current) => [newOrder, ...current].slice(0, 12));
     setCart([]);
     setShowCheckout(false);
     setCheckoutStage("summary");
@@ -510,6 +538,7 @@ export default function Home() {
             <span className="theme-orbit"><span /></span>
             <Moon className={theme === "dark" ? "active" : ""} size={14} />
           </button>
+          <button className="profile-button" onClick={() => setShowProfile(true)} aria-label="Open shopper profile"><CircleUserRound size={18} /></button>
           <button className={`bag-button ${cartCount ? "has-items" : ""} ${cartPulse ? "cart-bump" : ""}`} onClick={() => setShowCart(true)} aria-label={`Open cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}>
             <ShoppingBag size={19} />
             {cartCount > 0 && <span className="cart-count-badge" key={cartCount}>{cartCount}</span>}
@@ -582,9 +611,10 @@ export default function Home() {
           <button className="filter-toggle" onClick={() => setShowFilters((visible) => !visible)} aria-expanded={showFilters} aria-controls="product-filters"><SlidersHorizontal size={16} />{showFilters ? "Hide filters" : "Refine products"}</button>
           <div className="catalog-layout">
           <aside className={`filter-sidebar ${showFilters ? "is-open" : ""}`} id="product-filters" aria-label="Filter products">
-            <div className="filter-sidebar-heading"><div><p className="eyebrow"><span /> REFINE THE FLOOR</p><h3>Find your fit.</h3></div><button onClick={() => { setCategory("All"); setPriceCeiling(200); setMinimumRating(0); }}>Reset</button></div>
+            <div className="filter-sidebar-heading"><div><p className="eyebrow"><span /> REFINE THE FLOOR</p><h3>Find your fit.</h3></div><button onClick={() => { setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); setMinimumRating(0); }}>Reset</button></div>
             <fieldset><legend>Category</legend>{categories.map((item) => <label className="filter-choice" key={item}><input type="radio" name="category-filter" checked={category === item} onChange={() => setCategory(item)} /><span>{item}</span></label>)}</fieldset>
-            <fieldset><legend>Price ceiling <b>{money.format(priceCeiling)}</b></legend><input className="price-range" type="range" min="20" max="200" step="10" value={priceCeiling} onChange={(event) => setPriceCeiling(Number(event.target.value))} /><div className="range-labels"><span>$20</span><span>$200+</span></div></fieldset>
+            <fieldset><legend>Price range <b>{money.format(priceFloor)}–{money.format(priceCeiling)}</b></legend><div className="price-visual-range"><div className="price-track" style={{ "--from": `${((priceFloor - 20) / 180) * 100}%`, "--to": `${100 - ((priceCeiling - 20) / 180) * 100}%` } as React.CSSProperties} /><input aria-label="Minimum price" type="range" min="20" max="190" step="10" value={priceFloor} onChange={(event) => setPriceFloor(Math.min(Number(event.target.value), priceCeiling - 10))} /><input aria-label="Maximum price" type="range" min="30" max="200" step="10" value={priceCeiling} onChange={(event) => setPriceCeiling(Math.max(Number(event.target.value), priceFloor + 10))} /></div><div className="range-labels"><span>$20</span><span>$200+</span></div></fieldset>
+            <fieldset><legend>Colour</legend><div className="color-swatches"><button className={selectedColor === "All" ? "selected" : ""} onClick={() => setSelectedColor("All")} aria-pressed={selectedColor === "All"} aria-label="All colours">All</button>{colorSwatches.map((swatch) => <button key={swatch.value} className={selectedColor === swatch.value ? "selected" : ""} onClick={() => setSelectedColor(swatch.value)} aria-pressed={selectedColor === swatch.value} aria-label={`Filter by ${swatch.value}`} title={swatch.value}><i style={{ background: swatch.color }} /></button>)}</div><small>{selectedColor === "All" ? "Choose an object colour to narrow the market." : selectedColor}</small></fieldset>
             <fieldset><legend>Visitor rating</legend><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 0} onChange={() => setMinimumRating(0)} /><span>Any rating</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 4} onChange={() => setMinimumRating(4)} /><span>4 stars & up</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 5} onChange={() => setMinimumRating(5)} /><span>5 stars</span></label><small>{ratingSummaries.data?.length ? "Filters reflect published visitor notes only." : "Ratings will appear once visitors add notes."}</small></fieldset>
           </aside>
           <div className="product-results"><div className="product-rail" id="product-rail">
@@ -601,7 +631,7 @@ export default function Home() {
                 {product.badge && <span className="product-badge">{product.badge}</span>}
               </article>
             ))}
-            {!filteredProducts.length && <div className="empty-products"><Search size={21} /><p>No market finds match that search yet.</p><button onClick={() => { setQuery(""); setCategory("All"); setPriceCeiling(200); setMinimumRating(0); }}>Clear filters</button></div>}
+            {!filteredProducts.length && <div className="empty-products"><Search size={21} /><p>No market finds match that search yet.</p><button onClick={() => { setQuery(""); setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); setMinimumRating(0); }}>Clear filters</button></div>}
           </div></div></div>
           <div className="market-pulse" aria-label="Live marketplace signals">
             <span className="pulse-orbit"><i /></span>
@@ -660,6 +690,8 @@ export default function Home() {
           </aside>
         </div>
       )}
+
+      {showProfile && <div className="overlay profile-overlay" role="presentation" onMouseDown={() => setShowProfile(false)}><section className="profile-dashboard" role="dialog" aria-modal="true" aria-label="Shopper profile" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowProfile(false)} aria-label="Close shopper profile"><X size={20} /></button><div className="profile-hero"><span className="profile-avatar"><CircleUserRound size={30} /></span><div><p className="eyebrow"><span /> YOUR LUMA</p><h3>{profileName || "Market visitor"}</h3><p>Your local market preferences and simulated order requests stay on this device.</p></div></div><div className="profile-grid"><section className="profile-card profile-preferences"><div><p className="eyebrow"><span /> PREFERENCES</p><h4>Set your signal.</h4></div><label>Display name<input value={profileName} maxLength={60} onChange={(event) => setProfileName(event.target.value)} placeholder="Market visitor" /></label><label className="preference-switch"><span><b>Personalized discovery</b><small>Use saved pieces and searches to shape matches.</small></span><input type="checkbox" checked={personalizedDiscovery} onChange={(event) => setPersonalizedDiscovery(event.target.checked)} /></label><label className="preference-switch"><span><b>Market updates</b><small>Keep a preference for new-studio notes.</small></span><input type="checkbox" checked={marketUpdates} onChange={(event) => setMarketUpdates(event.target.checked)} /></label></section><section className="profile-card profile-orders"><div><p className="eyebrow"><span /> ORDER HISTORY</p><h4>Past requests.</h4></div>{orderHistory.length ? <div className="order-history-list">{orderHistory.map((order) => <article key={order.id}><div><b>{order.id}</b><span>{new Date(order.createdAt).toLocaleDateString()} · {order.itemCount} item{order.itemCount === 1 ? "" : "s"}</span></div><strong>{money.format(order.total)}</strong><small>Simulated order request</small></article>)}</div> : <p className="profile-empty">No order requests yet. A completed simulated checkout will appear here.</p>}</section><section className="profile-card profile-saves"><div><p className="eyebrow"><span /> SAVED FINDS</p><h4>Still thinking about.</h4></div>{wishlistProducts.length ? <div className="profile-saves-list">{wishlistProducts.map((product) => <article key={product.id}><img src={product.image} alt="" /><div><b>{product.name}</b><span>{product.vendor} · {money.format(product.price)}</span></div><button onClick={() => toggleWishlist(product)} aria-label={`Remove ${product.name} from saved finds`}><Heart size={16} fill="currentColor" /></button></article>)}</div> : <p className="profile-empty">Save a piece from the market to keep it close here.</p>}</section></div></section></div>}
 
       {showWishlist && <div className="overlay" role="presentation" onMouseDown={() => setShowWishlist(false)}><aside className="wishlist-drawer" role="dialog" aria-modal="true" aria-label="Saved products" onMouseDown={(event) => event.stopPropagation()}><div className="drawer-header"><div><p className="eyebrow"><span /> KEEP FOR LATER</p><h3>Saved finds <sup>{wishlist.length}</sup></h3></div><button onClick={() => setShowWishlist(false)} aria-label="Close saved products"><X size={21} /></button></div><div className="wishlist-lines">{wishlistProducts.length ? wishlistProducts.map((product) => <article className="wishlist-line" key={product.id}><img src={product.image} alt="" /><div><b>{product.name}</b><p>{product.vendor}</p><strong>{money.format(product.price)}</strong></div><div><button className="small-heart is-saved" onClick={() => toggleWishlist(product)} aria-label={`Remove ${product.name} from wishlist`}><Heart size={17} fill="currentColor" /></button><button className="quick-bag" onClick={() => addToCart(product)}>Bag <Plus size={13} /></button></div></article>) : <div className="wishlist-empty"><Heart size={27} /><p>Keep the pieces you’re still thinking about.</p><button onClick={() => setShowWishlist(false)}>Explore the market</button></div>}</div></aside></div>}
 
