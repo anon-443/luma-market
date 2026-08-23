@@ -82,3 +82,8 @@
 - [x] Tighten the footer’s empty vertical space and improve alignment of the brand, tagline, and link columns.
 - [x] Remove terminal full stops from every visible storefront heading while retaining punctuation in descriptive paragraphs.
 - [x] Verify the updated footer and heading treatment on desktop and mobile before delivery.
+- [x] Reduce the hero image frame so the landing visual is less dominant while retaining its editorial composition.
+- [x] Remove the “Independent studios all in one welcoming place” seller supporting line.
+- [x] Remove the Luma Selects supporting sentence beneath the promotion heading.
+- [x] Move filter controls away from the crowded left product-grid edge and into a clearer marketplace control location.
+- [x] Verify the refined hero, seller/promotion copy, and filter layout on desktop and mobile before delivery.

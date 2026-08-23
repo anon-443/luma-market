@@ -740,7 +740,6 @@ export default function Home() {
           <div className="promo-copy">
             <p className="eyebrow"><span /> LUMA SELECTS</p>
             <h2>Room for the<br /><em>unexpected</em></h2>
-            <p>Explore a handpicked collection from newer sellers building useful and beautiful things in small numbers</p>
             <button className="button dark-button" onClick={() => { setCategory("Accessories"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>See the edit <ArrowRight size={18} /></button>
           </div>
           <div className="promo-image"><img src="/manus-storage/luma-promo-arch_a2f778e9.jpg" alt="Curated accessories styled within a cream architectural arch" /><span className="promo-sticker">SAVE<br /><b>15%</b></span></div>
@@ -748,7 +747,7 @@ export default function Home() {
 
         <section className="vendors-section" id="makers" aria-labelledby="makers-heading">
           <div className="section-kicker"><span>02</span> SELLER STALLS</div>
-          <div className="vendors-heading"><h2 id="makers-heading">The people behind <em>the good stuff</em></h2><p>Independent studios all in one welcoming place</p></div>
+          <div className="vendors-heading"><h2 id="makers-heading">The people behind <em>the good stuff</em></h2></div>
           <div className="vendor-list">
             {vendors.map((vendor, index) => (
               <button className={`vendor-card ${vendor.palette}`} key={vendor.name} onClick={() => setActiveVendor(vendor)}>
