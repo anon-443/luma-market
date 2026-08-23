@@ -617,3 +617,10 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
   .filter-sidebar.is-open fieldset:nth-of-type(2) { grid-area: price; }
   .filter-sidebar.is-open fieldset:nth-of-type(3) { grid-area: colour; }
 }
+
+/* Lower only the requested desktop labels while preserving the compact control alignment. */
+@media (min-width: 821px) {
+  .filter-sidebar fieldset:nth-of-type(1) legend,
+  .filter-sidebar fieldset:nth-of-type(2) legend,
+  .filter-sidebar fieldset:nth-of-type(3) legend { position: relative; top: 6px; }
+}
