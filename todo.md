@@ -120,3 +120,6 @@
 - [x] Verify the lowered filter-panel heading alignment before delivery.
 - [x] Compact the desktop filter-panel boxes and remove remaining unused spacing without crowding controls.
 - [x] Verify the compacted filter panels on desktop and mobile before delivery.
+- [x] Reduce the gap between the desktop filter headings and their controls while retaining readable alignment.
+- [x] Further compact the desktop filter-shelf height without clipping content.
+- [x] Verify the denser filter shelf on desktop and mobile before delivery.
