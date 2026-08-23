@@ -21,14 +21,14 @@ export const appRouter = router({
     }),
   }),
   discovery: router({
-    suggest: publicProcedure.input(z.object({ query: z.string().trim().min(3).max(240) })).mutation(async ({ input }) => {
+    suggest: publicProcedure.input(z.object({ query: z.string().trim().min(3).max(240), history: z.array(z.string().trim().min(3).max(240)).max(5).optional() })).mutation(async ({ input }) => {
       try {
         const response = await invokeLLM({
           model: "gemini-3-flash-preview",
           maxTokens: 1024,
           messages: [
             { role: "system", content: "You are Luma Market's precise product finder. Always select at least one and up to four relevant IDs only from the supplied catalog. Interpret descriptive shopping language, such as mood, material, room, or use case. Consider live inventory: make currently well-stocked relevant choices first, and clearly flag a low-stock match only when it is a particularly strong fit. Do not invent products or attributes." },
-            { role: "user", content: `Catalog:\n${catalogContext}\n\nVisitor search: ${input.query}` },
+            { role: "user", content: `Catalog:\n${catalogContext}\n\nRecent visitor search themes: ${(input.history ?? []).join(" | ") || "None yet"}\n\nVisitor search: ${input.query}` },
           ],
           response_format: {
             type: "json_schema",

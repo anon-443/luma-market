@@ -3,7 +3,7 @@
  * Use asymmetric sections, Luma Saffron price stickers, spectral arches, and tactile 160–260ms motion.
  */
 import { useEffect, useMemo, useState } from "react";
-import type { FormEvent, KeyboardEvent } from "react";
+import type { FormEvent, KeyboardEvent, TouchEvent } from "react";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -22,6 +22,7 @@ import {
   Package,
   Plus,
   Search,
+  Share2,
   ShoppingBag,
   SlidersHorizontal,
   Sparkles,
@@ -211,10 +212,33 @@ function ImageLightbox({ product, imageIndex, onClose }: { product: Product; ima
   const gallery = productGallery[product.id] ?? [{ src: product.image, alt: product.name, position: product.imagePosition }];
   const [activeIndex, setActiveIndex] = useState(imageIndex);
   const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [gesture, setGesture] = useState<{ mode: "drag" | "pinch"; startX: number; startY: number; startPan: { x: number; y: number }; startDistance?: number; startZoom: number } | null>(null);
   const image = gallery[activeIndex] ?? gallery[0];
-  const changeImage = (direction: number) => { setActiveIndex((current) => (current + direction + gallery.length) % gallery.length); setZoom(1); };
+  const resetView = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
+  const changeImage = (direction: number) => { setActiveIndex((current) => (current + direction + gallery.length) % gallery.length); resetView(); };
+  const distance = (first: { clientX: number; clientY: number }, second: { clientX: number; clientY: number }) => Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    const first = event.touches[0];
+    if (!first) return;
+    if (event.touches.length === 2 && event.touches[1]) { setGesture({ mode: "pinch", startX: 0, startY: 0, startPan: pan, startDistance: distance(first, event.touches[1]), startZoom: zoom }); return; }
+    if (zoom > 1) setGesture({ mode: "drag", startX: first.clientX, startY: first.clientY, startPan: pan, startZoom: zoom });
+  };
+  const handleTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+    if (!gesture) return;
+    const first = event.touches[0];
+    if (!first) return;
+    event.preventDefault();
+    if (gesture.mode === "pinch" && event.touches[1] && gesture.startDistance) {
+      const nextZoom = Math.min(2.8, Math.max(1, gesture.startZoom * (distance(first, event.touches[1]) / gesture.startDistance)));
+      setZoom(nextZoom);
+      if (nextZoom === 1) setPan({ x: 0, y: 0 });
+      return;
+    }
+    if (gesture.mode === "drag") setPan({ x: Math.max(-170, Math.min(170, gesture.startPan.x + first.clientX - gesture.startX)), y: Math.max(-170, Math.min(170, gesture.startPan.y + first.clientY - gesture.startY)) });
+  };
 
-  return <div className="lightbox-overlay" role="presentation" onMouseDown={onClose}><section className="image-lightbox" role="dialog" aria-modal="true" aria-label={`${product.name} image gallery`} onMouseDown={(event) => event.stopPropagation()}><button className="lightbox-close" onClick={onClose} aria-label="Close image lightbox"><X size={22} /></button><div className="lightbox-image-wrap"><img src={image.src} alt={image.alt} style={{ objectPosition: image.position, transform: `scale(${zoom})` }} /></div><div className="lightbox-footer"><div className="lightbox-controls"><button onClick={() => setZoom((value) => Math.max(1, value - 0.3))} disabled={zoom <= 1} aria-label="Zoom out"><ZoomOut size={18} /></button><span>{Math.round(zoom * 100)}%</span><button onClick={() => setZoom((value) => Math.min(2.4, value + 0.3))} disabled={zoom >= 2.4} aria-label="Zoom in"><ZoomIn size={18} /></button></div><p>{activeIndex + 1} / {gallery.length} · {product.name}</p><div className="lightbox-controls"><button onClick={() => changeImage(-1)} aria-label="Previous image"><ChevronLeft size={18} /></button><button onClick={() => changeImage(1)} aria-label="Next image"><ChevronRight size={18} /></button></div></div></section></div>;
+  return <div className="lightbox-overlay" role="presentation" onMouseDown={onClose}><section className="image-lightbox" role="dialog" aria-modal="true" aria-label={`${product.name} image gallery`} onMouseDown={(event) => event.stopPropagation()}><button className="lightbox-close" onClick={onClose} aria-label="Close image lightbox"><X size={22} /></button><div className="lightbox-image-wrap" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={() => setGesture(null)} onTouchCancel={() => setGesture(null)}><img src={image.src} alt={image.alt} style={{ objectPosition: image.position, transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }} /></div><div className="lightbox-footer"><div className="lightbox-controls"><button onClick={() => { setZoom((value) => Math.max(1, value - 0.3)); if (zoom <= 1.3) setPan({ x: 0, y: 0 }); }} disabled={zoom <= 1} aria-label="Zoom out"><ZoomOut size={18} /></button><span>{Math.round(zoom * 100)}%</span><button onClick={() => setZoom((value) => Math.min(2.8, value + 0.3))} disabled={zoom >= 2.8} aria-label="Zoom in"><ZoomIn size={18} /></button></div><p>{activeIndex + 1} / {gallery.length} · {product.name}<small>Pinch to zoom · drag to pan</small></p><div className="lightbox-controls"><button onClick={() => changeImage(-1)} aria-label="Previous image"><ChevronLeft size={18} /></button><button onClick={() => changeImage(1)} aria-label="Next image"><ChevronRight size={18} /></button></div></div></section></div>;
 }
 
 function ProductReviews({ product }: { product: Product }) {
@@ -252,9 +276,9 @@ function ProductReviews({ product }: { product: Product }) {
   );
 }
 
-function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onToggleWishlist }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; isWishlisted: boolean; onToggleWishlist: (product: Product) => void }) {
+function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onToggleWishlist, onShare }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; isWishlisted: boolean; onToggleWishlist: (product: Product) => void; onShare: (product: Product) => void }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  return <><div className="overlay product-overlay" role="presentation" onMouseDown={onClose}><section className="product-modal" role="dialog" aria-modal="true" aria-label={product.name} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose} aria-label="Close product details"><X size={20} /></button><ProductGallery product={product} onOpenLightbox={setLightboxIndex} /><div className="product-detail-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><div className="detail-title-row"><h3>{product.name}</h3><button className={`detail-heart ${isWishlisted ? "is-saved" : ""}`} onClick={() => onToggleWishlist(product)} aria-pressed={isWishlisted} aria-label={`${isWishlisted ? "Remove" : "Save"} ${product.name} from wishlist`}><Heart size={19} fill={isWishlisted ? "currentColor" : "transparent"} /></button></div><p className="detail-price">{money.format(product.price)}</p><p className={`detail-stock ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Low stock · ${product.remaining} remaining` : `${product.remaining} ready to ship`}</p><p>{product.description}</p><ul>{product.specs.map((spec) => <li key={spec}><Check size={15} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); onClose(); }}>Add to bag <Plus size={18} /></button><ProductReviews product={product} /></div></section></div>{lightboxIndex !== null && <ImageLightbox product={product} imageIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />}</>;
+  return <><div className="overlay product-overlay" role="presentation" onMouseDown={onClose}><section className="product-modal" role="dialog" aria-modal="true" aria-label={product.name} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose} aria-label="Close product details"><X size={20} /></button><ProductGallery product={product} onOpenLightbox={setLightboxIndex} /><div className="product-detail-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><div className="detail-title-row"><h3>{product.name}</h3><div className="detail-actions"><button className="detail-share" onClick={() => onShare(product)} aria-label={`Share ${product.name}`}><Share2 size={18} /></button><button className={`detail-heart ${isWishlisted ? "is-saved" : ""}`} onClick={() => onToggleWishlist(product)} aria-pressed={isWishlisted} aria-label={`${isWishlisted ? "Remove" : "Save"} ${product.name} from wishlist`}><Heart size={19} fill={isWishlisted ? "currentColor" : "transparent"} /></button></div></div><p className="detail-price">{money.format(product.price)}</p><p className={`detail-stock ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Low stock · ${product.remaining} remaining` : `${product.remaining} ready to ship`}</p><p>{product.description}</p><ul>{product.specs.map((spec) => <li key={spec}><Check size={15} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); onClose(); }}>Add to bag <Plus size={18} /></button><ProductReviews product={product} /></div></section></div>{lightboxIndex !== null && <ImageLightbox product={product} imageIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />}</>;
 }
 
 export default function Home() {
@@ -274,6 +298,9 @@ export default function Home() {
   });
   const [aiSuggestion, setAiSuggestion] = useState<{ productIds: number[]; shortReason: string; inventoryNote: string; source: "ai" | "catalog" } | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem("luma-search-history") ?? "[]") as string[]; } catch { return []; }
+  });
   const [voiceSupported] = useState(() => typeof window !== "undefined" && Boolean((window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor }).SpeechRecognition || (window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor }).webkitSpeechRecognition));
   const aiSearch = trpc.discovery.suggest.useMutation({
     onSuccess: (suggestion) => setAiSuggestion(suggestion),
@@ -281,6 +308,11 @@ export default function Home() {
   });
 
   useEffect(() => { localStorage.setItem("luma-wishlist", JSON.stringify(wishlist)); }, [wishlist]);
+  useEffect(() => { localStorage.setItem("luma-search-history", JSON.stringify(searchHistory)); }, [searchHistory]);
+  useEffect(() => {
+    const productId = Number(new URLSearchParams(window.location.search).get("product"));
+    if (productId) setActiveProduct(products.find((product) => product.id === productId) ?? null);
+  }, []);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -340,11 +372,15 @@ export default function Home() {
     });
   };
 
-  const submitNaturalSearch = () => {
-    const searchText = query.trim();
+  const runDiscovery = (rawQuery: string) => {
+    const searchText = rawQuery.trim();
     if (searchText.length < 3) { toast.info("Describe a mood, material, room, or use case in a few words."); return; }
-    aiSearch.mutate({ query: searchText });
+    const nextHistory = [searchText, ...searchHistory.filter((item) => item.toLowerCase() !== searchText.toLowerCase())].slice(0, 5);
+    setSearchHistory(nextHistory);
+    aiSearch.mutate({ query: searchText, history: nextHistory.slice(1) });
   };
+
+  const submitNaturalSearch = () => runDiscovery(query);
 
   const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") { event.preventDefault(); submitNaturalSearch(); }
@@ -363,7 +399,7 @@ export default function Home() {
       if (!transcript) return;
       setQuery(transcript);
       setAiSuggestion(null);
-      aiSearch.mutate({ query: transcript });
+      runDiscovery(transcript);
     };
     recognition.onerror = () => toast.error("We couldn’t hear that clearly. Please try again or type your search.");
     recognition.onend = () => setIsListening(false);
@@ -372,6 +408,19 @@ export default function Home() {
   };
 
   const wishlistProducts = products.filter((product) => wishlist.includes(product.id));
+
+  const shareProduct = async (product: Product) => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
+    const shareData = { title: `${product.name} · Luma Market`, text: `A thoughtful find from ${product.vendor}: ${product.name}.`, url: shareUrl };
+    try {
+      if (navigator.share) { await navigator.share(shareData); toast.success("Share sheet opened."); return; }
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Product link copied — ready to share anywhere.");
+    } catch (error) {
+      if ((error as Error).name === "AbortError") return;
+      window.prompt("Copy this product link", shareUrl);
+    }
+  };
 
   return (
     <div className="market-shell">
@@ -451,7 +500,7 @@ export default function Home() {
           </div>
 
           <div className="shop-tools">
-            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button><button className="ai-search-button" onClick={submitNaturalSearch} disabled={aiSearch.isPending} aria-label="Ask the AI product finder"><Sparkles size={16} className={aiSearch.isPending ? "sparkle-spin" : ""} /></button></div><p className="ai-search-label">{voiceSupported ? <><Mic size={12} /> Speak or type a mood, material, room, or ritual</> : <><MicOff size={12} /> Voice search is unavailable here — type a natural description</>}</p></div>
+            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button><button className="ai-search-button" onClick={submitNaturalSearch} disabled={aiSearch.isPending} aria-label="Ask the AI product finder"><Sparkles size={16} className={aiSearch.isPending ? "sparkle-spin" : ""} /></button></div><p className="ai-search-label">{voiceSupported ? <><Mic size={12} /> Speak or type a mood, material, room, or ritual</> : <><MicOff size={12} /> Voice search is unavailable here — type a natural description</>}</p>{searchHistory.length > 0 && <div className="recent-searches"><span>Recent</span><div>{searchHistory.map((item) => <button key={item} onClick={() => { setQuery(item); setAiSuggestion(null); runDiscovery(item); }}>{item}</button>)}<button className="clear-history" onClick={() => setSearchHistory([])} aria-label="Clear recent searches"><X size={12} /></button></div></div>}</div>
             <div className="filter-row">
               <div className="category-pills" aria-label="Filter by category">
                 {categories.map((item) => <button className={category === item ? "selected" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}
@@ -552,7 +601,7 @@ export default function Home() {
         </div>
       )}
 
-      {activeProduct && <ProductDetailModal product={activeProduct} onClose={() => setActiveProduct(null)} onAddToCart={addToCart} isWishlisted={wishlist.includes(activeProduct.id)} onToggleWishlist={toggleWishlist} />}
+      {activeProduct && <ProductDetailModal product={activeProduct} onClose={() => setActiveProduct(null)} onAddToCart={addToCart} isWishlisted={wishlist.includes(activeProduct.id)} onToggleWishlist={toggleWishlist} onShare={shareProduct} />}
 
       {activeVendor && (
         <div className="overlay" role="presentation" onMouseDown={() => setActiveVendor(null)}>
