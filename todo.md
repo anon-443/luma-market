@@ -29,3 +29,7 @@
 - [x] Add a shopper profile dashboard for local order history, wishlist management, and saved preferences.
 - [x] Add an AI review-summary section using only submitted visitor reviews; show an honest empty state when no reviews exist.
 - [x] Verify visual filters, profile controls, and review-summary states before saving a delivery checkpoint.
+- [x] Reduce the desktop hero height and image footprint while preserving visual balance.
+- [x] Standardize product-card image aspect ratios and grid dimensions so cards do not stretch unpredictably.
+- [x] Refine responsive sizing and spacing across desktop, tablet, and mobile breakpoints.
+- [x] Verify the corrected hero and product grid at representative screen widths before saving a delivery checkpoint.
