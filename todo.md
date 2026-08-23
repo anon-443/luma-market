@@ -36,3 +36,8 @@
 - [x] Add an accessible secondary product image reveal on product-card hover and keyboard focus.
 - [x] Add a polished quick-add control that appears within product imagery and confirms cart additions.
 - [x] Verify hover, keyboard-focus, and touch-friendly fallback states before saving a delivery checkpoint.
+- [x] Tune hero, category bar, and market-floor type scale and vertical rhythm without changing the visual direction.
+- [x] Refine sidebar controls, product metadata, badges, and market-radar density to the requested compact scale.
+- [x] Tighten the Luma Selects and Good Objects section spacing, typography, and decorative badge scale.
+- [x] Add compact Shop and Sellers link columns to the footer while preserving its minimal styling.
+- [x] Verify the precision refinements on desktop and mobile before saving a delivery checkpoint.

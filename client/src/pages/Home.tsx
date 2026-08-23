@@ -682,7 +682,10 @@ export default function Home() {
       <footer className="site-footer">
         <div className="footer-brand"><img src="/manus-storage/luma-split-sun-logo_8bd655e3.png" alt="" /><span>Luma</span></div>
         <p>Find a new favourite seller.</p>
-        <div><a href="#shop">Shop</a><a href="#makers">Makers</a><a href="mailto:hello@lumamarket.example">Contact</a></div>
+        <div className="footer-columns">
+          <section><b>Shop</b><a href="#shop">Home</a><button onClick={() => { setCategory("Accessories"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Accessories</button><button onClick={() => { setCategory("Tech"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Tech</button><button onClick={() => { setCategory("Stationery"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Stationery</button></section>
+          <section><b>Sellers</b><a href="#makers">Become a maker</a><button onClick={() => setShowProfile(true)}>Seller dashboard</button><a href="#story">Our standards</a></section>
+        </div>
       </footer>
 
       {showCart && (
