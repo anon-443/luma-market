@@ -282,9 +282,9 @@ const productGallery: Record<number, GalleryImage[]> = {
 };
 
 const vendors = [
-  { name: "Maison Sora", description: "Small rituals for the table.", category: "Ceramics & home", products: 18, palette: "sora" },
-  { name: "Field Theory", description: "Objects that hold a room together.", category: "Lighting & furniture", products: 24, palette: "field" },
-  { name: "Onda Goods", description: "Useful things with soft edges.", category: "Textiles & accessories", products: 31, palette: "onda" },
+  { name: "Maison Sora", description: "Small rituals for the table", category: "Ceramics & home", products: 18, palette: "sora" },
+  { name: "Field Theory", description: "Objects that hold a room together", category: "Lighting & furniture", products: 24, palette: "field" },
+  { name: "Onda Goods", description: "Useful things with soft edges", category: "Textiles & accessories", products: 31, palette: "onda" },
 ];
 
 const categories = ["All", "Home", "Accessories", "Tech", "Stationery"];
@@ -373,22 +373,22 @@ function ProductReviews({ product }: { product: Product }) {
       setComment("");
       await reviewsQuery.refetch();
       await reviewSummaryQuery.refetch();
-      toast.success("Your review is now part of this product’s visitor notes.");
+      toast.success("Your review is now part of this product’s visitor notes");
     },
-    onError: (error) => toast.error(error.message || "We couldn’t save that review just yet."),
+    onError: (error) => toast.error(error.message || "We couldn’t save that review just yet"),
   });
   const reviews = (reviewsQuery.data ?? []) as VisitorReview[];
 
   return (
     <section className="reviews-panel" aria-labelledby={`reviews-${product.id}`}>
-      <div className="review-heading"><div><p className="eyebrow"><span /> VISITOR NOTES</p><h4 id={`reviews-${product.id}`}>Your take matters.</h4></div><span>{reviews.length} note{reviews.length === 1 ? "" : "s"}</span></div>
-      <section className="review-summary" aria-label="AI review themes"><div><Sparkles size={16} /><strong>AI review themes</strong><span>Built only from visitor notes</span></div>{reviewSummaryQuery.isLoading && reviews.length > 0 && <p>Reading the themes in submitted notes…</p>}{reviewSummaryQuery.data?.status === "empty" && <p>No notes yet, so there are no themes to summarize.</p>}{reviewSummaryQuery.data?.status === "unavailable" && <p>Visitor notes are here; an AI theme summary is temporarily unavailable.</p>}{reviewSummaryQuery.data?.status === "ready" && <div className="theme-columns"><div><b>Often appreciated</b>{reviewSummaryQuery.data.positives.length ? <ul>{reviewSummaryQuery.data.positives.map((item) => <li key={item}><Check size={13} />{item}</li>)}</ul> : <p>No repeated praise is clear yet.</p>}</div><div><b>Worth noting</b>{reviewSummaryQuery.data.considerations.length ? <ul>{reviewSummaryQuery.data.considerations.map((item) => <li key={item}><span>–</span>{item}</li>)}</ul> : <p>No recurring concerns are clear yet.</p>}</div></div>}</section>
+      <div className="review-heading"><div><p className="eyebrow"><span /> VISITOR NOTES</p><h4 id={`reviews-${product.id}`}>Your take matters</h4></div><span>{reviews.length} note{reviews.length === 1 ? "" : "s"}</span></div>
+      <section className="review-summary" aria-label="AI review themes"><div><Sparkles size={16} /><strong>AI review themes</strong><span>Built only from visitor notes</span></div>{reviewSummaryQuery.isLoading && reviews.length > 0 && <p>Reading submitted themes…</p>}{reviewSummaryQuery.data?.status === "empty" && <p>No notes yet — no themes to summarize</p>}{reviewSummaryQuery.data?.status === "unavailable" && <p>Visitor notes are here but themes are temporarily unavailable</p>}{reviewSummaryQuery.data?.status === "ready" && <div className="theme-columns"><div><b>Often appreciated</b>{reviewSummaryQuery.data.positives.length ? <ul>{reviewSummaryQuery.data.positives.map((item) => <li key={item}><Check size={13} />{item}</li>)}</ul> : <p>No repeated praise is clear yet</p>}</div><div><b>Worth noting</b>{reviewSummaryQuery.data.considerations.length ? <ul>{reviewSummaryQuery.data.considerations.map((item) => <li key={item}><span>–</span>{item}</li>)}</ul> : <p>No recurring concerns are clear yet</p>}</div></div>}</section>
       <div className="review-list">
         {reviewsQuery.isLoading && <p className="review-status">Finding recent notes…</p>}
-        {!reviewsQuery.isLoading && !reviews.length && <p className="review-status">No visitor notes yet. Be the first to share a considered take.</p>}
+        {!reviewsQuery.isLoading && !reviews.length && <p className="review-status">No visitor notes yet — be the first to share a considered take</p>}
         {reviews.map((review) => <article className="review-comment" key={review.id}><div><strong>{review.authorName}</strong><span className="review-stars" aria-label={`${review.rating} out of 5 stars`}>{Array.from({ length: 5 }, (_, index) => <Star key={index} size={13} fill={index < review.rating ? "currentColor" : "transparent"} />)}</span></div><p>{review.comment}</p></article>)}
       </div>
-      <form className="review-form" onSubmit={(event) => { event.preventDefault(); if (!rating) { toast.info("Choose a star rating before sharing your note."); return; } createReview.mutate({ productId: product.id, authorName, rating, comment }); }}>
+      <form className="review-form" onSubmit={(event) => { event.preventDefault(); if (!rating) { toast.info("Choose a star rating before sharing your note"); return; } createReview.mutate({ productId: product.id, authorName, rating, comment }); }}>
         <label>Your name<input required value={authorName} maxLength={80} onChange={(event) => setAuthorName(event.target.value)} placeholder="Name for your note" /></label>
         <fieldset><legend>Your rating</legend><div className="rating-picker" role="radiogroup" aria-label="Choose a rating from 1 to 5 stars">{[1, 2, 3, 4, 5].map((value) => <button type="button" key={value} onClick={() => setRating(value)} aria-label={`${value} star${value === 1 ? "" : "s"}`} aria-pressed={rating === value}><Star size={21} fill={value <= rating ? "currentColor" : "transparent"} /></button>)}</div></fieldset>
         <label>Your note<textarea required value={comment} minLength={4} maxLength={1000} onChange={(event) => setComment(event.target.value)} placeholder="What stood out when you used it?" rows={3} /></label>
@@ -411,7 +411,7 @@ function RelatedProducts({ product, onSelect, onAddToCart, searchHistory, wishli
     return score(right) - score(left) || left.id - right.id;
   }).slice(0, 2);
 
-  return <section className="related-products" aria-labelledby={`related-${product.id}`}><div className="related-heading"><div><p className="eyebrow"><span /> FOR YOUR MARKET TRAIL</p><h4 id={`related-${product.id}`}>You may also like</h4></div><Sparkles size={18} /></div><p className="related-rationale">Matched from this find, your recent searches, and saved pieces.</p><div className="related-grid">{related.map((item) => <article key={item.id}><button className="related-image" onClick={() => onSelect(item)} aria-label={`View ${item.name}`}><img src={item.image} alt="" style={{ objectPosition: item.imagePosition }} /></button><div><button onClick={() => onSelect(item)}>{item.name}</button><p>{item.vendor}</p><strong>{money.format(item.price)}</strong><button className="related-add" onClick={() => onAddToCart(item)} aria-label={`Add ${item.name} to cart`}><Plus size={14} /></button></div></article>)}</div></section>;
+  return <section className="related-products" aria-labelledby={`related-${product.id}`}><div className="related-heading"><div><p className="eyebrow"><span /> FOR YOUR MARKET TRAIL</p><h4 id={`related-${product.id}`}>You may also like</h4></div><Sparkles size={18} /></div><p className="related-rationale">Matched from this find, your recent searches, and saved pieces</p><div className="related-grid">{related.map((item) => <article key={item.id}><button className="related-image" onClick={() => onSelect(item)} aria-label={`View ${item.name}`}><img src={item.image} alt="" style={{ objectPosition: item.imagePosition }} /></button><div><button onClick={() => onSelect(item)}>{item.name}</button><p>{item.vendor}</p><strong>{money.format(item.price)}</strong><button className="related-add" onClick={() => onAddToCart(item)} aria-label={`Add ${item.name} to cart`}><Plus size={14} /></button></div></article>)}</div></section>;
 }
 
 function QuickViewModal({ product, onClose, onAddToCart, onViewDetails }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; onViewDetails: (product: Product) => void }) {
@@ -475,7 +475,7 @@ export default function Home() {
   const [voiceSupported] = useState(() => typeof window !== "undefined" && Boolean((window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor }).SpeechRecognition || (window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor }).webkitSpeechRecognition));
   const aiSearch = trpc.discovery.suggest.useMutation({
     onSuccess: (suggestion) => setAiSuggestion(suggestion),
-    onError: () => toast.error("The market finder is taking a breath. Try a few keywords instead."),
+    onError: () => toast.error("The market finder is taking a breath — try a few keywords instead"),
   });
   const ratingSummaries = trpc.reviews.summaries.useQuery();
 
@@ -555,7 +555,7 @@ export default function Home() {
     setCart([]);
     setShowCheckout(false);
     setCheckoutStage("summary");
-    toast.success("Order request confirmed", { description: "Your sellers will receive the preparation details next." });
+    toast.success("Order request confirmed", { description: "Your sellers will receive the preparation details next" });
   };
 
   const openCheckout = () => {
@@ -579,7 +579,7 @@ export default function Home() {
 
   const runDiscovery = (rawQuery: string) => {
     const searchText = rawQuery.trim();
-    if (searchText.length < 3) { toast.info("Describe a mood, material, room, or use case in a few words."); return; }
+    if (searchText.length < 3) { toast.info("Describe a mood, material, room, or use case in a few words"); return; }
     const nextHistory = [searchText, ...searchHistory.filter((item) => item.toLowerCase() !== searchText.toLowerCase())].slice(0, 5);
     setSearchHistory(nextHistory);
     aiSearch.mutate({ query: searchText, history: nextHistory.slice(1) });
@@ -594,7 +594,7 @@ export default function Home() {
   const startVoiceSearch = () => {
     const voiceWindow = window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor };
     const Recognition = voiceWindow.SpeechRecognition ?? voiceWindow.webkitSpeechRecognition;
-    if (!Recognition) { toast.info("Voice search is not available in this browser. You can still describe what you need in the search field."); return; }
+    if (!Recognition) { toast.info("Voice search is not available in this browser — describe what you need in the search field"); return; }
     const recognition = new Recognition();
     recognition.continuous = false;
     recognition.interimResults = false;
@@ -606,7 +606,7 @@ export default function Home() {
       setAiSuggestion(null);
       runDiscovery(transcript);
     };
-    recognition.onerror = () => toast.error("We couldn’t hear that clearly. Please try again or type your search.");
+    recognition.onerror = () => toast.error("We couldn’t hear that clearly — please try again or type your search");
     recognition.onend = () => setIsListening(false);
     setIsListening(true);
     recognition.start();
@@ -618,9 +618,9 @@ export default function Home() {
     const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
     const shareData = { title: `${product.name} · Luma Market`, text: `A thoughtful find from ${product.vendor}: ${product.name}.`, url: shareUrl };
     try {
-      if (navigator.share) { await navigator.share(shareData); toast.success("Share sheet opened."); return; }
+      if (navigator.share) { await navigator.share(shareData); toast.success("Share sheet opened"); return; }
       await navigator.clipboard.writeText(shareUrl);
-      toast.success("Product link copied — ready to share anywhere.");
+      toast.success("Product link copied — ready to share anywhere");
     } catch (error) {
       if ((error as Error).name === "AbortError") return;
       window.prompt("Copy this product link", shareUrl);
@@ -668,13 +668,14 @@ export default function Home() {
         <section className="hero" aria-labelledby="hero-heading">
           <div className="hero-copy">
             <p className="eyebrow"><span /> MARKETPLACE / 24</p>
+            <p className="hero-prompt">Find your next useful obsession</p>
             <h1 id="hero-heading">The good kind <em>of too much.</em></h1>
-            <p className="hero-description">A living market of thoughtful finds, independent studios, and objects with a point of view.</p>
+            <p className="hero-description">Thoughtful finds from independent studios</p>
+            <div className="hero-stat"><strong>38</strong><span><b>independent sellers</b><small>now in the arcade</small></span></div>
             <div className="hero-cta-row">
               <a className="button primary-button" href="#shop">Browse the market <ArrowDownRight size={18} /></a>
               <a className="text-link" href="#makers">Meet the makers <ArrowRight size={16} /></a>
             </div>
-            <div className="hero-stat"><strong>38</strong><span>independent sellers<br />now in the arcade</span></div>
           </div>
           <div className="hero-visual">
             <div className="hero-ring ring-a" />
@@ -686,7 +687,6 @@ export default function Home() {
         </section>
 
         <section className="category-ribbon" aria-label="Product categories">
-          <p>Find your next useful obsession</p>
           <div className="category-links">
             {categories.slice(1).map((item) => <button key={item} onClick={() => { setCategory(item); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>{item}</button>)}
           </div>
@@ -697,7 +697,7 @@ export default function Home() {
           <div className="shop-heading-row">
             <div>
               <h2 id="shop-heading">Made to become <em>yours.</em></h2>
-              <p>Small-run finds from independent sellers, ready to take home.</p>
+              <p>Small-run finds from independent sellers ready to take home</p>
             </div>
             <div className="rail-controls" aria-label="Browse products">
               <button onClick={() => moveCollection("left")} aria-label="Scroll products left"><ChevronLeft size={19} /></button>
@@ -722,8 +722,8 @@ export default function Home() {
             <div className="filter-sidebar-heading"><div><p className="eyebrow"><span /> REFINE THE FLOOR</p><h3>Find your fit.</h3></div><button onClick={() => { setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); setMinimumRating(0); }}>Reset</button></div>
             <fieldset><legend>Category</legend>{categories.map((item) => <label className="filter-choice" key={item}><input type="radio" name="category-filter" checked={category === item} onChange={() => setCategory(item)} /><span>{item}</span></label>)}</fieldset>
             <fieldset><legend>Price range <b>{money.format(priceFloor)}–{money.format(priceCeiling)}</b></legend><div className="price-visual-range"><div className="price-track" style={{ "--from": `${((priceFloor - 20) / 180) * 100}%`, "--to": `${100 - ((priceCeiling - 20) / 180) * 100}%` } as React.CSSProperties} /><input aria-label="Minimum price" type="range" min="20" max="190" step="10" value={priceFloor} onChange={(event) => setPriceFloor(Math.min(Number(event.target.value), priceCeiling - 10))} /><input aria-label="Maximum price" type="range" min="30" max="200" step="10" value={priceCeiling} onChange={(event) => setPriceCeiling(Math.max(Number(event.target.value), priceFloor + 10))} /></div><div className="range-labels"><span>$20</span><span>$200+</span></div></fieldset>
-            <fieldset><legend>Colour</legend><div className="color-swatches"><button className={selectedColor === "All" ? "selected" : ""} onClick={() => setSelectedColor("All")} aria-pressed={selectedColor === "All"} aria-label="All colours">All</button>{colorSwatches.map((swatch) => <button key={swatch.value} className={selectedColor === swatch.value ? "selected" : ""} onClick={() => setSelectedColor(swatch.value)} aria-pressed={selectedColor === swatch.value} aria-label={`Filter by ${swatch.value}`} title={swatch.value}><i style={{ background: swatch.color }} /></button>)}</div><small>{selectedColor === "All" ? "Choose an object colour to narrow the market." : selectedColor}</small></fieldset>
-            <fieldset><legend>Visitor rating</legend><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 0} onChange={() => setMinimumRating(0)} /><span>Any rating</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 4} onChange={() => setMinimumRating(4)} /><span>4 stars & up</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 5} onChange={() => setMinimumRating(5)} /><span>5 stars</span></label><small>{ratingSummaries.data?.length ? "Filters reflect published visitor notes only." : "Ratings will appear once visitors add notes."}</small></fieldset>
+            <fieldset><legend>Colour</legend><div className="color-swatches"><button className={selectedColor === "All" ? "selected" : ""} onClick={() => setSelectedColor("All")} aria-pressed={selectedColor === "All"} aria-label="All colours">All</button>{colorSwatches.map((swatch) => <button key={swatch.value} className={selectedColor === swatch.value ? "selected" : ""} onClick={() => setSelectedColor(swatch.value)} aria-pressed={selectedColor === swatch.value} aria-label={`Filter by ${swatch.value}`} title={swatch.value}><i style={{ background: swatch.color }} /></button>)}</div><small>{selectedColor === "All" ? "Choose an object colour to narrow the market" : selectedColor}</small></fieldset>
+            <fieldset><legend>Visitor rating</legend><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 0} onChange={() => setMinimumRating(0)} /><span>Any rating</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 4} onChange={() => setMinimumRating(4)} /><span>4 stars & up</span></label><label className="filter-choice"><input type="radio" name="rating-filter" checked={minimumRating === 5} onChange={() => setMinimumRating(5)} /><span>5 stars</span></label><small>{ratingSummaries.data?.length ? "Filters reflect published visitor notes only" : "Ratings will appear once visitors add notes"}</small></fieldset>
           </aside>
           <div className="product-results"><div className="product-rail" id="product-rail">
             {filteredProducts.map((product, index) => (
@@ -756,7 +756,7 @@ export default function Home() {
           <div className="promo-copy">
             <p className="eyebrow"><span /> LUMA SELECTS</p>
             <h2>Room for the<br /><em>unexpected.</em></h2>
-            <p>Explore a handpicked collection from newer sellers building useful, beautiful things in small numbers.</p>
+            <p>Explore a handpicked collection from newer sellers building useful and beautiful things in small numbers</p>
             <button className="button dark-button" onClick={() => { setCategory("Accessories"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>See the edit <ArrowRight size={18} /></button>
           </div>
           <div className="promo-image"><img src="/manus-storage/luma-promo-arch_a2f778e9.jpg" alt="Curated accessories styled within a cream architectural arch" /><span className="promo-sticker">SAVE<br /><b>15%</b></span></div>
@@ -764,7 +764,7 @@ export default function Home() {
 
         <section className="vendors-section" id="makers" aria-labelledby="makers-heading">
           <div className="section-kicker"><span>02</span> SELLER STALLS</div>
-          <div className="vendors-heading"><h2 id="makers-heading">The people behind <em>the good stuff.</em></h2><p>Independent studios, all in one welcoming place.</p></div>
+          <div className="vendors-heading"><h2 id="makers-heading">The people behind <em>the good stuff.</em></h2><p>Independent studios all in one welcoming place</p></div>
           <div className="vendor-list">
             {vendors.map((vendor, index) => (
               <button className={`vendor-card ${vendor.palette}`} key={vendor.name} onClick={() => setActiveVendor(vendor)}>
@@ -786,7 +786,7 @@ export default function Home() {
 
       <footer className="site-footer">
         <div className="footer-brand"><img src="/manus-storage/luma-split-sun-logo_8bd655e3.png" alt="" /><span>Luma</span></div>
-        <p>Find a new favourite seller.</p>
+        <p>Find a new favourite seller</p>
         <div className="footer-columns">
           <section><b>Shop</b><a href="#shop">Home</a><button onClick={() => { setCategory("Accessories"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Accessories</button><button onClick={() => { setCategory("Tech"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Tech</button><button onClick={() => { setCategory("Stationery"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Stationery</button></section>
           <section><b>Sellers</b><a href="#makers">Become a maker</a><button onClick={() => setShowProfile(true)}>Seller dashboard</button><a href="#story">Our standards</a></section>
@@ -798,24 +798,24 @@ export default function Home() {
           <aside className="cart-drawer" role="dialog" aria-modal="true" aria-label="Shopping cart" onMouseDown={(event) => event.stopPropagation()}>
             <div className="drawer-header"><div><p className="eyebrow"><span /> YOUR FINDINGS</p><h3>Shopping bag <sup>{cartCount}</sup></h3></div><button onClick={() => setShowCart(false)} aria-label="Close shopping cart"><X size={21} /></button></div>
             <div className="cart-lines">
-              {cart.length ? cart.map((item) => <div className="cart-line" key={item.id}><div className={`cart-thumb ${item.imageClass}`}><item.Icon size={22} /></div><div><b>{item.name}</b><p>{item.vendor}</p><div className="quantity"><button onClick={() => updateQuantity(item.id, -1)} aria-label={`Remove one ${item.name}`}><Minus size={13} /></button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label={`Add one ${item.name}`}><Plus size={13} /></button></div></div><strong>{money.format(item.price * item.quantity)}</strong></div>) : <div className="cart-empty"><ShoppingBag size={26} /><p>Your bag is ready when you are.</p><button onClick={() => setShowCart(false)}>Keep browsing</button></div>}
+              {cart.length ? cart.map((item) => <div className="cart-line" key={item.id}><div className={`cart-thumb ${item.imageClass}`}><item.Icon size={22} /></div><div><b>{item.name}</b><p>{item.vendor}</p><div className="quantity"><button onClick={() => updateQuantity(item.id, -1)} aria-label={`Remove one ${item.name}`}><Minus size={13} /></button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label={`Add one ${item.name}`}><Plus size={13} /></button></div></div><strong>{money.format(item.price * item.quantity)}</strong></div>) : <div className="cart-empty"><ShoppingBag size={26} /><p>Your bag is ready when you are</p><button onClick={() => setShowCart(false)}>Keep browsing</button></div>}
             </div>
-            <div className="cart-footer"><div className="cart-price-line"><span>Subtotal</span><b>{money.format(cartTotal)}</b></div><div className="cart-price-line"><span>Estimated delivery</span><b>{estimatedShipping ? money.format(estimatedShipping) : "Complimentary"}</b></div><div className="cart-grand-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><p>{cartTotal >= 100 ? "Complimentary delivery unlocked." : "Add a little more to unlock complimentary delivery."}</p><button className="button primary-button full-width" disabled={!cart.length} onClick={openCheckout}>Continue to delivery <ArrowRight size={18} /></button></div>
+            <div className="cart-footer"><div className="cart-price-line"><span>Subtotal</span><b>{money.format(cartTotal)}</b></div><div className="cart-price-line"><span>Estimated delivery</span><b>{estimatedShipping ? money.format(estimatedShipping) : "Complimentary"}</b></div><div className="cart-grand-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><p>{cartTotal >= 100 ? "Complimentary delivery unlocked" : "Add a little more to unlock complimentary delivery"}</p><button className="button primary-button full-width" disabled={!cart.length} onClick={openCheckout}>Continue to delivery <ArrowRight size={18} /></button></div>
           </aside>
         </div>
       )}
 
-      {showProfile && <div className="overlay profile-overlay" role="presentation" onMouseDown={() => setShowProfile(false)}><section className="profile-dashboard" role="dialog" aria-modal="true" aria-label="Shopper profile" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowProfile(false)} aria-label="Close shopper profile"><X size={20} /></button><div className="profile-hero"><span className="profile-avatar"><CircleUserRound size={30} /></span><div><p className="eyebrow"><span /> YOUR LUMA</p><h3>{profileName || "Market visitor"}</h3><p>Your local market preferences and simulated order requests stay on this device.</p></div></div><div className="profile-grid"><section className="profile-card profile-preferences"><div><p className="eyebrow"><span /> PREFERENCES</p><h4>Set your signal.</h4></div><label>Display name<input value={profileName} maxLength={60} onChange={(event) => setProfileName(event.target.value)} placeholder="Market visitor" /></label><label className="preference-switch"><span><b>Personalized discovery</b><small>Use saved pieces and searches to shape matches.</small></span><input type="checkbox" checked={personalizedDiscovery} onChange={(event) => setPersonalizedDiscovery(event.target.checked)} /></label><label className="preference-switch"><span><b>Market updates</b><small>Keep a preference for new-studio notes.</small></span><input type="checkbox" checked={marketUpdates} onChange={(event) => setMarketUpdates(event.target.checked)} /></label></section><section className="profile-card profile-orders"><div><p className="eyebrow"><span /> ORDER HISTORY</p><h4>Past requests.</h4></div>{orderHistory.length ? <div className="order-history-list">{orderHistory.map((order) => <article key={order.id}><div><b>{order.id}</b><span>{new Date(order.createdAt).toLocaleDateString()} · {order.itemCount} item{order.itemCount === 1 ? "" : "s"}</span></div><strong>{money.format(order.total)}</strong><small>Simulated order request</small></article>)}</div> : <p className="profile-empty">No order requests yet. A completed simulated checkout will appear here.</p>}</section><section className="profile-card profile-saves"><div><p className="eyebrow"><span /> SAVED FINDS</p><h4>Still thinking about.</h4></div>{wishlistProducts.length ? <div className="profile-saves-list">{wishlistProducts.map((product) => <article key={product.id}><img src={product.image} alt="" /><div><b>{product.name}</b><span>{product.vendor} · {money.format(product.price)}</span></div><button onClick={() => toggleWishlist(product)} aria-label={`Remove ${product.name} from saved finds`}><Heart size={16} fill="currentColor" /></button></article>)}</div> : <p className="profile-empty">Save a piece from the market to keep it close here.</p>}</section></div></section></div>}
+      {showProfile && <div className="overlay profile-overlay" role="presentation" onMouseDown={() => setShowProfile(false)}><section className="profile-dashboard" role="dialog" aria-modal="true" aria-label="Shopper profile" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowProfile(false)} aria-label="Close shopper profile"><X size={20} /></button><div className="profile-hero"><span className="profile-avatar"><CircleUserRound size={30} /></span><div><p className="eyebrow"><span /> YOUR LUMA</p><h3>{profileName || "Market visitor"}</h3><p>Your local market preferences and simulated order requests stay on this device</p></div></div><div className="profile-grid"><section className="profile-card profile-preferences"><div><p className="eyebrow"><span /> PREFERENCES</p><h4>Set your signal</h4></div><label>Display name<input value={profileName} maxLength={60} onChange={(event) => setProfileName(event.target.value)} placeholder="Market visitor" /></label><label className="preference-switch"><span><b>Personalized discovery</b><small>Use saved pieces and searches to shape matches</small></span><input type="checkbox" checked={personalizedDiscovery} onChange={(event) => setPersonalizedDiscovery(event.target.checked)} /></label><label className="preference-switch"><span><b>Market updates</b><small>Keep a preference for new-studio notes</small></span><input type="checkbox" checked={marketUpdates} onChange={(event) => setMarketUpdates(event.target.checked)} /></label></section><section className="profile-card profile-orders"><div><p className="eyebrow"><span /> ORDER HISTORY</p><h4>Past requests</h4></div>{orderHistory.length ? <div className="order-history-list">{orderHistory.map((order) => <article key={order.id}><div><b>{order.id}</b><span>{new Date(order.createdAt).toLocaleDateString()} · {order.itemCount} item{order.itemCount === 1 ? "" : "s"}</span></div><strong>{money.format(order.total)}</strong><small>Simulated order request</small></article>)}</div> : <p className="profile-empty">No order requests yet — a completed simulated checkout will appear here</p>}</section><section className="profile-card profile-saves"><div><p className="eyebrow"><span /> SAVED FINDS</p><h4>Still thinking about</h4></div>{wishlistProducts.length ? <div className="profile-saves-list">{wishlistProducts.map((product) => <article key={product.id}><img src={product.image} alt="" /><div><b>{product.name}</b><span>{product.vendor} · {money.format(product.price)}</span></div><button onClick={() => toggleWishlist(product)} aria-label={`Remove ${product.name} from saved finds`}><Heart size={16} fill="currentColor" /></button></article>)}</div> : <p className="profile-empty">Save a piece from the market to keep it close here</p>}</section></div></section></div>}
 
-      {showWishlist && <div className="overlay" role="presentation" onMouseDown={() => setShowWishlist(false)}><aside className="wishlist-drawer" role="dialog" aria-modal="true" aria-label="Saved products" onMouseDown={(event) => event.stopPropagation()}><div className="drawer-header"><div><p className="eyebrow"><span /> KEEP FOR LATER</p><h3>Saved finds <sup>{wishlist.length}</sup></h3></div><button onClick={() => setShowWishlist(false)} aria-label="Close saved products"><X size={21} /></button></div><div className="wishlist-lines">{wishlistProducts.length ? wishlistProducts.map((product) => <article className="wishlist-line" key={product.id}><img src={product.image} alt="" /><div><b>{product.name}</b><p>{product.vendor}</p><strong>{money.format(product.price)}</strong></div><div><button className="small-heart is-saved" onClick={() => toggleWishlist(product)} aria-label={`Remove ${product.name} from wishlist`}><Heart size={17} fill="currentColor" /></button><button className="quick-bag" onClick={() => addToCart(product)}>Bag <Plus size={13} /></button></div></article>) : <div className="wishlist-empty"><Heart size={27} /><p>Keep the pieces you’re still thinking about.</p><button onClick={() => setShowWishlist(false)}>Explore the market</button></div>}</div></aside></div>}
+      {showWishlist && <div className="overlay" role="presentation" onMouseDown={() => setShowWishlist(false)}><aside className="wishlist-drawer" role="dialog" aria-modal="true" aria-label="Saved products" onMouseDown={(event) => event.stopPropagation()}><div className="drawer-header"><div><p className="eyebrow"><span /> KEEP FOR LATER</p><h3>Saved finds <sup>{wishlist.length}</sup></h3></div><button onClick={() => setShowWishlist(false)} aria-label="Close saved products"><X size={21} /></button></div><div className="wishlist-lines">{wishlistProducts.length ? wishlistProducts.map((product) => <article className="wishlist-line" key={product.id}><img src={product.image} alt="" /><div><b>{product.name}</b><p>{product.vendor}</p><strong>{money.format(product.price)}</strong></div><div><button className="small-heart is-saved" onClick={() => toggleWishlist(product)} aria-label={`Remove ${product.name} from wishlist`}><Heart size={17} fill="currentColor" /></button><button className="quick-bag" onClick={() => addToCart(product)}>Bag <Plus size={13} /></button></div></article>) : <div className="wishlist-empty"><Heart size={27} /><p>Keep the pieces you’re still thinking about</p><button onClick={() => setShowWishlist(false)}>Explore the market</button></div>}</div></aside></div>}
 
       {showCheckout && (
         <div className="overlay checkout-overlay" role="presentation">
           <section className={`checkout-modal checkout-${checkoutStage}`} role="dialog" aria-modal="true" aria-label="Checkout order summary">
             {checkoutStage !== "processing" && <button className="modal-close" onClick={() => { setShowCheckout(false); setCheckoutStage("summary"); }} aria-label="Close checkout"><X size={20} /></button>}
-            {checkoutStage === "summary" && <><p className="eyebrow"><span /> ORDER SUMMARY</p><h3>Almost yours.</h3><p className="checkout-intro">Review your small-run finds, then try the simulated payment step. No money moves in this experience.</p><div className="checkout-lines">{cart.map((item) => <div key={item.id}><span>{item.quantity} × {item.name}</span><b>{money.format(item.price * item.quantity)}</b></div>)}</div><form onSubmit={beginPayment}><label>Full name<input required name="name" placeholder="Jordan Lee" /></label><label>Email address<input required type="email" name="email" placeholder="you@example.com" /></label><label>Delivery address<textarea required name="address" placeholder="Street, city, postal code" rows={3} /></label><div className="checkout-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><button className="button primary-button full-width" type="submit">Simulate payment <ArrowRight size={18} /></button></form></>}
-            {checkoutStage === "processing" && <div className="payment-state" aria-live="polite"><span className="payment-orbit"><Loader2 size={28} /></span><p className="eyebrow"><span /> PAYMENT SIMULATION</p><h3>Checking the light.</h3><p>Simulating a secure approval for your order estimate of {money.format(cartGrandTotal)}.</p></div>}
-            {checkoutStage === "confirmed" && <div className="payment-state confirmed" aria-live="polite"><span className="payment-orbit"><Check size={29} /></span><p className="eyebrow"><span /> SIMULATED APPROVAL</p><h3>It’s in motion.</h3><p>Your order request is ready for sellers to review. No payment was taken.</p><div className="checkout-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><button className="button primary-button full-width" onClick={completeCheckout}>Back to the market <ArrowRight size={18} /></button></div>}
+            {checkoutStage === "summary" && <><p className="eyebrow"><span /> ORDER SUMMARY</p><h3>Almost yours</h3><p className="checkout-intro">Review your small-run finds, then try the simulated payment step — no money moves in this experience</p><div className="checkout-lines">{cart.map((item) => <div key={item.id}><span>{item.quantity} × {item.name}</span><b>{money.format(item.price * item.quantity)}</b></div>)}</div><form onSubmit={beginPayment}><label>Full name<input required name="name" placeholder="Jordan Lee" /></label><label>Email address<input required type="email" name="email" placeholder="you@example.com" /></label><label>Delivery address<textarea required name="address" placeholder="Street, city, postal code" rows={3} /></label><div className="checkout-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><button className="button primary-button full-width" type="submit">Simulate payment <ArrowRight size={18} /></button></form></>}
+            {checkoutStage === "processing" && <div className="payment-state" aria-live="polite"><span className="payment-orbit"><Loader2 size={28} /></span><p className="eyebrow"><span /> PAYMENT SIMULATION</p><h3>Checking the light</h3><p>Simulating a secure approval for your order estimate of {money.format(cartGrandTotal)}</p></div>}
+            {checkoutStage === "confirmed" && <div className="payment-state confirmed" aria-live="polite"><span className="payment-orbit"><Check size={29} /></span><p className="eyebrow"><span /> SIMULATED APPROVAL</p><h3>It’s in motion</h3><p>Your order request is ready for sellers to review — no payment was taken</p><div className="checkout-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><button className="button primary-button full-width" onClick={completeCheckout}>Back to the market <ArrowRight size={18} /></button></div>}
           </section>
         </div>
       )}
@@ -828,7 +828,7 @@ export default function Home() {
         <div className="overlay" role="presentation" onMouseDown={() => setActiveVendor(null)}>
           <section className="vendor-modal" role="dialog" aria-modal="true" aria-label={`${activeVendor.name} store`} onMouseDown={(event) => event.stopPropagation()}>
             <button className="modal-close" onClick={() => setActiveVendor(null)} aria-label="Close seller details"><X size={20} /></button>
-            <div className={`vendor-modal-mark ${activeVendor.palette}`}>{activeVendor.name.charAt(0)}</div><p className="eyebrow"><span /> INDEPENDENT SELLER</p><h3>{activeVendor.name}</h3><p>{activeVendor.description} Discover {activeVendor.products} pieces across {activeVendor.category.toLowerCase()}.</p><div className="vendor-modal-actions"><button className="button primary-button" onClick={() => { setQuery(activeVendor.name); setActiveVendor(null); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>View available pieces <ArrowRight size={17} /></button><button className="text-link" onClick={() => setActiveVendor(null)}>Back to stalls</button></div>
+            <div className={`vendor-modal-mark ${activeVendor.palette}`}>{activeVendor.name.charAt(0)}</div><p className="eyebrow"><span /> INDEPENDENT SELLER</p><h3>{activeVendor.name}</h3><p>{activeVendor.description} — discover {activeVendor.products} pieces across {activeVendor.category.toLowerCase()}</p><div className="vendor-modal-actions"><button className="button primary-button" onClick={() => { setQuery(activeVendor.name); setActiveVendor(null); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>View available pieces <ArrowRight size={17} /></button><button className="text-link" onClick={() => setActiveVendor(null)}>Back to stalls</button></div>
           </section>
         </div>
       )}

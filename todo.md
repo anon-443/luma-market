@@ -53,3 +53,14 @@
 - [x] Review the refreshed typography and palette at a mobile viewport before delivery.
 - [x] Apply and audit a complete refreshed font cascade so no rendered interface text can fall back to a legacy font declaration.
 - [x] Re-check header, drawer, filtering, checkout, review, footer, and modal text surfaces after the final font-cascade audit.
+- [x] Increase desktop header navigation and action-control scale while keeping the full header balanced.
+- [x] Move the seller-count message to the upper-left hero copy area and preserve clear breathing room beneath it.
+- [x] Recompose the catalog to show three roomy product cards per desktop row and reduce visual congestion.
+- [x] Remove unnecessary terminal periods from short marketplace copy, keep compact supporting lines single-line where practical, and use justified paragraph treatment only for multi-line descriptive copy.
+- [x] Verify the revised header, hero, catalog, and copy treatment on desktop and mobile before delivery.
+- [x] Audit all visible short marketplace messages and remove unnecessary terminal periods across conditional panels and feedback states.
+- [x] Re-check compact copy across cart, wishlist, product, vendor, profile, review, and checkout interfaces after the punctuation pass.
+- [x] Remove remaining unnecessary terminal periods from short checkout, vendor, profile, and other conditional-panel copy.
+- [x] Verify the cart, wishlist, product, vendor, profile, review, and checkout interfaces after the final punctuation cleanup.
+- [x] Reopen the cart and checkout overlays after the final punctuation cleanup and verify their compact rendered copy.
+- [x] Reopen a product detail panel and review section after the final punctuation cleanup and verify their compact rendered copy.
