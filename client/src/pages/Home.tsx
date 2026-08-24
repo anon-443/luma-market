@@ -71,6 +71,7 @@ type WebSpeechConstructor = new () => WebSpeechRecognition;
 
 export const seasonalPalettes = [
   { id: "gallery", label: "Gallery linen", description: "Quiet cream, ink and oxblood" },
+  { id: "cinema", label: "Cinematic studio", description: "Ink, ember and mist" },
   { id: "terracotta", label: "Terracotta dusk", description: "Clay, blush and olive" },
   { id: "coastal", label: "Coastal paper", description: "Chalk, marine and citrus" },
 ] as const;

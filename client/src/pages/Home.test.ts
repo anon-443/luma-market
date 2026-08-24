@@ -12,8 +12,8 @@ describe("marketplace ordering and vendor metadata", () => {
     expect(ordered.map((product) => product.id)).toEqual([1, 4, 12, 3, 9, 6, 2, 5, 7, 10, 8, 11]);
   });
 
-  it("offers Gallery linen as the default alongside two seasonal palette alternatives", () => {
-    expect(seasonalPalettes.map((palette) => palette.id)).toEqual(["gallery", "terracotta", "coastal"]);
+  it("offers Gallery linen as the default alongside three seasonal palette alternatives", () => {
+    expect(seasonalPalettes.map((palette) => palette.id)).toEqual(["gallery", "cinema", "terracotta", "coastal"]);
   });
 
   it("provides a standalone route slug and contact metadata for every vendor", () => {

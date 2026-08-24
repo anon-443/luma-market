@@ -163,3 +163,5 @@
 - [x] Replace the current default light palette with a more refined, neutral editorial color system while preserving every image and crop.
 - [x] Add accessible, persisted seasonal color presets that visitors can switch from the landing header.
 - [x] Verify the default palette and each seasonal preset across desktop and mobile without changing image assets.
+- [x] Study Palomino’s high-level visual direction and translate suitable ideas into original Luma landing refinements without copying source design or assets.
+- [x] Verify any resulting Luma refinement across desktop and mobile while preserving existing marketplace images and behavior.

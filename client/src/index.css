@@ -879,6 +879,21 @@ html:not(.dark) .market-shell[data-seasonal-palette="gallery"] .hero-visual { ba
 html:not(.dark) .market-shell[data-seasonal-palette="gallery"] .market-section { background: linear-gradient(180deg, rgba(217, 221, 208, 0.74), rgba(247, 243, 235, 0.16) 240px, transparent 520px); }
 html:not(.dark) .market-shell[data-seasonal-palette="gallery"] .promo-section { background: linear-gradient(120deg, #d4a34b 0%, #e3bd69 56%, #c8d2c6 56%, #afc0b4 100%); }
 
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] { --background: #e8e4dc; --foreground: #20262c; --card: #f7f4ee; --card-foreground: #20262c; --popover: #f7f4ee; --popover-foreground: #20262c; --primary: #20262c; --primary-foreground: #f7f4ee; --secondary: #dce2dd; --secondary-foreground: #20262c; --muted: #dedbd3; --muted-foreground: #69727a; --accent: #e6a83d; --accent-foreground: #20262c; --border: #c9c6bf; --input: #c2c8c5; --ring: #e6a83d; --hero-copy: #11181e; --hero-visual: #5f8a8e; --hero-orbit: #e6a83d; --ink: #20262c; --paper: #e8e4dc; --surface: #f7f4ee; --soft-surface: #dce2dd; --line: rgba(32, 38, 44, 0.16); --coral: #d46b5c; --saffron: #e6a83d; --teal: #397b78; }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] { background: radial-gradient(circle at 93% 3%, rgba(57, 123, 120, 0.18), transparent 24%), #e8e4dc; }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .hero-copy { --ink: #f8f3e9; --muted-foreground: #c8d0ce; --line: rgba(248, 243, 233, 0.16); background-image: radial-gradient(circle at 12% 15%, rgba(230, 168, 61, 0.18), transparent 18%), radial-gradient(circle at 87% 76%, rgba(212, 107, 92, 0.14), transparent 25%), linear-gradient(135deg, #11191f 0%, #17262c 68%, #274448 125%); }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .hero-copy, html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .hero h1 { color: var(--ink); }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .hero-copy::before { border-color: rgba(230, 168, 61, 0.7); box-shadow: 0 0 0 33px rgba(230, 168, 61, 0.07), 0 0 0 67px rgba(230, 168, 61, 0.035); }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .hero-copy::after { border-color: rgba(248, 243, 233, 0.15); }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .hero-visual { background: radial-gradient(circle at 72% 18%, rgba(246, 214, 127, 0.35), transparent 24%), linear-gradient(135deg, #31545a, #9ebcae 90%); }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .hero-image-frame { box-shadow: 22px 22px 0 rgba(15, 24, 29, 0.3); }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .hero-visual-index { background: rgba(248, 243, 233, 0.9); border-color: rgba(230, 168, 61, 0.5); }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .market-section { background: linear-gradient(180deg, rgba(216, 226, 221, 0.9), rgba(247, 244, 238, 0.2) 240px, transparent 520px); }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .promo-section { background: linear-gradient(120deg, #1d3035 0%, #31555a 56%, #deb258 56%, #e8cc83 100%); color: #f7f4ee; }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .promo-copy .eyebrow, html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .promo-copy p:not(.eyebrow) { color: rgba(247, 244, 238, 0.75); }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .promo-copy .eyebrow span { background: #e6a83d; }
+html:not(.dark) .market-shell[data-seasonal-palette="cinema"] .promo-section::before { border-color: rgba(247, 244, 238, 0.25); }
+
 html:not(.dark) .market-shell[data-seasonal-palette="terracotta"] { --background: #f2e3d8; --foreground: #30243b; --card: #fff8f0; --card-foreground: #30243b; --popover: #fff8f0; --popover-foreground: #30243b; --primary: #30243b; --primary-foreground: #fff8f0; --secondary: #dbe1cf; --secondary-foreground: #30243b; --muted: #ecd6c8; --muted-foreground: #735e69; --accent: #d8874e; --accent-foreground: #30243b; --border: #dfc5b8; --input: #d4b5a5; --ring: #d8874e; --hero-copy: #edc5b5; --hero-visual: #b8c8ad; --hero-orbit: #c76849; --ink: #30243b; --paper: #f2e3d8; --surface: #fff8f0; --soft-surface: #dbe1cf; --line: rgba(48, 36, 59, 0.16); --coral: #b9584c; --saffron: #d8874e; --teal: #5c7d65; }
 html:not(.dark) .market-shell[data-seasonal-palette="terracotta"] { background: radial-gradient(circle at 86% 3%, rgba(92, 125, 101, 0.18), transparent 22%), #f2e3d8; }
 html:not(.dark) .market-shell[data-seasonal-palette="terracotta"] .hero-copy { background-image: radial-gradient(circle at 15% 12%, rgba(216, 135, 78, 0.22), transparent 20%), linear-gradient(135deg, #edc5b5, #f0d4bd 70%, #e2d9c6 115%); }
@@ -903,6 +918,7 @@ html:not(.dark) .market-shell[data-seasonal-palette="coastal"] .hero-visual { ba
 .palette-menu button small { margin-top: 2px; color: var(--muted-foreground); font-size: 9px; line-height: 1.3; }
 .palette-swatch { width: 38px; height: 27px; border: 1px solid rgba(28, 29, 47, 0.12); display: block; }
 .palette-swatch.gallery { background: linear-gradient(135deg, #e9e3d8 0 48%, #c2cec3 48%); }
+.palette-swatch.cinema { background: linear-gradient(135deg, #11191f 0 48%, #6b9994 48%); }
 .palette-swatch.terracotta { background: linear-gradient(135deg, #edc5b5 0 48%, #a9c0a9 48%); }
 .palette-swatch.coastal { background: linear-gradient(135deg, #d4e5e3 0 48%, #94c4c5 48%); }
 @keyframes palette-pop-in { from { opacity: 0; transform: translateY(-7px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
