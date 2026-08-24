@@ -140,3 +140,7 @@
 - [x] Add a popularity sorting mode without restoring Visitor Rating sorting or filtering.
 - [x] Add clearly labelled footer social links and marketplace contact access.
 - [x] Verify vendor stores, contact actions, vendor search, popularity sorting, social links, and responsive presentation before delivery.
+- [x] Reduce the seller-section heading, seller names, supporting lines, and monogram scale without changing the seller-list structure.
+- [x] Verify the reduced seller-section scale on desktop and mobile before delivery.
+- [x] Further reduce the complete seller-section heading, seller-row text, and monogram scale while retaining clarity.
+- [x] Verify the further reduced seller section on desktop and mobile before delivery.

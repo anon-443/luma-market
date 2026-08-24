@@ -706,3 +706,29 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
   .vendor-search-results { margin-inline: 0; }
   .vendor-search-results button { width: 100%; min-width: 0; }
 }
+
+/* A quieter maker section: reduce the whole typographic and monogram hierarchy together. */
+@media (min-width: 821px) {
+  .vendors-section .vendors-heading { margin-bottom: 34px; }
+  .vendors-section .vendors-heading h2 { font-size: clamp(38px, 4vw, 58px); line-height: .98; }
+  .vendors-section .vendor-card { grid-template-columns: 46px 58px minmax(0, 1.35fr) minmax(136px, .85fr) 34px; gap: 12px; padding: 18px 8px; }
+  .vendors-section .vendor-card:hover { padding-left: 14px; padding-right: 14px; }
+  .vendors-section .vendor-number { font-size: 11px; }
+  .vendors-section .vendor-mark { width: 44px; height: 44px; font-size: 28px; }
+  .vendors-section .vendor-details { gap: 3px; }
+  .vendors-section .vendor-details b { font-size: 22px; }
+  .vendors-section .vendor-details small, .vendors-section .vendor-category { font-size: 11px; line-height: 1.4; }
+  .vendors-section .vendor-arrow { width: 19px; height: 19px; }
+}
+
+@media (max-width: 820px) {
+  .vendors-section .vendors-heading { margin-bottom: 24px; }
+  .vendors-section .vendors-heading h2 { font-size: 37px; line-height: 1; }
+  .vendors-section .vendor-card { grid-template-columns: 25px 44px minmax(0, 1fr) 20px; gap: 7px; padding: 14px 2px; }
+  .vendors-section .vendor-mark { width: 36px; height: 36px; font-size: 24px; }
+  .vendors-section .vendor-number { font-size: 10px; }
+  .vendors-section .vendor-details { gap: 2px; }
+  .vendors-section .vendor-details b { font-size: 19px; }
+  .vendors-section .vendor-details small { font-size: 10px; line-height: 1.35; }
+  .vendors-section .vendor-arrow { width: 16px; height: 16px; }
+}
