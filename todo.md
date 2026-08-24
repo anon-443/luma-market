@@ -165,3 +165,7 @@
 - [x] Verify the default palette and each seasonal preset across desktop and mobile without changing image assets.
 - [x] Study Palomino’s high-level visual direction and translate suitable ideas into original Luma landing refinements without copying source design or assets.
 - [x] Verify any resulting Luma refinement across desktop and mobile while preserving existing marketplace images and behavior.
+- [x] Remove unused outer side gutters throughout the desktop marketplace layout while retaining mobile-safe spacing.
+- [x] Increase header navigation/action and footer-link typography for clearer hierarchy.
+- [x] Give every product card a more distinct, colorful, aesthetic visual treatment without altering commerce behavior.
+- [x] Verify the full-width layout, enlarged typography, and varied product visuals on desktop and mobile before delivery.
