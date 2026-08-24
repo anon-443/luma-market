@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { orderProducts, products, vendors } from "./Home";
+import { orderProducts, products, seasonalPalettes, vendors } from "./Home";
 
 describe("marketplace ordering and vendor metadata", () => {
   it("orders the catalog by popularity", () => {
@@ -10,6 +10,10 @@ describe("marketplace ordering and vendor metadata", () => {
   it("keeps an unrated catalog deterministic when Top rated is selected", () => {
     const ordered = orderProducts(products, "rating");
     expect(ordered.map((product) => product.id)).toEqual([1, 4, 12, 3, 9, 6, 2, 5, 7, 10, 8, 11]);
+  });
+
+  it("offers Gallery linen as the default alongside two seasonal palette alternatives", () => {
+    expect(seasonalPalettes.map((palette) => palette.id)).toEqual(["gallery", "terracotta", "coastal"]);
   });
 
   it("provides a standalone route slug and contact metadata for every vendor", () => {

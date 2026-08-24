@@ -160,3 +160,6 @@
 - [x] Refresh the light theme with a more distinctive, layered Luma color system while preserving every existing image asset and crop.
 - [x] Add refined light-theme motion and surface treatments without changing marketplace behavior or images.
 - [x] Verify the refreshed light theme on desktop and mobile before delivery.
+- [x] Replace the current default light palette with a more refined, neutral editorial color system while preserving every image and crop.
+- [x] Add accessible, persisted seasonal color presets that visitors can switch from the landing header.
+- [x] Verify the default palette and each seasonal preset across desktop and mobile without changing image assets.

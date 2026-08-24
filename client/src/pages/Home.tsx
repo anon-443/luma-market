@@ -22,6 +22,7 @@ import {
   Minus,
   Moon,
   Package,
+  Palette,
   Plus,
   Search,
   Share2,
@@ -67,6 +68,13 @@ type PastOrder = { id: string; createdAt: number; itemCount: number; total: numb
 type WebSpeechEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
 type WebSpeechRecognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; onresult: ((event: WebSpeechEvent) => void) | null; onerror: (() => void) | null; onend: (() => void) | null };
 type WebSpeechConstructor = new () => WebSpeechRecognition;
+
+export const seasonalPalettes = [
+  { id: "gallery", label: "Gallery linen", description: "Quiet cream, ink and oxblood" },
+  { id: "terracotta", label: "Terracotta dusk", description: "Clay, blush and olive" },
+  { id: "coastal", label: "Coastal paper", description: "Chalk, marine and citrus" },
+] as const;
+type SeasonalPalette = typeof seasonalPalettes[number]["id"];
 
 export const products: Product[] = [
   {
@@ -476,6 +484,11 @@ function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onTog
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const [, setLocation] = useLocation();
+  const [seasonalPalette, setSeasonalPalette] = useState<SeasonalPalette>(() => {
+    const stored = localStorage.getItem("luma-seasonal-palette");
+    return seasonalPalettes.some((palette) => palette.id === stored) ? stored as SeasonalPalette : "gallery";
+  });
+  const [showPalettePicker, setShowPalettePicker] = useState(false);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("featured");
@@ -530,6 +543,9 @@ export default function Home() {
   useEffect(() => { localStorage.setItem("luma-profile-name", profileName); }, [profileName]);
   useEffect(() => { localStorage.setItem("luma-personalized-discovery", String(personalizedDiscovery)); }, [personalizedDiscovery]);
   useEffect(() => { localStorage.setItem("luma-market-updates", String(marketUpdates)); }, [marketUpdates]);
+  useEffect(() => {
+    localStorage.setItem("luma-seasonal-palette", seasonalPalette);
+  }, [seasonalPalette]);
   useEffect(() => {
     const productId = Number(new URLSearchParams(window.location.search).get("product"));
     if (productId) setActiveProduct(products.find((product) => product.id === productId) ?? null);
@@ -675,7 +691,7 @@ export default function Home() {
   };
 
   return (
-    <div className="market-shell">
+    <div className="market-shell" data-seasonal-palette={seasonalPalette}>
       <div className="market-grain" aria-hidden="true" />
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Luma Market home">
@@ -693,6 +709,10 @@ export default function Home() {
             <span className="theme-orbit"><span /></span>
             <Moon className={theme === "dark" ? "active" : ""} size={14} />
           </button>
+          <div className="palette-picker">
+            <button className="palette-toggle" onClick={() => setShowPalettePicker((open) => !open)} aria-label="Choose a seasonal color palette" aria-expanded={showPalettePicker}><Palette size={17} /></button>
+            {showPalettePicker && <div className="palette-menu" role="menu" aria-label="Seasonal color palettes"><p>Seasonal palettes</p>{seasonalPalettes.map((palette) => <button key={palette.id} className={seasonalPalette === palette.id ? "is-selected" : ""} role="menuitemradio" aria-checked={seasonalPalette === palette.id} onClick={() => { setSeasonalPalette(palette.id); setShowPalettePicker(false); }}><span className={`palette-swatch ${palette.id}`} aria-hidden="true" /><span><b>{palette.label}</b><small>{palette.description}</small></span>{seasonalPalette === palette.id && <Check size={15} />}</button>)}</div>}
+          </div>
           <button className="profile-button" onClick={() => setShowProfile(true)} aria-label="Open shopper profile"><CircleUserRound size={18} /></button>
           <button className={`bag-button ${cartCount ? "has-items" : ""} ${cartPulse ? "cart-bump" : ""}`} onClick={() => setShowCart(true)} aria-label={`Open cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}>
             <ShoppingBag size={19} />
