@@ -133,3 +133,5 @@
 - [x] Verify the compact desktop shelf and mobile stacked filter drawer behavior before delivery.
 - [x] Lower the Category, Price Range, $20–$200, and Colour labels together in the desktop filter shelf.
 - [x] Verify the lowered filter-label alignment on desktop and mobile before delivery.
+- [x] Lower the Category, Price Range, $20–$200, and Colour labels further together in the desktop filter shelf.
+- [x] Verify the further-lowered label alignment on desktop and mobile before delivery.
