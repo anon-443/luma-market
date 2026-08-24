@@ -718,6 +718,7 @@ export default function Home() {
             <p className="hero-prompt">Find your next useful obsession</p>
             <h1 id="hero-heading">The good kind <em>of too much</em></h1>
             <p className="hero-description">Thoughtful finds from independent studios</p>
+            <div className="hero-context" aria-label="Marketplace qualities"><span>Hand-finished</span><i /><span>Small-run</span><i /><span>Made to keep</span></div>
             <div className="hero-stat"><strong>38</strong><span><b>independent sellers</b><small>now in the arcade</small></span></div>
             <div className="hero-cta-row">
               <a className="button primary-button" href="#shop">Browse the market <ArrowDownRight size={18} /></a>
@@ -727,6 +728,7 @@ export default function Home() {
           <div className="hero-visual">
             <div className="hero-ring ring-a" />
             <div className="hero-ring ring-b" />
+            <div className="hero-visual-index"><span>OPEN MARKET</span><b>STUDIO EDIT / 01</b></div>
             <div className="hero-image-frame"><img src="/manus-storage/luma-hero-market_87349503.jpg" alt="Curated homeware, accessories and daily objects arranged in a sunlit gallery" /></div>
             <div className="hero-sticker">NEW<br /><b>THIS WEEK</b></div>
             <div className="hero-note"><span className="note-dot" /> Open studio edition</div>

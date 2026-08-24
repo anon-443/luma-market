@@ -773,3 +773,81 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
 .clear-cart { width: 100%; min-height: 34px; margin: 0 0 9px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: 800 10px "IBM Plex Sans", sans-serif; letter-spacing: 0.04em; text-transform: uppercase; transition: background 180ms var(--ease-out), color 180ms var(--ease-out), border-color 180ms var(--ease-out); }
 .clear-cart:hover { border-color: var(--coral); background: var(--coral); color: #fffdf9; }
 .clear-cart:active { transform: scale(0.98); }
+
+/* Night Arcade: a warmer, more dimensional dark palette for the marketplace. */
+.dark {
+  --background: #11111a;
+  --foreground: #f8f0e9;
+  --card: #1b1a2a;
+  --card-foreground: #f8f0e9;
+  --popover: #1b1a2a;
+  --popover-foreground: #f8f0e9;
+  --primary: #ffc45d;
+  --primary-foreground: #17121f;
+  --secondary: #25223a;
+  --secondary-foreground: #f8f0e9;
+  --muted: #211e32;
+  --muted-foreground: #c3bccf;
+  --accent: #ffc45d;
+  --accent-foreground: #17121f;
+  --destructive: #ff806d;
+  --destructive-foreground: #17121f;
+  --border: rgba(248, 240, 233, 0.16);
+  --input: rgba(248, 240, 233, 0.22);
+  --ring: #ffc45d;
+  --hero-copy: #181527;
+  --hero-visual: #2b2141;
+  --hero-orbit: #ffc45d;
+  --ink: #f8f0e9;
+  --paper: #11111a;
+  --surface: #1b1a2a;
+  --soft-surface: #25223a;
+  --line: rgba(248, 240, 233, 0.15);
+  --coral: #ff806d;
+  --saffron: #ffc45d;
+  --teal: #82d8c5;
+}
+.dark .market-shell { background: radial-gradient(circle at 88% 5%, rgba(130, 216, 197, 0.1), transparent 25%), radial-gradient(circle at 11% 19%, rgba(255, 128, 109, 0.09), transparent 22%), var(--paper); }
+.dark .hero-copy { background: linear-gradient(145deg, #1b1730 0%, #151421 72%); }
+.dark .hero-visual { background: radial-gradient(circle at 72% 18%, rgba(255, 196, 93, 0.18), transparent 25%), linear-gradient(135deg, #2c2342, #1d1931); }
+.dark .hero-image-frame { box-shadow: 20px 20px 0 rgba(130, 216, 197, 0.13); }
+
+/* Original landing treatment: editorial in scale, distinctly Luma in material and pacing. */
+.hero { isolation: isolate; }
+.hero-copy { overflow: hidden; background-image: radial-gradient(circle at 18% 14%, rgba(233, 162, 27, 0.13), transparent 19%), linear-gradient(135deg, var(--hero-copy), color-mix(in srgb, var(--hero-copy) 88%, var(--surface))); }
+.hero-copy::before { content: ""; position: absolute; z-index: 0; width: 310px; height: 310px; top: -185px; left: -125px; border: 1px solid color-mix(in srgb, var(--saffron) 65%, transparent); border-radius: 50%; box-shadow: 0 0 0 33px color-mix(in srgb, var(--saffron) 7%, transparent), 0 0 0 67px color-mix(in srgb, var(--saffron) 4%, transparent); }
+.hero-copy > * { position: relative; z-index: 2; }
+.hero-context { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; color: var(--muted-foreground); font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.hero-context i { width: 4px; height: 4px; border-radius: 50%; background: var(--coral); }
+.hero-visual::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 42%, color-mix(in srgb, var(--saffron) 10%, transparent) 100%); z-index: 2; }
+.hero-visual-index { position: absolute; z-index: 6; right: 8%; top: 5.6%; min-width: 130px; padding: 9px 11px; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); background: color-mix(in srgb, var(--surface) 84%, transparent); backdrop-filter: blur(8px); color: var(--ink); display: grid; gap: 3px; box-shadow: 5px 5px 0 color-mix(in srgb, var(--ink) 8%, transparent); }
+.hero-visual-index span { color: var(--teal); font-size: 8px; font-weight: 900; letter-spacing: 0.12em; }
+.hero-visual-index b { font-size: 10px; letter-spacing: 0.04em; }
+.hero-image-frame { border: 1px solid color-mix(in srgb, var(--surface) 85%, transparent); }
+.hero-sticker { z-index: 7; }
+.hero-note { z-index: 7; }
+.market-section { background: linear-gradient(180deg, color-mix(in srgb, var(--paper) 95%, var(--saffron)) 0%, var(--paper) 160px); }
+.shop-heading-row h2 { max-width: 760px; }
+.shop-tools { position: relative; z-index: 3; padding: 11px; background: color-mix(in srgb, var(--surface) 85%, transparent); border: 1px solid color-mix(in srgb, var(--line) 75%, transparent); box-shadow: 0 16px 40px color-mix(in srgb, var(--ink) 6%, transparent); }
+.promo-section { position: relative; overflow: hidden; }
+.promo-section::before { content: ""; position: absolute; z-index: 1; width: 330px; height: 330px; left: -165px; top: -185px; border: 1px solid rgba(22, 33, 58, 0.35); border-radius: 50%; }
+.promo-copy, .promo-image { position: relative; z-index: 2; }
+.vendors-section { background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--teal) 7%, transparent)); }
+@media (prefers-reduced-motion: no-preference) {
+  .hero-copy > :is(.eyebrow, .hero-prompt, h1, .hero-description, .hero-context, .hero-stat, .hero-cta-row) { animation: luma-copy-in 680ms var(--ease-out) both; }
+  .hero-copy > .hero-prompt { animation-delay: 40ms; }
+  .hero-copy > h1 { animation-delay: 90ms; }
+  .hero-copy > .hero-description { animation-delay: 140ms; }
+  .hero-copy > .hero-context { animation-delay: 180ms; }
+  .hero-copy > .hero-stat { animation-delay: 220ms; }
+  .hero-copy > .hero-cta-row { animation-delay: 260ms; }
+  .hero-visual-index { animation: luma-card-in 760ms 180ms var(--ease-out) both; }
+}
+@keyframes luma-copy-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes luma-card-in { from { opacity: 0; transform: translate(10px, -8px) rotate(2deg); } to { opacity: 1; transform: translate(0, 0) rotate(0); } }
+@media (max-width: 820px) {
+  .hero-context { margin-top: 16px; font-size: 9px; }
+  .hero-visual-index { right: 7%; top: 6%; min-width: 116px; padding: 7px 9px; }
+  .hero-visual-index b { font-size: 9px; }
+  .shop-tools { padding: 9px; box-shadow: 0 12px 28px color-mix(in srgb, var(--ink) 7%, transparent); }
+}

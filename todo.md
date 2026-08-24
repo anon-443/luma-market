@@ -153,3 +153,7 @@
 - [x] Add rating-based product sorting using only visitor-submitted review aggregates.
 - [x] Add a dedicated Clear cart action to the shopping-cart drawer.
 - [x] Verify clear-cart, rating-listing, and rating-sort flows on desktop and mobile before delivery.
+- [x] Redesign the Luma landing-page visual hierarchy with original event-inspired pacing, sizing, and visual depth without copying the reference project.
+- [x] Refresh the dark theme with a more distinctive, cohesive nighttime palette and strong contrast.
+- [x] Add refined, purposeful landing-page motion and visual treatments while preserving marketplace usability.
+- [x] Verify the redesigned landing page in light and dark mode on desktop and mobile before delivery.
