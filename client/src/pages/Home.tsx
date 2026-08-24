@@ -38,13 +38,15 @@ import {
 import { toast } from "sonner";
 import { useTheme } from "@/contexts/ThemeContext";
 import { trpc } from "@/lib/trpc";
+import { useLocation } from "wouter";
 
-type Product = {
+export type Product = {
   id: number;
   name: string;
   vendor: string;
   category: string;
   price: number;
+  popularity: number;
   color: string;
   imageClass: string;
   image: string;
@@ -65,13 +67,14 @@ type WebSpeechEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
 type WebSpeechRecognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; onresult: ((event: WebSpeechEvent) => void) | null; onerror: (() => void) | null; onend: (() => void) | null };
 type WebSpeechConstructor = new () => WebSpeechRecognition;
 
-const products: Product[] = [
+export const products: Product[] = [
   {
     id: 1,
     name: "Lumen Table Lamp",
     vendor: "Field Theory",
     category: "Home",
     price: 128,
+    popularity: 94,
     color: "Brushed brass",
     imageClass: "lamp",
     image: "/manus-storage/luma-product-objects_5f2f2446.jpg",
@@ -89,6 +92,7 @@ const products: Product[] = [
     vendor: "Onda Goods",
     category: "Accessories",
     price: 86,
+    popularity: 82,
     color: "Persimmon",
     imageClass: "tote",
     image: "/manus-storage/luma-product-accessory_fcbbe62f.jpg",
@@ -106,6 +110,7 @@ const products: Product[] = [
     vendor: "Maison Sora",
     category: "Home",
     price: 34,
+    popularity: 88,
     color: "Cobalt glaze",
     imageClass: "mug",
     image: "/manus-storage/luma-product-ceramic_6dbcb79f.jpg",
@@ -122,6 +127,7 @@ const products: Product[] = [
     vendor: "Acoustic Tide",
     category: "Tech",
     price: 164,
+    popularity: 91,
     color: "Sage grey",
     imageClass: "headphones",
     image: "/manus-storage/luma-product-knit_22081181.webp",
@@ -139,6 +145,7 @@ const products: Product[] = [
     vendor: "Paper Current",
     category: "Stationery",
     price: 24,
+    popularity: 79,
     color: "Ink blue",
     imageClass: "book",
     image: "/manus-storage/luma-product-objects_5f2f2446.jpg",
@@ -155,6 +162,7 @@ const products: Product[] = [
     vendor: "Onda Goods",
     category: "Home",
     price: 92,
+    popularity: 84,
     color: "Oat & coral",
     imageClass: "throw",
     image: "/manus-storage/luma-product-knit_22081181.webp",
@@ -171,6 +179,7 @@ const products: Product[] = [
     vendor: "Field Theory",
     category: "Home",
     price: 72,
+    popularity: 76,
     color: "Sage grey",
     imageClass: "clock",
     image: "/manus-storage/luma-product-accessory_fcbbe62f.jpg",
@@ -188,6 +197,7 @@ const products: Product[] = [
     vendor: "Acoustic Tide",
     category: "Tech",
     price: 58,
+    popularity: 73,
     color: "Brushed brass",
     imageClass: "stand",
     image: "/manus-storage/luma-product-objects_5f2f2446.jpg",
@@ -204,6 +214,7 @@ const products: Product[] = [
     vendor: "Onda Goods",
     category: "Accessories",
     price: 48,
+    popularity: 86,
     color: "Persimmon",
     imageClass: "scarf",
     image: "/manus-storage/luma-product-knit_22081181.webp",
@@ -221,6 +232,7 @@ const products: Product[] = [
     vendor: "Paper Current",
     category: "Stationery",
     price: 32,
+    popularity: 75,
     color: "Ink blue",
     imageClass: "pens",
     image: "/manus-storage/luma-product-objects_5f2f2446.jpg",
@@ -237,6 +249,7 @@ const products: Product[] = [
     vendor: "Onda Goods",
     category: "Accessories",
     price: 26,
+    popularity: 71,
     color: "Oat & coral",
     imageClass: "pouch",
     image: "/manus-storage/luma-product-accessory_fcbbe62f.jpg",
@@ -253,6 +266,7 @@ const products: Product[] = [
     vendor: "Maison Sora",
     category: "Home",
     price: 68,
+    popularity: 89,
     color: "Cobalt glaze",
     imageClass: "tray",
     image: "/manus-storage/luma-product-ceramic_6dbcb79f.jpg",
@@ -281,11 +295,35 @@ const productGallery: Record<number, GalleryImage[]> = {
   12: [{ src: "/manus-storage/luma-product-ceramic_6dbcb79f.jpg", alt: "Sunday Serving Tray view", position: "62% 52%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Sunday Serving Tray glaze detail", position: "43% 54%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Sunday Serving Tray table context", position: "30% 48%" }],
 };
 
-const vendors = [
-  { name: "Maison Sora", description: "Small rituals for the table", category: "Ceramics & home", products: 18, palette: "sora" },
-  { name: "Field Theory", description: "Objects that hold a room together", category: "Lighting & furniture", products: 24, palette: "field" },
-  { name: "Onda Goods", description: "Useful things with soft edges", category: "Textiles & accessories", products: 31, palette: "onda" },
+export type Vendor = {
+  name: string;
+  slug: string;
+  description: string;
+  category: string;
+  products: number;
+  palette: string;
+  location: string;
+  contactEmail: string;
+  websiteLabel: string;
+  story: string;
+};
+
+export const vendors: Vendor[] = [
+  { name: "Maison Sora", slug: "maison-sora", description: "Small rituals for the table", category: "Ceramics & home", products: 18, palette: "sora", location: "Portland, Oregon", contactEmail: "hello@maisonsora.studio", websiteLabel: "maisonsora.studio", story: "A small ceramics studio making quietly useful vessels for shared meals and slower mornings." },
+  { name: "Field Theory", slug: "field-theory", description: "Objects that hold a room together", category: "Lighting & furniture", products: 24, palette: "field", location: "Brooklyn, New York", contactEmail: "studio@fieldtheory.design", websiteLabel: "fieldtheory.design", story: "Field Theory makes practical room-scale objects with soft geometry, considered metals, and long repairable lives." },
+  { name: "Onda Goods", slug: "onda-goods", description: "Useful things with soft edges", category: "Textiles & accessories", products: 31, palette: "onda", location: "Los Angeles, California", contactEmail: "hello@ondagoods.studio", websiteLabel: "ondagoods.studio", story: "Onda Goods works with tactile textiles and everyday carry pieces designed to soften the sharper parts of a day." },
+  { name: "Acoustic Tide", slug: "acoustic-tide", description: "Better listening, quieter work", category: "Sound & desk objects", products: 14, palette: "tide", location: "Seattle, Washington", contactEmail: "studio@acoustictide.audio", websiteLabel: "acoustictide.audio", story: "Acoustic Tide builds calm listening tools and desk companions for focused, lower-friction routines." },
+  { name: "Paper Current", slug: "paper-current", description: "Paper tools for thinking clearly", category: "Stationery & paper", products: 22, palette: "paper", location: "Chicago, Illinois", contactEmail: "hello@papercurrent.co", websiteLabel: "papercurrent.co", story: "Paper Current makes durable desk stationery that leaves room for plans, notes, lists, and a little drift." },
 ];
+
+export function orderProducts(items: Product[], sort: string) {
+  return [...items].sort((a, b) => {
+    if (sort === "popular") return b.popularity - a.popularity || a.id - b.id;
+    if (sort === "price-low") return a.price - b.price;
+    if (sort === "price-high") return b.price - a.price;
+    return a.id - b.id;
+  });
+}
 
 const categories = ["All", "Home", "Accessories", "Tech", "Stationery"];
 const colorSwatches = [
@@ -430,6 +468,7 @@ function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onTog
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
+  const [, setLocation] = useLocation();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("featured");
@@ -451,7 +490,6 @@ export default function Home() {
   const [showMenu, setShowMenu] = useState(false);
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [activeVendor, setActiveVendor] = useState<(typeof vendors)[number] | null>(null);
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutStage, setCheckoutStage] = useState<"summary" | "processing" | "confirmed">("summary");
   const [showWishlist, setShowWishlist] = useState(false);
@@ -510,12 +548,14 @@ export default function Home() {
       return searchMatch && categoryMatch && priceMatch && colorMatch;
     });
 
-    return [...result].sort((a, b) => {
-      if (sort === "price-low") return a.price - b.price;
-      if (sort === "price-high") return b.price - a.price;
-      return a.id - b.id;
-    });
+    return orderProducts(result, sort);
   }, [aiSuggestion, category, priceCeiling, priceFloor, query, selectedColor, sort]);
+
+  const matchingVendors = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return [];
+    return vendors.filter((vendor) => [vendor.name, vendor.category, vendor.description].some((value) => value.toLowerCase().includes(normalized)));
+  }, [query]);
 
   const addToCart = (product: Product, options: { openCart?: boolean } = {}) => {
     setCart((current) => {
@@ -688,10 +728,11 @@ export default function Home() {
               <div className="category-pills" aria-label="Filter by category">
                 {categories.map((item) => <button className={category === item ? "selected" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}
               </div>
-              <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
+              <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="popular">Most popular</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
             </div>
           </div>
           {aiSuggestion && <div className="ai-suggestion"><div><Sparkles size={17} /><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}<small>{aiSuggestion.inventoryNote}</small></span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
+          {matchingVendors.length > 0 && <section className="vendor-search-results" aria-label="Matching seller stores"><p className="eyebrow"><span /> SELLER MATCHES</p><div>{matchingVendors.map((vendor) => <button key={vendor.slug} onClick={() => setLocation(`/makers/${vendor.slug}`)}><span className={`vendor-search-mark ${vendor.palette}`}>{vendor.name.charAt(0)}</span><span><b>{vendor.name}</b><small>{vendor.category}</small></span><ArrowRight size={16} /></button>)}</div></section>}
 
           <button className="filter-toggle" onClick={() => setShowFilters((visible) => !visible)} aria-expanded={showFilters} aria-controls="product-filters"><SlidersHorizontal size={16} />{showFilters ? "Hide filters" : "Refine products"}</button>
           <div className="catalog-layout">
@@ -742,7 +783,7 @@ export default function Home() {
           <div className="vendors-heading"><h2 id="makers-heading">The people behind <em>the good stuff</em></h2></div>
           <div className="vendor-list">
             {vendors.map((vendor, index) => (
-              <button className={`vendor-card ${vendor.palette}`} key={vendor.name} onClick={() => setActiveVendor(vendor)}>
+              <button className={`vendor-card ${vendor.palette}`} key={vendor.name} onClick={() => setLocation(`/makers/${vendor.slug}`)}>
                 <span className="vendor-number">0{index + 1}</span>
                 <span className="vendor-mark">{vendor.name.charAt(0)}</span>
                 <span className="vendor-details"><b>{vendor.name}</b><small>{vendor.description}</small></span>
@@ -767,6 +808,7 @@ export default function Home() {
         <div className="footer-columns">
           <section><b>Shop</b><a href="#shop">Home</a><button onClick={() => { setCategory("Accessories"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Accessories</button><button onClick={() => { setCategory("Tech"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Tech</button><button onClick={() => { setCategory("Stationery"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>Stationery</button></section>
           <section><b>Sellers</b><a href="#makers">Become a maker</a><button onClick={() => setShowProfile(true)}>Seller dashboard</button><a href="#story">Our standards</a></section>
+          <section><b>Keep in touch</b><a href="mailto:hello@luma.market">Contact Luma</a><a href="https://www.instagram.com/lumamarket/" target="_blank" rel="noreferrer">Instagram</a><a href="https://www.pinterest.com/lumamarket/" target="_blank" rel="noreferrer">Pinterest</a></section>
         </div>
       </footer>
 
@@ -801,14 +843,6 @@ export default function Home() {
 
       {quickViewProduct && <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onViewDetails={setActiveProduct} />}
 
-      {activeVendor && (
-        <div className="overlay" role="presentation" onMouseDown={() => setActiveVendor(null)}>
-          <section className="vendor-modal" role="dialog" aria-modal="true" aria-label={`${activeVendor.name} store`} onMouseDown={(event) => event.stopPropagation()}>
-            <button className="modal-close" onClick={() => setActiveVendor(null)} aria-label="Close seller details"><X size={20} /></button>
-            <div className={`vendor-modal-mark ${activeVendor.palette}`}>{activeVendor.name.charAt(0)}</div><p className="eyebrow"><span /> INDEPENDENT SELLER</p><h3>{activeVendor.name}</h3><p>{activeVendor.description} — discover {activeVendor.products} pieces across {activeVendor.category.toLowerCase()}</p><div className="vendor-modal-actions"><button className="button primary-button" onClick={() => { setQuery(activeVendor.name); setActiveVendor(null); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>View available pieces <ArrowRight size={17} /></button><button className="text-link" onClick={() => setActiveVendor(null)}>Back to stalls</button></div>
-          </section>
-        </div>
-      )}
     </div>
   );
 }

@@ -135,3 +135,8 @@
 - [x] Verify the lowered filter-label alignment on desktop and mobile before delivery.
 - [x] Lower the Category, Price Range, $20–$200, and Colour labels further together in the desktop filter shelf.
 - [x] Verify the further-lowered label alignment on desktop and mobile before delivery.
+- [x] Add dedicated vendor-store pages with vendor profile, store details, available products, reviews, and contact actions.
+- [x] Add vendor-name discovery as a distinct marketplace search result.
+- [x] Add a popularity sorting mode without restoring Visitor Rating sorting or filtering.
+- [x] Add clearly labelled footer social links and marketplace contact access.
+- [x] Verify vendor stores, contact actions, vendor search, popularity sorting, social links, and responsive presentation before delivery.
