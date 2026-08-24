@@ -69,6 +69,9 @@ type WebSpeechEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
 type WebSpeechRecognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; onresult: ((event: WebSpeechEvent) => void) | null; onerror: (() => void) | null; onend: (() => void) | null };
 type WebSpeechConstructor = new () => WebSpeechRecognition;
 
+const LIVE_ASSET_ORIGIN = "https://lumamarket-bpjxazt8.manus.space";
+const lumaAsset = (path: string) => typeof window !== "undefined" && window.location.hostname.endsWith("github.io") ? `${LIVE_ASSET_ORIGIN}${path}` : path;
+
 export const seasonalPalettes = [
   { id: "gallery", label: "Gallery linen", description: "Quiet cream, ink and oxblood" },
   { id: "cinema", label: "Cinematic studio", description: "Ink, ember and mist" },
@@ -290,6 +293,8 @@ export const products: Product[] = [
   },
 ];
 
+products.forEach((product) => { product.image = lumaAsset(product.image); });
+
 const productGallery: Record<number, GalleryImage[]> = {
   1: [{ src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Lumen Table Lamp front view", position: "80% 40%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Lumen Table Lamp material detail", position: "18% 50%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Lumen Table Lamp styled room view", position: "64% 50%" }],
   2: [{ src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Flora Carryall product view", position: "center" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Flora Carryall textile detail", position: "70% 56%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Flora Carryall styled context", position: "84% 44%" }],
@@ -304,6 +309,8 @@ const productGallery: Record<number, GalleryImage[]> = {
   11: [{ src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Daylight Pouch product view", position: "82% 61%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Daylight Pouch textile detail", position: "62% 57%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Daylight Pouch desk setting", position: "18% 56%" }],
   12: [{ src: "/manus-storage/luma-product-ceramic_6dbcb79f.jpg", alt: "Sunday Serving Tray view", position: "62% 52%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Sunday Serving Tray glaze detail", position: "43% 54%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Sunday Serving Tray table context", position: "30% 48%" }],
 };
+
+Object.values(productGallery).flat().forEach((image) => { image.src = lumaAsset(image.src); });
 
 export type Vendor = {
   name: string;
@@ -696,7 +703,7 @@ export default function Home() {
       <div className="market-grain" aria-hidden="true" />
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Luma Market home">
-          <img src="/manus-storage/luma-split-sun-logo_8bd655e3.png" alt="" />
+          <img src={lumaAsset("/manus-storage/luma-split-sun-logo_8bd655e3.png")} alt="" />
           <span>Luma</span>
         </a>
         <nav className="desktop-nav" aria-label="Primary navigation">
@@ -750,7 +757,7 @@ export default function Home() {
             <div className="hero-ring ring-a" />
             <div className="hero-ring ring-b" />
             <div className="hero-visual-index"><span>OPEN MARKET</span><b>STUDIO EDIT / 01</b></div>
-            <div className="hero-image-frame"><img src="/manus-storage/luma-hero-market_87349503.jpg" alt="Curated homeware, accessories and daily objects arranged in a sunlit gallery" /></div>
+            <div className="hero-image-frame"><img src={lumaAsset("/manus-storage/luma-hero-market_87349503.jpg")} alt="Curated homeware, accessories and daily objects arranged in a sunlit gallery" /></div>
             <div className="hero-sticker">NEW<br /><b>THIS WEEK</b></div>
             <div className="hero-note"><span className="note-dot" /> Open studio edition</div>
           </div>
@@ -820,7 +827,7 @@ export default function Home() {
             <h2>Room for the<br /><em>unexpected</em></h2>
             <button className="button dark-button" onClick={() => { setCategory("Accessories"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>See the edit <ArrowRight size={18} /></button>
           </div>
-          <div className="promo-image"><img src="/manus-storage/luma-promo-arch_a2f778e9.jpg" alt="Curated accessories styled within a cream architectural arch" /><span className="promo-sticker">SAVE<br /><b>15%</b></span></div>
+          <div className="promo-image"><img src={lumaAsset("/manus-storage/luma-promo-arch_a2f778e9.jpg")} alt="Curated accessories styled within a cream architectural arch" /><span className="promo-sticker">SAVE<br /><b>15%</b></span></div>
         </section>
 
         <section className="vendors-section" id="makers" aria-labelledby="makers-heading">
@@ -843,14 +850,14 @@ export default function Home() {
         </section>
 
         <section className="story-section" id="story" aria-labelledby="story-heading">
-          <div className="story-image"><img src="/manus-storage/luma-vendor-story_61e67283.jpg" alt="A sunlit independent ceramic studio with handmade tableware" /><div className="story-stamp">CURIOUSLY<br />COLLECTED</div></div>
+          <div className="story-image"><img src={lumaAsset("/manus-storage/luma-vendor-story_61e67283.jpg")} alt="A sunlit independent ceramic studio with handmade tableware" /><div className="story-stamp">CURIOUSLY<br />COLLECTED</div></div>
           <div className="story-copy"><p className="eyebrow"><span /> A DIFFERENT KIND OF CART</p><h2 id="story-heading">Good objects start with <em>good questions</em></h2><p>We build a calmer place to browse the things people make with intention. Every seller brings their own point of view. Your cart just lets the conversation continue.</p><a href="#shop" className="text-link">Take a look around <ArrowRight size={16} /></a></div>
         </section>
       </main>
 
       <footer className="site-footer">
         <div className="footer-identity">
-          <div className="footer-brand"><img src="/manus-storage/luma-split-sun-logo_8bd655e3.png" alt="" /><span>Luma</span></div>
+          <div className="footer-brand"><img src={lumaAsset("/manus-storage/luma-split-sun-logo_8bd655e3.png")} alt="" /><span>Luma</span></div>
           <p>Find a new favourite seller</p>
         </div>
         <div className="footer-columns">

@@ -9,10 +9,8 @@ build/
 
 # Environment variables
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 
 # IDE and editor files
 .vscode/
@@ -112,3 +110,10 @@ temp/
 # Manus version file (auto-generated, not part of source)
 client/public/__manus__/version.json
 .project-config.json
+
+# Local planning and development instrumentation
+.manus-logs/
+client/public/__manus__/
+ideas.md
+todo.md
+template.json
