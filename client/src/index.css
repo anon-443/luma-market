@@ -732,3 +732,18 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
   .vendors-section .vendor-details small { font-size: 10px; line-height: 1.35; }
   .vendors-section .vendor-arrow { width: 16px; height: 16px; }
 }
+
+/* Restore more presence to the desktop landing hero without disturbing the mobile composition. */
+@media (min-width: 821px) {
+  .hero, .hero-visual { min-height: 520px; }
+  .hero-copy { padding-top: 64px; padding-bottom: 54px; }
+  .hero h1 { max-width: 550px; font-size: clamp(60px, 4.4vw, 68px); margin-top: 20px; margin-bottom: 22px; }
+  .hero-description { max-width: 445px; font-size: 16px; line-height: 1.7; }
+  .hero-stat { margin-top: 45px; gap: 10px; }
+  .hero-stat strong { font-size: 46px; }
+  .hero-stat span { font-size: 13px; }
+  .hero-cta-row { margin-top: 31px; }
+  .hero-cta-row .button { min-height: 50px; padding-inline: 20px; font-size: 13px; }
+  .hero-cta-row .text-link { font-size: 13px; }
+  .hero-image-frame { width: min(72%, 560px); height: 82%; right: 9%; top: 9%; border-radius: 190px 190px 8px 8px; }
+}

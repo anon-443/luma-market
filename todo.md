@@ -144,3 +144,5 @@
 - [x] Verify the reduced seller-section scale on desktop and mobile before delivery.
 - [x] Further reduce the complete seller-section heading, seller-row text, and monogram scale while retaining clarity.
 - [x] Verify the further reduced seller section on desktop and mobile before delivery.
+- [x] Increase the desktop hero headline, supporting copy, and image-frame scale while preserving composition balance.
+- [x] Verify the enlarged hero on desktop and mobile before delivery.
