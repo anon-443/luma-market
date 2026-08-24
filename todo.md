@@ -157,3 +157,6 @@
 - [x] Refresh the dark theme with a more distinctive, cohesive nighttime palette and strong contrast.
 - [x] Add refined, purposeful landing-page motion and visual treatments while preserving marketplace usability.
 - [x] Verify the redesigned landing page in light and dark mode on desktop and mobile before delivery.
+- [x] Refresh the light theme with a more distinctive, layered Luma color system while preserving every existing image asset and crop.
+- [x] Add refined light-theme motion and surface treatments without changing marketplace behavior or images.
+- [x] Verify the refreshed light theme on desktop and mobile before delivery.

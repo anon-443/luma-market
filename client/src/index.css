@@ -35,36 +35,36 @@
 
 :root {
   --radius: 0.4rem;
-  --background: #fbfaf7;
-  --foreground: #172434;
-  --card: #ffffff;
-  --card-foreground: #172434;
-  --popover: #ffffff;
-  --popover-foreground: #172434;
-  --primary: #172434;
-  --primary-foreground: #ffffff;
-  --secondary: #f0ece3;
-  --secondary-foreground: #172434;
-  --muted: #f4f1eb;
-  --muted-foreground: #6e706d;
-  --accent: #e9a21b;
-  --accent-foreground: #172434;
-  --destructive: #bc4b45;
-  --destructive-foreground: #ffffff;
-  --border: #ded9cf;
-  --input: #d8d2c8;
-  --ring: #e9a21b;
-  --hero-copy: #faf8f3;
-  --hero-visual: #dbe6df;
-  --hero-orbit: #e9a21b;
-  --ink: #172434;
-  --paper: #fbfaf7;
-  --surface: #ffffff;
-  --soft-surface: #f0ece3;
-  --line: rgba(23, 36, 52, 0.16);
-  --coral: #d45f4e;
-  --saffron: #e9a21b;
-  --teal: #397d77;
+  --background: #f8efe1;
+  --foreground: #20223d;
+  --card: #fffaf2;
+  --card-foreground: #20223d;
+  --popover: #fffaf2;
+  --popover-foreground: #20223d;
+  --primary: #20223d;
+  --primary-foreground: #fffaf2;
+  --secondary: #e2ece9;
+  --secondary-foreground: #20223d;
+  --muted: #f0e2d2;
+  --muted-foreground: #666577;
+  --accent: #efaf22;
+  --accent-foreground: #20223d;
+  --destructive: #c95049;
+  --destructive-foreground: #fffaf2;
+  --border: #ded0c1;
+  --input: #d8c8b7;
+  --ring: #efaf22;
+  --hero-copy: #f7ddca;
+  --hero-visual: #bfe0d8;
+  --hero-orbit: #efaf22;
+  --ink: #20223d;
+  --paper: #f8efe1;
+  --surface: #fffaf2;
+  --soft-surface: #e2ece9;
+  --line: rgba(32, 34, 61, 0.16);
+  --coral: #cd5a4e;
+  --saffron: #efaf22;
+  --teal: #247d75;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -811,6 +811,36 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
 .dark .hero-copy { background: linear-gradient(145deg, #1b1730 0%, #151421 72%); }
 .dark .hero-visual { background: radial-gradient(circle at 72% 18%, rgba(255, 196, 93, 0.18), transparent 25%), linear-gradient(135deg, #2c2342, #1d1931); }
 .dark .hero-image-frame { box-shadow: 20px 20px 0 rgba(130, 216, 197, 0.13); }
+
+/* Daytime Arcade: layered color and material without modifying any image assets. */
+html:not(.dark) .market-shell { background: radial-gradient(circle at 87% 2%, rgba(36, 125, 117, 0.16), transparent 21%), radial-gradient(circle at 4% 38%, rgba(205, 90, 78, 0.12), transparent 23%), linear-gradient(140deg, #f8efe1 0%, #fff5e7 45%, #e9f2e8 100%); }
+html:not(.dark) .site-header { background: color-mix(in srgb, var(--surface) 77%, transparent); backdrop-filter: blur(14px); }
+html:not(.dark) .hero-copy { background-image: radial-gradient(circle at 18% 14%, rgba(239, 175, 34, 0.25), transparent 19%), radial-gradient(circle at 86% 76%, rgba(205, 90, 78, 0.18), transparent 28%), linear-gradient(135deg, #f7ddca 0%, #f8e8ce 55%, #e2ece0 130%); }
+html:not(.dark) .hero-visual { background: radial-gradient(circle at 72% 20%, rgba(255, 248, 215, 0.7), transparent 23%), linear-gradient(135deg, #a8d9cc, #d9edcf 82%); }
+html:not(.dark) .hero-image-frame { box-shadow: 22px 22px 0 rgba(36, 125, 117, 0.18); }
+html:not(.dark) .hero-visual-index { background: rgba(255, 250, 242, 0.88); border-color: rgba(36, 125, 117, 0.25); box-shadow: 5px 5px 0 rgba(205, 90, 78, 0.16); }
+html:not(.dark) .market-section { background: linear-gradient(180deg, rgba(226, 236, 233, 0.78) 0%, rgba(255, 250, 242, 0.2) 230px, transparent 500px); }
+html:not(.dark) .shop-tools { background: rgba(255, 250, 242, 0.84); border-color: rgba(36, 125, 117, 0.2); box-shadow: 0 20px 48px rgba(32, 34, 61, 0.12); }
+html:not(.dark) .filter-shelf { box-shadow: 0 14px 36px rgba(32, 34, 61, 0.07); }
+html:not(.dark) .product-card { border-radius: 2px; }
+html:not(.dark) .product-visual { box-shadow: 0 14px 0 rgba(205, 90, 78, 0.12); }
+html:not(.dark) .promo-section { background: linear-gradient(120deg, #f1b522 0%, #ffc64a 56%, #d8e6cf 56%, #b8d7ce 100%); }
+html:not(.dark) .vendors-section { background: radial-gradient(circle at 83% 44%, rgba(239, 175, 34, 0.18), transparent 17%), linear-gradient(180deg, transparent, rgba(205, 90, 78, 0.08)); }
+html:not(.dark) .vendor-card:hover { background: rgba(255, 250, 242, 0.7); }
+
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.dark) .hero-copy::before { animation: luma-sun-breathe 11s var(--ease-in-out) infinite alternate; }
+  html:not(.dark) .hero-ring { animation: luma-orbit-drift 9s var(--ease-in-out) infinite alternate; }
+  html:not(.dark) .ring-b { animation-delay: -3.5s; }
+  html:not(.dark) .hero-image-frame { animation: luma-frame-settle 760ms 180ms var(--ease-out) both; }
+  html:not(.dark) .primary-button { box-shadow: 5px 5px 0 rgba(205, 90, 78, 0.18); }
+  html:not(.dark) .primary-button:hover { transform: translateY(-2px); box-shadow: 7px 8px 0 rgba(205, 90, 78, 0.2); }
+  html:not(.dark) .category-pills button:hover { transform: translateY(-2px); }
+  html:not(.dark) .vendor-card:hover .vendor-mark { transform: rotate(-7deg) scale(1.05); }
+}
+@keyframes luma-sun-breathe { from { transform: translate3d(0, 0, 0) scale(0.96); opacity: 0.72; } to { transform: translate3d(20px, 12px, 0) scale(1.06); opacity: 1; } }
+@keyframes luma-orbit-drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(14px, -10px, 0); } }
+@keyframes luma-frame-settle { from { opacity: 0; transform: translate3d(0, 18px, 0) rotate(0deg) scale(0.985); } to { opacity: 1; transform: translate3d(0, 0, 0) rotate(2deg) scale(1); } }
 
 /* Original landing treatment: editorial in scale, distinctly Luma in material and pacing. */
 .hero { isolation: isolate; }
