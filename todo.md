@@ -146,3 +146,5 @@
 - [x] Verify the further reduced seller section on desktop and mobile before delivery.
 - [x] Increase the desktop hero headline, supporting copy, and image-frame scale while preserving composition balance.
 - [x] Verify the enlarged hero on desktop and mobile before delivery.
+- [x] Further increase the desktop hero text and image-frame scale while retaining a balanced landing composition.
+- [x] Verify the further enlarged hero on desktop and mobile before delivery.

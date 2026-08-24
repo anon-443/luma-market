@@ -747,3 +747,18 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
   .hero-cta-row .text-link { font-size: 13px; }
   .hero-image-frame { width: min(72%, 560px); height: 82%; right: 9%; top: 9%; border-radius: 190px 190px 8px 8px; }
 }
+
+/* A bolder follow-up scale pass for the desktop landing statement. */
+@media (min-width: 821px) {
+  .hero, .hero-visual { min-height: 575px; }
+  .hero-copy { padding-top: 75px; padding-bottom: 64px; }
+  .hero h1 { max-width: 620px; font-size: clamp(68px, 5.3vw, 82px); margin-top: 22px; margin-bottom: 26px; }
+  .hero-description { max-width: 475px; font-size: 17px; line-height: 1.7; }
+  .hero-stat { margin-top: 50px; gap: 12px; }
+  .hero-stat strong { font-size: 52px; }
+  .hero-stat span { font-size: 14px; }
+  .hero-cta-row { margin-top: 34px; gap: 26px; }
+  .hero-cta-row .button { min-height: 52px; padding-inline: 22px; font-size: 14px; }
+  .hero-cta-row .text-link { font-size: 14px; }
+  .hero-image-frame { width: min(77%, 630px); height: 84%; right: 7%; top: 8%; border-radius: 220px 220px 8px 8px; }
+}
