@@ -169,3 +169,6 @@
 - [x] Increase header navigation/action and footer-link typography for clearer hierarchy.
 - [x] Give every product card a more distinct, colorful, aesthetic visual treatment without altering commerce behavior.
 - [x] Verify the full-width layout, enlarged typography, and varied product visuals on desktop and mobile before delivery.
+- [x] Align landing-page text and section content to the same left rhythm as the Luma brand mark.
+- [x] Increase desktop header navigation and action-control size without disrupting mobile controls.
+- [x] Verify the updated alignment and header scale on desktop and mobile before delivery.
