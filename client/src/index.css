@@ -762,3 +762,14 @@ body, button, input, select, textarea { font-family: "IBM Plex Sans", sans-serif
   .hero-cta-row .text-link { font-size: 14px; }
   .hero-image-frame { width: min(77%, 630px); height: 84%; right: 7%; top: 8%; border-radius: 220px 220px 8px 8px; }
 }
+
+/* Genuine review summaries use submitted visitor notes only. */
+.listing-rating { display: inline-flex; align-items: center; gap: 4px; margin-top: 7px; color: var(--coral); font-size: 11px; font-weight: 800; line-height: 1; }
+.listing-rating small { color: var(--muted-foreground); font-size: 10px; font-weight: 700; }
+.vendor-rating { display: inline-flex; align-items: center; gap: 4px; color: var(--coral); font-size: 10px; font-weight: 800; line-height: 1.2; }
+.vendor-rating svg { flex: 0 0 auto; }
+@media (max-width: 820px) { .listing-rating { margin-top: 6px; }.vendor-rating { font-size: 9px; } }
+
+.clear-cart { width: 100%; min-height: 34px; margin: 0 0 9px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: 800 10px "IBM Plex Sans", sans-serif; letter-spacing: 0.04em; text-transform: uppercase; transition: background 180ms var(--ease-out), color 180ms var(--ease-out), border-color 180ms var(--ease-out); }
+.clear-cart:hover { border-color: var(--coral); background: var(--coral); color: #fffdf9; }
+.clear-cart:active { transform: scale(0.98); }

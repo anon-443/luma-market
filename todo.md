@@ -148,3 +148,8 @@
 - [x] Verify the enlarged hero on desktop and mobile before delivery.
 - [x] Further increase the desktop hero text and image-frame scale while retaining a balanced landing composition.
 - [x] Verify the further enlarged hero on desktop and mobile before delivery.
+- [x] Audit the completed marketplace against the attached multi-vendor project requirements and document any remaining gaps.
+- [x] Add an honest visitor-rating summary to product and vendor listings without creating any synthetic reviews or ratings.
+- [x] Add rating-based product sorting using only visitor-submitted review aggregates.
+- [x] Add a dedicated Clear cart action to the shopping-cart drawer.
+- [x] Verify clear-cart, rating-listing, and rating-sort flows on desktop and mobile before delivery.

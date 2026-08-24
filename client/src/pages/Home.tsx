@@ -61,6 +61,7 @@ export type Product = {
 
 type CartLine = Product & { quantity: number };
 type VisitorReview = { id: number; authorName: string; rating: number; comment: string; createdAt: Date | string };
+export type RatingSummary = { productId: number; reviewCount: number; averageRating: number };
 type GalleryImage = { src: string; alt: string; position?: string };
 type PastOrder = { id: string; createdAt: number; itemCount: number; total: number; items: Array<{ id: number; quantity: number }> };
 type WebSpeechEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
@@ -316,9 +317,15 @@ export const vendors: Vendor[] = [
   { name: "Paper Current", slug: "paper-current", description: "Paper tools for thinking clearly", category: "Stationery & paper", products: 22, palette: "paper", location: "Chicago, Illinois", contactEmail: "hello@papercurrent.co", websiteLabel: "papercurrent.co", story: "Paper Current makes durable desk stationery that leaves room for plans, notes, lists, and a little drift." },
 ];
 
-export function orderProducts(items: Product[], sort: string) {
+export function orderProducts(items: Product[], sort: string, ratingSummaries: RatingSummary[] = []) {
+  const ratingsByProductId = new Map(ratingSummaries.map((summary) => [summary.productId, summary]));
   return [...items].sort((a, b) => {
     if (sort === "popular") return b.popularity - a.popularity || a.id - b.id;
+    if (sort === "rating") {
+      const aRating = ratingsByProductId.get(a.id);
+      const bRating = ratingsByProductId.get(b.id);
+      return (bRating?.averageRating ?? 0) - (aRating?.averageRating ?? 0) || (bRating?.reviewCount ?? 0) - (aRating?.reviewCount ?? 0) || b.popularity - a.popularity || a.id - b.id;
+    }
     if (sort === "price-low") return a.price - b.price;
     if (sort === "price-high") return b.price - a.price;
     return a.id - b.id;
@@ -514,6 +521,8 @@ export default function Home() {
     onSuccess: (suggestion) => setAiSuggestion(suggestion),
     onError: () => toast.error("The market finder is taking a breath — try a few keywords instead"),
   });
+  const reviewSummariesQuery = trpc.reviews.summaries.useQuery();
+  const reviewSummaries = (reviewSummariesQuery.data ?? []) as RatingSummary[];
   useEffect(() => { localStorage.setItem("luma-wishlist", JSON.stringify(wishlist)); }, [wishlist]);
   useEffect(() => { localStorage.setItem("luma-cart", JSON.stringify(cart.map(({ id, quantity }) => ({ id, quantity })))); }, [cart]);
   useEffect(() => { localStorage.setItem("luma-search-history", JSON.stringify(searchHistory)); }, [searchHistory]);
@@ -530,6 +539,16 @@ export default function Home() {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const estimatedShipping = cart.length ? (cartTotal >= 100 ? 0 : 8) : 0;
   const cartGrandTotal = cartTotal + estimatedShipping;
+  const ratingsByProductId = useMemo(() => new Map(reviewSummaries.map((summary) => [summary.productId, summary])), [reviewSummaries]);
+  const ratingsByVendorName = useMemo(() => new Map(vendors.map((vendor) => {
+    const storeSummaries = products
+      .filter((product) => product.vendor === vendor.name)
+      .map((product) => ratingsByProductId.get(product.id))
+      .filter((summary): summary is RatingSummary => Boolean(summary));
+    const reviewCount = storeSummaries.reduce((total, summary) => total + summary.reviewCount, 0);
+    const averageRating = reviewCount ? storeSummaries.reduce((total, summary) => total + summary.averageRating * summary.reviewCount, 0) / reviewCount : 0;
+    return [vendor.name, { reviewCount, averageRating }];
+  })), [ratingsByProductId]);
   useEffect(() => {
     if (!cartCount) return;
     setCartPulse(true);
@@ -548,8 +567,8 @@ export default function Home() {
       return searchMatch && categoryMatch && priceMatch && colorMatch;
     });
 
-    return orderProducts(result, sort);
-  }, [aiSuggestion, category, priceCeiling, priceFloor, query, selectedColor, sort]);
+    return orderProducts(result, sort, reviewSummaries);
+  }, [aiSuggestion, category, priceCeiling, priceFloor, query, reviewSummaries, selectedColor, sort]);
 
   const matchingVendors = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -728,7 +747,7 @@ export default function Home() {
               <div className="category-pills" aria-label="Filter by category">
                 {categories.map((item) => <button className={category === item ? "selected" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}
               </div>
-              <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="popular">Most popular</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
+              <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="popular">Most popular</option><option value="rating">Top rated</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
             </div>
           </div>
           {aiSuggestion && <div className="ai-suggestion"><div><Sparkles size={17} /><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}<small>{aiSuggestion.inventoryNote}</small></span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
@@ -743,7 +762,9 @@ export default function Home() {
             <fieldset><legend>Colour</legend><div className="color-swatches"><button className={selectedColor === "All" ? "selected" : ""} onClick={() => setSelectedColor("All")} aria-pressed={selectedColor === "All"} aria-label="All colours">All</button>{colorSwatches.map((swatch) => <button key={swatch.value} className={selectedColor === swatch.value ? "selected" : ""} onClick={() => setSelectedColor(swatch.value)} aria-pressed={selectedColor === swatch.value} aria-label={`Filter by ${swatch.value}`} title={swatch.value}><i style={{ background: swatch.color }} /></button>)}</div><small>{selectedColor === "All" ? "Choose an object colour to narrow the market" : selectedColor}</small></fieldset>
           </aside>
           <div className="product-results"><div className="product-rail" id="product-rail">
-            {filteredProducts.map((product, index) => (
+            {filteredProducts.map((product, index) => {
+              const ratingSummary = ratingsByProductId.get(product.id);
+              return (
               <article className="product-card" style={{ "--index": index } as React.CSSProperties} key={product.id}>
                 <div className="product-visual-wrap">
                   <button className="product-visual-button" onClick={() => setActiveProduct(product)} aria-label={`View ${product.name}`}><ProductVisual product={product} /></button>
@@ -753,12 +774,13 @@ export default function Home() {
                 </div>
                 <div className="product-meta">
                   <button className="product-name" onClick={() => setActiveProduct(product)}>{product.name}</button>
-                  <p>{product.vendor} <span>·</span> {product.category}</p><span className={`stock-note ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`}</span>
+                  <p>{product.vendor} <span>·</span> {product.category}</p><span className={`stock-note ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`}</span><span className="listing-rating" aria-label={ratingSummary?.reviewCount ? `${ratingSummary.averageRating.toFixed(1)} out of 5 from ${ratingSummary.reviewCount} visitor reviews` : "No visitor ratings yet"}><Star size={13} fill={ratingSummary?.reviewCount ? "currentColor" : "transparent"} />{ratingSummary?.reviewCount ? <><b>{ratingSummary.averageRating.toFixed(1)}</b><small>{ratingSummary.reviewCount} note{ratingSummary.reviewCount === 1 ? "" : "s"}</small></> : <small>No ratings yet</small>}</span>
                   <div className="product-price-row"><strong>{money.format(product.price)}</strong><button onClick={() => addToCart(product)} className="circle-add" aria-label={`Add ${product.name} to cart`}><Plus size={17} /></button></div>
                 </div>
                 {product.badge && <span className="product-badge">{product.badge}</span>}
               </article>
-            ))}
+              );
+            })}
             {!filteredProducts.length && <div className="empty-products"><Search size={21} /><p>No market finds match that search yet.</p><button onClick={() => { setQuery(""); setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); }}>Clear filters</button></div>}
           </div></div></div>
           <div className="market-pulse" aria-label="Live marketplace signals">
@@ -782,15 +804,18 @@ export default function Home() {
           <div className="section-kicker"><span>02</span> SELLER STALLS</div>
           <div className="vendors-heading"><h2 id="makers-heading">The people behind <em>the good stuff</em></h2></div>
           <div className="vendor-list">
-            {vendors.map((vendor, index) => (
+            {vendors.map((vendor, index) => {
+              const ratingSummary = ratingsByVendorName.get(vendor.name);
+              return (
               <button className={`vendor-card ${vendor.palette}`} key={vendor.name} onClick={() => setLocation(`/makers/${vendor.slug}`)}>
                 <span className="vendor-number">0{index + 1}</span>
                 <span className="vendor-mark">{vendor.name.charAt(0)}</span>
-                <span className="vendor-details"><b>{vendor.name}</b><small>{vendor.description}</small></span>
+                <span className="vendor-details"><b>{vendor.name}</b><small>{vendor.description}</small><span className="vendor-rating" aria-label={ratingSummary?.reviewCount ? `${ratingSummary.averageRating.toFixed(1)} out of 5 from ${ratingSummary.reviewCount} visitor reviews` : "No visitor ratings yet"}><Star size={12} fill={ratingSummary?.reviewCount ? "currentColor" : "transparent"} />{ratingSummary?.reviewCount ? <>{ratingSummary.averageRating.toFixed(1)} · {ratingSummary.reviewCount} note{ratingSummary.reviewCount === 1 ? "" : "s"}</> : "No ratings yet"}</span></span>
                 <span className="vendor-category">{vendor.category}<br />{vendor.products} items</span>
                 <ArrowRight className="vendor-arrow" size={20} />
               </button>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -819,7 +844,7 @@ export default function Home() {
             <div className="cart-lines">
               {cart.length ? cart.map((item) => <div className="cart-line" key={item.id}><div className={`cart-thumb ${item.imageClass}`}><item.Icon size={22} /></div><div><b>{item.name}</b><p>{item.vendor}</p><div className="quantity"><button onClick={() => updateQuantity(item.id, -1)} aria-label={`Remove one ${item.name}`}><Minus size={13} /></button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label={`Add one ${item.name}`}><Plus size={13} /></button></div></div><strong>{money.format(item.price * item.quantity)}</strong></div>) : <div className="cart-empty"><ShoppingBag size={26} /><p>Your bag is ready when you are</p><button onClick={() => setShowCart(false)}>Keep browsing</button></div>}
             </div>
-            <div className="cart-footer"><div className="cart-price-line"><span>Subtotal</span><b>{money.format(cartTotal)}</b></div><div className="cart-price-line"><span>Estimated delivery</span><b>{estimatedShipping ? money.format(estimatedShipping) : "Complimentary"}</b></div><div className="cart-grand-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><p>{cartTotal >= 100 ? "Complimentary delivery unlocked" : "Add a little more to unlock complimentary delivery"}</p><button className="button primary-button full-width" disabled={!cart.length} onClick={openCheckout}>Continue to delivery <ArrowRight size={18} /></button></div>
+            <div className="cart-footer"><div className="cart-price-line"><span>Subtotal</span><b>{money.format(cartTotal)}</b></div><div className="cart-price-line"><span>Estimated delivery</span><b>{estimatedShipping ? money.format(estimatedShipping) : "Complimentary"}</b></div><div className="cart-grand-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><p>{cartTotal >= 100 ? "Complimentary delivery unlocked" : "Add a little more to unlock complimentary delivery"}</p>{cart.length > 0 && <button className="clear-cart" onClick={() => { setCart([]); toast.success("Your bag is clear"); }}>Clear cart</button>}<button className="button primary-button full-width" disabled={!cart.length} onClick={openCheckout}>Continue to delivery <ArrowRight size={18} /></button></div>
           </aside>
         </div>
       )}

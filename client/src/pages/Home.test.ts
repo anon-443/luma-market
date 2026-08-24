@@ -2,8 +2,13 @@ import { describe, expect, it } from "vitest";
 import { orderProducts, products, vendors } from "./Home";
 
 describe("marketplace ordering and vendor metadata", () => {
-  it("orders the catalog by popularity without relying on visitor ratings", () => {
+  it("orders the catalog by popularity", () => {
     const ordered = orderProducts(products, "popular");
+    expect(ordered.map((product) => product.id)).toEqual([1, 4, 12, 3, 9, 6, 2, 5, 7, 10, 8, 11]);
+  });
+
+  it("keeps an unrated catalog deterministic when Top rated is selected", () => {
+    const ordered = orderProducts(products, "rating");
     expect(ordered.map((product) => product.id)).toEqual([1, 4, 12, 3, 9, 6, 2, 5, 7, 10, 8, 11]);
   });
 
