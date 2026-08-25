@@ -699,7 +699,7 @@ export default function Home() {
   };
 
   return (
-    <div className="market-shell" data-seasonal-palette={seasonalPalette}>
+    <div className="market-shell atelier-index" data-seasonal-palette={seasonalPalette}>
       <div className="market-grain" aria-hidden="true" />
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Luma Market home">
@@ -742,15 +742,15 @@ export default function Home() {
       <main id="top">
         <section className="hero" aria-labelledby="hero-heading">
           <div className="hero-copy">
-            <p className="eyebrow"><span /> MARKETPLACE / 24</p>
-            <p className="hero-prompt">Find your next useful obsession</p>
-            <h1 id="hero-heading">The good kind <em>of too much</em></h1>
-            <p className="hero-description">Thoughtful finds from independent studios</p>
+            <p className="eyebrow"><span /> LUMA / OBJECT INDEX</p>
+            <p className="hero-prompt">A better way to browse the everyday</p>
+            <h1 id="hero-heading">Useful objects <em>with a pulse</em></h1>
+            <p className="hero-description">Independent pieces for rooms, rituals, and the in-between moments</p>
             <div className="hero-context" aria-label="Marketplace qualities"><span>Hand-finished</span><i /><span>Small-run</span><i /><span>Made to keep</span></div>
-            <div className="hero-stat"><strong>38</strong><span><b>independent sellers</b><small>now in the arcade</small></span></div>
+            <div className="hero-stat"><strong>38</strong><span><b>independent studios</b><small>in the current edit</small></span></div>
             <div className="hero-cta-row">
-              <a className="button primary-button" href="#shop">Browse the market <ArrowDownRight size={18} /></a>
-              <a className="text-link" href="#makers">Meet the makers <ArrowRight size={16} /></a>
+              <a className="button primary-button" href="#shop">Enter the index <ArrowDownRight size={18} /></a>
+              <a className="text-link" href="#makers">Meet the studios <ArrowRight size={16} /></a>
             </div>
           </div>
           <div className="hero-visual">
