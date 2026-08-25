@@ -28,7 +28,7 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light" switchable>
+      <ThemeProvider defaultTheme="light" switchable={false}>
         <TooltipProvider>
           <Toaster richColors position="bottom-right" />
           <WouterRouter base={routerBase}>

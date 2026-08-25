@@ -1310,3 +1310,121 @@ html:not(.dark) .market-shell.atelier-index[data-seasonal-palette] .hero-copy {
 }
 html:not(.dark) .market-shell.atelier-index[data-seasonal-palette] .hero-copy, html:not(.dark) .market-shell.atelier-index[data-seasonal-palette] .hero h1 { color: #f4f5ef; }
 .dark .market-shell.atelier-index[data-seasonal-palette] .hero-copy { background: radial-gradient(circle at 84% 80%, color-mix(in srgb, var(--coral) 20%, transparent), transparent 31%), linear-gradient(135deg, #10162a 0%, #17254a 65%, #113845 142%); }
+
+/* Fixed light studio palette and refined marketplace proportions. */
+.atelier-index {
+  --paper: #f1f3ed;
+  --surface: #fbfcf8;
+  --soft-surface: #e4e9e0;
+  --ink: #101a32;
+  --line: rgba(16, 26, 50, 0.17);
+  --muted-foreground: #5d6878;
+  --saffron: #e6b647;
+  --coral: #d85a58;
+  --teal: #3c8079;
+  --hero-copy: #101a32;
+  --hero-visual: #dbe9e4;
+  --hero-orbit: #e6b647;
+}
+.dark .atelier-index { color: var(--ink); background: linear-gradient(115deg, #f8faf6 0%, var(--paper) 56%, #e8ece5 100%); }
+.atelier-index .theme-toggle, .atelier-index .palette-picker { display: none; }
+.atelier-index .site-header { height: 100px; }
+.atelier-index .brand, .atelier-index .footer-brand { font-size: 31px; }
+.atelier-index .brand img, .atelier-index .footer-brand img { width: 33px; height: 33px; }
+.atelier-index .desktop-nav a { font-size: 12px; }
+.atelier-index .header-actions { gap: 11px; }
+.atelier-index .bag-button, .atelier-index .profile-button, .atelier-index .wishlist-button { width: 46px; height: 46px; border-radius: 13px; }
+
+.atelier-index .hero { min-height: min(630px, calc(100vh - 100px)); }
+.atelier-index .hero-copy { padding-top: clamp(52px, 5.5vw, 86px); padding-bottom: 48px; background: radial-gradient(circle at 84% 80%, color-mix(in srgb, var(--coral) 26%, transparent), transparent 31%), radial-gradient(circle at 14% 12%, color-mix(in srgb, var(--saffron) 18%, transparent), transparent 22%), linear-gradient(135deg, #101a32 0%, #172448 64%, #143d50 142%) !important; }
+.atelier-index .hero-prompt { margin-top: 16px; }
+.atelier-index .hero h1 { margin: 20px 0 22px; font-size: clamp(60px, 5.8vw, 98px); }
+.atelier-index .hero-description { max-width: 620px; font-size: 17px; white-space: nowrap; }
+.atelier-index .hero-context { margin-top: 19px; }
+.atelier-index .hero-stat { margin-top: clamp(26px, 4vh, 48px); }
+.atelier-index .hero-stat strong { font-size: 61px; }
+.atelier-index .hero-stat span { font-size: 13px; }
+.atelier-index .hero-cta-row { margin-top: 24px; }
+.atelier-index .hero-note { display: none; }
+.atelier-index .hero-image-frame { width: min(82%, 760px); height: 81%; right: 7%; top: 9%; }
+.atelier-index .hero-image-frame img { object-position: 24% center; transform: scale(1.22); }
+.atelier-index .hero-visual-index { top: 6%; }
+.atelier-index .hero-sticker { top: 13%; }
+
+.atelier-index .market-section { padding-top: clamp(50px, 5vw, 76px); padding-bottom: 66px; }
+.atelier-index .shop-heading-row { margin-top: 16px; }
+.atelier-index .shop-heading-row h2 { max-width: none; font-size: clamp(58px, 5.2vw, 84px); white-space: nowrap; }
+.atelier-index .shop-heading-row p { font-size: 15px; white-space: nowrap; }
+.atelier-index .shop-tools { margin: 28px 0 18px; min-height: 72px; }
+.atelier-index .search-field { height: 58px; }
+.atelier-index .search-field input { font-size: 13px; }
+.atelier-index .voice-search-button, .atelier-index .ai-search-button { width: 42px; height: 42px; flex-basis: 42px; }
+.atelier-index .category-pills button { padding: 12px 13px; font-size: 11px; }
+.atelier-index .sort-select { min-width: 174px; height: 46px; font-size: 11px; }
+.atelier-index .filter-sidebar { margin-top: 4px; }
+.atelier-index .market-pulse { min-height: 106px; margin: 38px calc(50% - 50vw) 0; padding: 20px clamp(24px, 5.5vw, 112px); width: 100vw; border-radius: 0; grid-template-columns: 64px 1.25fr 1.25fr auto; }
+.atelier-index .pulse-orbit { width: 49px; height: 49px; }
+.atelier-index .market-pulse b { font-size: 11px; }
+.atelier-index .market-pulse p span { font-size: 18px; white-space: nowrap; }
+.atelier-index .market-pulse a { font-size: 11px; }
+
+@media (max-width: 820px) {
+  .atelier-index .site-header { height: 82px; }
+  .atelier-index .brand { font-size: 27px; }
+  .atelier-index .hero { min-height: 0; }
+  .atelier-index .hero-copy { min-height: 470px; padding: 48px 24px 42px; }
+  .atelier-index .hero h1 { margin: 18px 0; font-size: clamp(52px, 15.2vw, 73px); }
+  .atelier-index .hero-description { font-size: 15px; white-space: normal; }
+  .atelier-index .hero-visual { min-height: 400px; }
+  .atelier-index .hero-image-frame { width: 82%; height: 80%; right: 5%; top: 9%; }
+  .atelier-index .hero-image-frame img { transform: scale(1.18); object-position: 22% center; }
+  .atelier-index .market-section { padding: 52px 20px 58px; }
+  .atelier-index .shop-heading-row h2 { font-size: clamp(47px, 13vw, 62px); white-space: normal; }
+  .atelier-index .shop-heading-row p { white-space: normal; }
+  .atelier-index .shop-tools { margin-top: 24px; }
+  .atelier-index .market-pulse { min-height: 0; margin: 30px -20px 0; padding: 20px; width: calc(100% + 40px); border-radius: 0; grid-template-columns: 46px 1fr; gap: 14px; }
+  .atelier-index .market-pulse p span { font-size: 16px; white-space: normal; }
+  .atelier-index .market-pulse a { grid-column: 2; justify-self: start; }
+}
+
+@media (min-width: 821px) {
+  .atelier-index .catalog-layout { grid-template-columns: 1fr; gap: 22px; }
+  .atelier-index .filter-sidebar {
+    position: static;
+    min-height: 92px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 122px minmax(310px, 1.15fr) minmax(250px, .94fr) minmax(250px, .94fr);
+    align-items: stretch;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .atelier-index .filter-sidebar-heading.filter-sidebar-actions {
+    min-height: 0;
+    padding: 0 18px;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid var(--line);
+  }
+  .atelier-index .filter-sidebar-actions > button { font-size: 11px; }
+  .atelier-index .filter-sidebar fieldset {
+    min-width: 0;
+    min-height: 92px;
+    margin: 0;
+    padding: 13px 20px;
+    align-content: center;
+    border: 0;
+    border-left: 1px solid var(--line);
+  }
+  .atelier-index .filter-sidebar-heading + fieldset { border-left: 0; }
+  .atelier-index .filter-sidebar legend { margin-bottom: 7px; font-size: 10px; }
+  .atelier-index .filter-sidebar fieldset:nth-of-type(1) { display: flex; align-content: center; align-items: center; gap: 5px 10px; flex-wrap: wrap; }
+  .atelier-index .filter-sidebar fieldset:nth-of-type(1) legend { flex-basis: 100%; }
+  .atelier-index .filter-choice { gap: 5px; font-size: 11px; white-space: nowrap; }
+  .atelier-index .filter-choice input { width: 13px; height: 13px; }
+  .atelier-index .filter-sidebar small { font-size: 10px; white-space: nowrap; }
+  .atelier-index .price-visual-range { height: 20px; }
+  .atelier-index .range-labels { font-size: 10px; }
+  .atelier-index .color-swatches { gap: 6px; flex-wrap: nowrap; }
+  .atelier-index .color-swatches button { width: 22px; height: 22px; }
+}

@@ -10,7 +10,7 @@
 | Shopping | Wishlist, quick view, product gallery with touch-friendly zoom, persistent cart, order estimate, checkout validation, and simulated payment state |
 | Marketplace | Five vendor profiles, vendor-name search, individual maker pages, availability information, and contact links |
 | Reviews | Visitor notes, aggregate rating summaries, and honest empty states when no review has been submitted |
-| Visual system | Responsive light and dark modes, persisted seasonal palettes, reduced-motion support, and original editorial product imagery |
+| Visual system | A fixed cream, teal, ink, ochre, and coral light experience with reduced-motion support and original editorial product imagery |
 
 ## Technology
 
