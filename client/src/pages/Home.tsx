@@ -24,6 +24,7 @@ import {
   Package,
   Plus,
   Search,
+  Scale,
   Share2,
   ShoppingBag,
   SlidersHorizontal,
@@ -300,6 +301,8 @@ const productGallery: Record<number, GalleryImage[]> = Object.fromEntries(
 
 export type Vendor = {
   name: string;
+  logo: string;
+  portrait: string;
   slug: string;
   description: string;
   category: string;
@@ -312,12 +315,23 @@ export type Vendor = {
 };
 
 export const vendors: Vendor[] = [
-  { name: "Maison Sora", slug: "maison-sora", description: "Small rituals for the table", category: "Ceramics & home", products: 18, palette: "sora", location: "Portland, Oregon", contactEmail: "hello@maisonsora.studio", websiteLabel: "maisonsora.studio", story: "A small ceramics studio making quietly useful vessels for shared meals and slower mornings." },
-  { name: "Field Theory", slug: "field-theory", description: "Objects that hold a room together", category: "Lighting & furniture", products: 24, palette: "field", location: "Brooklyn, New York", contactEmail: "studio@fieldtheory.design", websiteLabel: "fieldtheory.design", story: "Field Theory makes practical room-scale objects with soft geometry, considered metals, and long repairable lives." },
-  { name: "Onda Goods", slug: "onda-goods", description: "Useful things with soft edges", category: "Textiles & accessories", products: 31, palette: "onda", location: "Los Angeles, California", contactEmail: "hello@ondagoods.studio", websiteLabel: "ondagoods.studio", story: "Onda Goods works with tactile textiles and everyday carry pieces designed to soften the sharper parts of a day." },
-  { name: "Acoustic Tide", slug: "acoustic-tide", description: "Better listening, quieter work", category: "Sound & desk objects", products: 14, palette: "tide", location: "Seattle, Washington", contactEmail: "studio@acoustictide.audio", websiteLabel: "acoustictide.audio", story: "Acoustic Tide builds calm listening tools and desk companions for focused, lower-friction routines." },
-  { name: "Paper Current", slug: "paper-current", description: "Paper tools for thinking clearly", category: "Stationery & paper", products: 22, palette: "paper", location: "Chicago, Illinois", contactEmail: "hello@papercurrent.co", websiteLabel: "papercurrent.co", story: "Paper Current makes durable desk stationery that leaves room for plans, notes, lists, and a little drift." },
+  { name: "Maison Sora", logo: "MS", portrait: "/manus-storage/luma-maker-maison-sora_33c0fb90.jpg", slug: "maison-sora", description: "Small rituals for the table", category: "Ceramics & home", products: 18, palette: "sora", location: "Portland, Oregon", contactEmail: "hello@maisonsora.studio", websiteLabel: "maisonsora.studio", story: "A small ceramics studio making quietly useful vessels for shared meals and slower mornings." },
+  { name: "Field Theory", logo: "FT", portrait: "/manus-storage/luma-maker-field-theory_81f2f02f.jpg", slug: "field-theory", description: "Objects that hold a room together", category: "Lighting & furniture", products: 24, palette: "field", location: "Brooklyn, New York", contactEmail: "studio@fieldtheory.design", websiteLabel: "fieldtheory.design", story: "Field Theory makes practical room-scale objects with soft geometry, considered metals, and long repairable lives." },
+  { name: "Onda Goods", logo: "OG", portrait: "/manus-storage/luma-maker-onda-goods_9a99d087.jpg", slug: "onda-goods", description: "Useful things with soft edges", category: "Textiles & accessories", products: 31, palette: "onda", location: "Los Angeles, California", contactEmail: "hello@ondagoods.studio", websiteLabel: "ondagoods.studio", story: "Onda Goods works with tactile textiles and everyday carry pieces designed to soften the sharper parts of a day." },
+  { name: "Acoustic Tide", logo: "AT", portrait: "/manus-storage/luma-maker-acoustic-tide_513e825a.jpg", slug: "acoustic-tide", description: "Better listening, quieter work", category: "Sound & desk objects", products: 14, palette: "tide", location: "Seattle, Washington", contactEmail: "studio@acoustictide.audio", websiteLabel: "acoustictide.audio", story: "Acoustic Tide builds calm listening tools and desk companions for focused, lower-friction routines." },
+  { name: "Paper Current", logo: "PC", portrait: "/manus-storage/luma-maker-paper-current_686daf69.jpg", slug: "paper-current", description: "Paper tools for thinking clearly", category: "Stationery & paper", products: 22, palette: "paper", location: "Chicago, Illinois", contactEmail: "hello@papercurrent.co", websiteLabel: "papercurrent.co", story: "Paper Current makes durable desk stationery that leaves room for plans, notes, lists, and a little drift." },
 ];
+
+vendors.forEach((vendor) => { vendor.portrait = lumaAsset(vendor.portrait); });
+
+export function availabilityLabel(product: Product) {
+  return product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`;
+}
+
+export function nextComparisonIds(selectedIds: number[], productId: number, limit = 3) {
+  if (selectedIds.includes(productId)) return selectedIds.filter((id) => id !== productId);
+  return selectedIds.length >= limit ? selectedIds : [...selectedIds, productId];
+}
 
 export function orderProducts(items: Product[], sort: string, ratingSummaries: RatingSummary[] = []) {
   const ratingsByProductId = new Map(ratingSummaries.map((summary) => [summary.productId, summary]));
@@ -517,6 +531,12 @@ export default function Home() {
   const [searchHistory, setSearchHistory] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem("luma-search-history") ?? "[]") as string[]; } catch { return []; }
   });
+  const [comparisonIds, setComparisonIds] = useState<number[]>(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("luma-comparison") ?? "[]") as unknown[];
+      return stored.filter((id): id is number => typeof id === "number" && products.some((product) => product.id === id)).slice(0, 3);
+    } catch { return []; }
+  });
   const [voiceSupported] = useState(() => typeof window !== "undefined" && Boolean((window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor }).SpeechRecognition || (window as typeof window & { SpeechRecognition?: WebSpeechConstructor; webkitSpeechRecognition?: WebSpeechConstructor }).webkitSpeechRecognition));
   const aiSearch = trpc.discovery.suggest.useMutation({
     onSuccess: (suggestion) => setAiSuggestion(suggestion),
@@ -527,6 +547,7 @@ export default function Home() {
   useEffect(() => { localStorage.setItem("luma-wishlist", JSON.stringify(wishlist)); }, [wishlist]);
   useEffect(() => { localStorage.setItem("luma-cart", JSON.stringify(cart.map(({ id, quantity }) => ({ id, quantity })))); }, [cart]);
   useEffect(() => { localStorage.setItem("luma-search-history", JSON.stringify(searchHistory)); }, [searchHistory]);
+  useEffect(() => { localStorage.setItem("luma-comparison", JSON.stringify(comparisonIds)); }, [comparisonIds]);
   useEffect(() => { localStorage.setItem("luma-order-history", JSON.stringify(orderHistory)); }, [orderHistory]);
   useEffect(() => { localStorage.setItem("luma-profile-name", profileName); }, [profileName]);
   useEffect(() => { localStorage.setItem("luma-personalized-discovery", String(personalizedDiscovery)); }, [personalizedDiscovery]);
@@ -661,6 +682,17 @@ export default function Home() {
   };
 
   const wishlistProducts = products.filter((product) => wishlist.includes(product.id));
+  const comparisonProducts = products.filter((product) => comparisonIds.includes(product.id));
+
+  const toggleComparison = (product: Product) => {
+    const alreadySelected = comparisonIds.includes(product.id);
+    if (!alreadySelected && comparisonIds.length >= 3) {
+      toast.info("Compare up to three products at a time", { description: "Remove one of your selected finds to add another" });
+      return;
+    }
+    setComparisonIds((current) => nextComparisonIds(current, product.id));
+    toast.success(alreadySelected ? "Removed from comparison" : "Added to comparison", { description: product.name });
+  };
 
   const shareProduct = async (product: Product) => {
     const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
@@ -759,9 +791,11 @@ export default function Home() {
               <article className="product-card" style={{ "--index": index } as React.CSSProperties} key={product.id}>
                 <div className="product-visual-wrap">
                   <button className="product-visual-button" onClick={() => setActiveProduct(product)} aria-label={`View ${product.name}`}><ProductVisual product={product} /></button>
+                  <span className={`availability-badge ${product.inventoryStatus}`}><i aria-hidden="true" />{availabilityLabel(product)}</span>
                   <button className="card-quick-add" onClick={() => addToCart(product, { openCart: false })} aria-label={`Quick add ${product.name} to cart`}><Plus size={16} /><span>Quick add</span></button>
                   <button className="quick-view-trigger" onClick={() => setQuickViewProduct(product)} aria-label={`Quick view ${product.name}`}><Eye size={16} /><span>Quick view</span></button>
                   <button className={`product-heart ${wishlist.includes(product.id) ? "is-saved" : ""}`} onClick={() => toggleWishlist(product)} aria-label={`${wishlist.includes(product.id) ? "Remove" : "Save"} ${product.name} ${wishlist.includes(product.id) ? "from" : "to"} wishlist`} aria-pressed={wishlist.includes(product.id)}><Heart size={17} fill={wishlist.includes(product.id) ? "currentColor" : "transparent"} /></button>
+                  <button className={`product-compare-toggle ${comparisonIds.includes(product.id) ? "is-selected" : ""}`} onClick={() => toggleComparison(product)} aria-label={`${comparisonIds.includes(product.id) ? "Remove" : "Add"} ${product.name} ${comparisonIds.includes(product.id) ? "from" : "to"} comparison`} aria-pressed={comparisonIds.includes(product.id)}><Scale size={14} /><span>{comparisonIds.includes(product.id) ? "Selected" : "Compare"}</span></button>
                 </div>
                 <div className="product-meta">
                   <button className="product-name" onClick={() => setActiveProduct(product)}>{product.name}</button>
@@ -800,9 +834,8 @@ export default function Home() {
               return (
               <button className={`vendor-card ${vendor.palette}`} key={vendor.name} onClick={() => setLocation(`/makers/${vendor.slug}`)}>
                 <span className="vendor-number">0{index + 1}</span>
-                <span className="vendor-mark">{vendor.name.charAt(0)}</span>
                 <span className="vendor-details"><b>{vendor.name}</b><small>{vendor.description}</small><span className="vendor-rating" aria-label={ratingSummary?.reviewCount ? `${ratingSummary.averageRating.toFixed(1)} out of 5 from ${ratingSummary.reviewCount} visitor reviews` : "No visitor ratings yet"}><Star size={12} fill={ratingSummary?.reviewCount ? "currentColor" : "transparent"} />{ratingSummary?.reviewCount ? <>{ratingSummary.averageRating.toFixed(1)} · {ratingSummary.reviewCount} note{ratingSummary.reviewCount === 1 ? "" : "s"}</> : "No ratings yet"}</span></span>
-                <span className="vendor-category">{vendor.category}<br />{vendor.products} items</span>
+                <span className="vendor-category"><img className="seller-portrait" src={vendor.portrait} alt={`${vendor.name} maker portrait`} /><span><b>{vendor.category}</b><small>{vendor.products} items</small></span></span>
                 <ArrowRight className="vendor-arrow" size={20} />
               </button>
               );
@@ -854,6 +887,8 @@ export default function Home() {
           </section>
         </div>
       )}
+
+      {comparisonProducts.length > 0 && <aside className="comparison-dock" aria-label="Selected products for comparison"><div><span className="comparison-count"><Scale size={15} /> Compare {comparisonProducts.length}/3</span><div className="comparison-mini-list">{comparisonProducts.map((product) => <button key={product.id} onClick={() => toggleComparison(product)} aria-label={`Remove ${product.name} from comparison`}><img src={product.image} alt="" /><span>{product.name}</span><X size={13} /></button>)}</div></div><button className="compare-now" onClick={() => setLocation("/compare")}>Compare now <ArrowRight size={16} /></button></aside>}
 
       {activeProduct && <ProductDetailModal product={activeProduct} onClose={() => setActiveProduct(null)} onAddToCart={addToCart} isWishlisted={wishlist.includes(activeProduct.id)} onToggleWishlist={toggleWishlist} onShare={shareProduct} onSelectProduct={setActiveProduct} searchHistory={searchHistory} wishlist={wishlist} />}
 

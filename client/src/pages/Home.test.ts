@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { orderProducts, products, seasonalPalettes, vendors } from "./Home";
+import { availabilityLabel, nextComparisonIds, orderProducts, products, seasonalPalettes, vendors } from "./Home";
 
 describe("marketplace ordering and vendor metadata", () => {
   it("orders the catalog by popularity", () => {
@@ -22,6 +22,19 @@ describe("marketplace ordering and vendor metadata", () => {
       expect(vendor.slug).toMatch(/^[a-z0-9-]+$/);
       expect(vendor.contactEmail).toContain("@");
       expect(products.some((product) => product.vendor === vendor.name)).toBe(true);
+      expect(vendor.logo).toMatch(/^[A-Z]{2}$/);
+      expect(vendor.portrait).toMatch(/\/manus-storage\/luma-maker-/);
     });
+  });
+
+  it("uses direct availability labels for current and low stock pieces", () => {
+    expect(availabilityLabel(products[0]!)).toBe("18 in stock");
+    expect(availabilityLabel(products[1]!)).toBe("Only 4 left");
+  });
+
+  it("keeps comparison selections unique and capped at three products", () => {
+    expect(nextComparisonIds([1, 2], 3)).toEqual([1, 2, 3]);
+    expect(nextComparisonIds([1, 2, 3], 4)).toEqual([1, 2, 3]);
+    expect(nextComparisonIds([1, 2, 3], 2)).toEqual([1, 3]);
   });
 });
