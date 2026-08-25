@@ -1493,6 +1493,16 @@ html:not(.dark) .market-shell.atelier-index[data-seasonal-palette] .hero-copy, h
 
 .atelier-index .theme-toggle { display: flex !important; }
 
+/* Calm the promotional colour field and make all footer copy consistently white. */
+html:not(.dark) .market-shell.atelier-index .promo-section {
+  background: linear-gradient(125deg, #8eaaa4 0%, #c7d9d3 57%, #e8e0d0 57%, #d2dfd2 100%) !important;
+  color: #101a32;
+}
+html:not(.dark) .market-shell.atelier-index .promo-copy .eyebrow { color: rgba(16,26,50,.72); }
+html:not(.dark) .market-shell.atelier-index .promo-copy .eyebrow span { background: #d46d63; }
+.atelier-index .site-footer,
+.atelier-index .site-footer :is(a, b, p, button, span) { color: #ffffff !important; }
+
 @media (max-width: 430px) {
   .atelier-index .site-header { padding-inline: 9px; }
   .atelier-index .brand { gap: 6px; font-size: 25px; }
