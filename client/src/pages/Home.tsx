@@ -20,6 +20,7 @@ import {
   Mic,
   MicOff,
   Minus,
+  Moon,
   Package,
   Plus,
   Search,
@@ -28,6 +29,7 @@ import {
   SlidersHorizontal,
   Sparkles,
   Star,
+  Sun,
   X,
   ZoomIn,
   ZoomOut,
@@ -36,6 +38,7 @@ import {
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export type Product = {
   id: number;
@@ -291,22 +294,9 @@ export const products: Product[] = [
 
 products.forEach((product) => { product.image = lumaAsset(product.image); });
 
-const productGallery: Record<number, GalleryImage[]> = {
-  1: [{ src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Lumen Table Lamp front view", position: "80% 40%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Lumen Table Lamp material detail", position: "18% 50%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Lumen Table Lamp styled room view", position: "64% 50%" }],
-  2: [{ src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Flora Carryall product view", position: "center" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Flora Carryall textile detail", position: "70% 56%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Flora Carryall styled context", position: "84% 44%" }],
-  3: [{ src: "/manus-storage/luma-product-ceramic_6dbcb79f.jpg", alt: "Cloud Ritual Mug ceramic view", position: "center 34%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Cloud Ritual Mug material detail", position: "18% 66%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Cloud Ritual Mug table setting", position: "40% 52%" }],
-  4: [{ src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Daytrip Headphones product view", position: "center" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Daytrip Headphones desk setup", position: "76% 36%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Daytrip Headphones colour detail", position: "20% 55%" }],
-  5: [{ src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Notion Daily Book cover view", position: "13% 62%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Notion Daily Book paper detail", position: "64% 56%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Notion Daily Book desk context", position: "48% 54%" }],
-  6: [{ src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Coastline Throw woven texture", position: "73% 58%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Coastline Throw colour detail", position: "68% 50%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Coastline Throw living space", position: "94% 46%" }],
-  7: [{ src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Orbit Alarm Clock front view", position: "16% 44%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Orbit Alarm Clock material detail", position: "55% 34%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Orbit Alarm Clock bedside context", position: "40% 58%" }],
-  8: [{ src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Hush Desk Stand front view", position: "55% 34%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Hush Desk Stand texture detail", position: "25% 50%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Hush Desk Stand work setting", position: "75% 48%" }],
-  9: [{ src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Second Sun Scarf woven view", position: "43% 48%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Second Sun Scarf colour detail", position: "65% 48%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Second Sun Scarf styled context", position: "82% 45%" }],
-  10: [{ src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Marginalia Pen Set view", position: "33% 65%" }, { src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Marginalia Pen Set detail", position: "20% 55%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Marginalia Pen Set writing context", position: "58% 54%" }],
-  11: [{ src: "/manus-storage/luma-product-accessory_fcbbe62f.jpg", alt: "Daylight Pouch product view", position: "82% 61%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Daylight Pouch textile detail", position: "62% 57%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Daylight Pouch desk setting", position: "18% 56%" }],
-  12: [{ src: "/manus-storage/luma-product-ceramic_6dbcb79f.jpg", alt: "Sunday Serving Tray view", position: "62% 52%" }, { src: "/manus-storage/luma-product-objects_5f2f2446.jpg", alt: "Sunday Serving Tray glaze detail", position: "43% 54%" }, { src: "/manus-storage/luma-product-knit_22081181.webp", alt: "Sunday Serving Tray table context", position: "30% 48%" }],
-};
-
-Object.values(productGallery).flat().forEach((image) => { image.src = lumaAsset(image.src); });
+const productGallery: Record<number, GalleryImage[]> = Object.fromEntries(
+  products.map((product) => [product.id, [{ src: product.image, alt: `${product.name} product view`, position: product.imagePosition }]])
+);
 
 export type Vendor = {
   name: string;
@@ -359,11 +349,11 @@ const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD
 function ProductVisual({ product }: { product: Product }) {
   const { Icon } = product;
   const gallery = productGallery[product.id] ?? [{ src: product.image, alt: product.name, position: product.imagePosition }];
-  const secondary = gallery[1] ?? gallery[0];
+  const secondary = gallery[1];
   return (
     <div className={`product-visual ${product.imageClass}`} aria-label={`${product.name} product artwork`}>
       <img className="product-photo" src={product.image} style={{ objectPosition: product.imagePosition }} alt="" />
-      <img className="product-photo product-photo-secondary" src={secondary.src} style={{ objectPosition: secondary.position }} alt="" />
+      {secondary && <img className="product-photo product-photo-secondary" src={secondary.src} style={{ objectPosition: secondary.position }} alt="" />}
       <div className="photo-vignette" />
       <div className="visual-orbit" />
       <span className="product-icon-badge"><Icon aria-hidden="true" /></span>
@@ -381,7 +371,7 @@ function ProductGallery({ product, onOpenLightbox }: { product: Product; onOpenL
 
   useEffect(() => { setActiveIndex(0); setZoomed(false); }, [product.id]);
 
-  return <div className="product-gallery"><button className="gallery-stage" onClick={() => onOpenLightbox(activeIndex)} onMouseMove={(event) => { const box = event.currentTarget.getBoundingClientRect(); setOrigin(`${((event.clientX - box.left) / box.width) * 100}% ${((event.clientY - box.top) / box.height) * 100}%`); }} onMouseEnter={() => setZoomed(true)} onMouseLeave={() => setZoomed(false)} aria-label={`Open ${product.name} image ${activeIndex + 1} in lightbox`}><img src={activeImage.src} alt={activeImage.alt} style={{ objectPosition: activeImage.position, transformOrigin: origin, transform: zoomed ? "scale(1.34)" : "scale(1)" }} /><span className="gallery-enlarge"><Expand size={16} /> Click to inspect</span></button><div className="gallery-thumbnails" aria-label={`${product.name} image views`}>{gallery.map((image, index) => <button key={`${image.src}-${index}`} className={index === activeIndex ? "selected" : ""} onClick={() => setActiveIndex(index)} aria-label={`Show ${product.name} image ${index + 1}`}><img src={image.src} alt="" style={{ objectPosition: image.position }} /></button>)}</div></div>;
+  return <div className="product-gallery"><button className="gallery-stage" onClick={() => onOpenLightbox(activeIndex)} onMouseMove={(event) => { const box = event.currentTarget.getBoundingClientRect(); setOrigin(`${((event.clientX - box.left) / box.width) * 100}% ${((event.clientY - box.top) / box.height) * 100}%`); }} onMouseEnter={() => setZoomed(true)} onMouseLeave={() => setZoomed(false)} aria-label={`Open ${product.name} image ${activeIndex + 1} in lightbox`}><img src={activeImage.src} alt={activeImage.alt} style={{ objectPosition: activeImage.position, transformOrigin: origin, transform: zoomed ? "scale(1.2)" : "scale(1)" }} /><span className="gallery-enlarge"><Expand size={16} /> Click to inspect</span></button>{gallery.length > 1 && <div className="gallery-thumbnails" aria-label={`${product.name} image views`}>{gallery.map((image, index) => <button key={`${image.src}-${index}`} className={index === activeIndex ? "selected" : ""} onClick={() => setActiveIndex(index)} aria-label={`Show ${product.name} image ${index + 1}`}><img src={image.src} alt="" style={{ objectPosition: image.position }} /></button>)}</div>}</div>;
 }
 
 function ImageLightbox({ product, imageIndex, onClose }: { product: Product; imageIndex: number; onClose: () => void }) {
@@ -487,6 +477,7 @@ function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onTog
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const { theme, toggleTheme } = useTheme();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("featured");
@@ -705,6 +696,7 @@ export default function Home() {
             {cartCount > 0 && <span className="cart-count-badge" key={cartCount}>{cartCount}</span>}
           </button>
           <button className={`wishlist-button ${wishlist.length ? "has-saves" : ""}`} onClick={() => setShowWishlist(true)} aria-label={`Open wishlist with ${wishlist.length} item${wishlist.length === 1 ? "" : "s"}`}><Heart size={18} fill={wishlist.length ? "currentColor" : "transparent"} /><span>{wishlist.length}</span></button>
+          {toggleTheme && <button className="theme-toggle" onClick={toggleTheme} aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}><Sun size={16} className={theme === "light" ? "active" : ""} /><span className="theme-orbit"><span /></span><Moon size={16} className={theme === "dark" ? "active" : ""} /></button>}
           <button className="menu-button" onClick={() => setShowMenu((open) => !open)} aria-label="Toggle navigation"><Menu size={21} /></button>
         </div>
       </header>
@@ -766,7 +758,7 @@ export default function Home() {
             <div className="filter-sidebar-heading filter-sidebar-actions"><button onClick={() => { setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); }}>Reset filters</button></div>
             <fieldset><legend>Category</legend>{categories.map((item) => <label className="filter-choice" key={item}><input type="radio" name="category-filter" checked={category === item} onChange={() => setCategory(item)} /><span>{item}</span></label>)}</fieldset>
             <fieldset><legend>Price range <b>{money.format(priceFloor)}–{money.format(priceCeiling)}</b></legend><div className="price-visual-range"><div className="price-track" style={{ "--from": `${((priceFloor - 20) / 180) * 100}%`, "--to": `${100 - ((priceCeiling - 20) / 180) * 100}%` } as React.CSSProperties} /><input aria-label="Minimum price" type="range" min="20" max="190" step="10" value={priceFloor} onChange={(event) => setPriceFloor(Math.min(Number(event.target.value), priceCeiling - 10))} /><input aria-label="Maximum price" type="range" min="30" max="200" step="10" value={priceCeiling} onChange={(event) => setPriceCeiling(Math.max(Number(event.target.value), priceFloor + 10))} /></div><div className="range-labels"><span>$20</span><span>$200+</span></div></fieldset>
-            <fieldset><legend>Colour</legend><div className="color-swatches"><button className={selectedColor === "All" ? "selected" : ""} onClick={() => setSelectedColor("All")} aria-pressed={selectedColor === "All"} aria-label="All colours">All</button>{colorSwatches.map((swatch) => <button key={swatch.value} className={selectedColor === swatch.value ? "selected" : ""} onClick={() => setSelectedColor(swatch.value)} aria-pressed={selectedColor === swatch.value} aria-label={`Filter by ${swatch.value}`} title={swatch.value}><i style={{ background: swatch.color }} /></button>)}</div><small>{selectedColor === "All" ? "Choose an object colour to narrow the market" : selectedColor}</small></fieldset>
+            <fieldset><legend>Colour</legend><div className="color-swatches"><button className={selectedColor === "All" ? "selected" : ""} onClick={() => setSelectedColor("All")} aria-pressed={selectedColor === "All"} aria-label="All colours">All</button>{colorSwatches.map((swatch) => <button key={swatch.value} className={selectedColor === swatch.value ? "selected" : ""} onClick={() => setSelectedColor(swatch.value)} aria-pressed={selectedColor === swatch.value} aria-label={`Filter by ${swatch.value}`} title={swatch.value}><i style={{ background: swatch.color }} /></button>)}</div></fieldset>
           </aside>
           <div className="product-results"><div className="product-rail" id="product-rail">
             {filteredProducts.map((product, index) => {
