@@ -484,7 +484,6 @@ export default function Home() {
   const [priceFloor, setPriceFloor] = useState(20);
   const [priceCeiling, setPriceCeiling] = useState(200);
   const [selectedColor, setSelectedColor] = useState("All");
-  const [showFilters, setShowFilters] = useState(false);
   const [cart, setCart] = useState<CartLine[]>(() => {
     try {
       const stored = JSON.parse(localStorage.getItem("luma-cart") ?? "[]") as Array<{ id?: number; quantity?: number }>;
@@ -752,14 +751,7 @@ export default function Home() {
           {aiSuggestion && <div className="ai-suggestion"><div><Sparkles size={17} /><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}<small>{aiSuggestion.inventoryNote}</small></span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
           {matchingVendors.length > 0 && <section className="vendor-search-results" aria-label="Matching seller stores"><p className="eyebrow"><span /> SELLER MATCHES</p><div>{matchingVendors.map((vendor) => <button key={vendor.slug} onClick={() => setLocation(`/makers/${vendor.slug}`)}><span className={`vendor-search-mark ${vendor.palette}`}>{vendor.name.charAt(0)}</span><span><b>{vendor.name}</b><small>{vendor.category}</small></span><ArrowRight size={16} /></button>)}</div></section>}
 
-          <button className="filter-toggle" onClick={() => setShowFilters((visible) => !visible)} aria-expanded={showFilters} aria-controls="product-filters"><SlidersHorizontal size={16} />{showFilters ? "Hide filters" : "Refine products"}</button>
           <div className="catalog-layout">
-          <aside className={`filter-sidebar ${showFilters ? "is-open" : ""}`} id="product-filters" aria-label="Filter products">
-            <div className="filter-sidebar-heading filter-sidebar-actions"><button onClick={() => { setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); }}>Reset filters</button></div>
-            <fieldset><legend>Category</legend>{categories.map((item) => <label className="filter-choice" key={item}><input type="radio" name="category-filter" checked={category === item} onChange={() => setCategory(item)} /><span>{item}</span></label>)}</fieldset>
-            <fieldset><legend>Price range <b>{money.format(priceFloor)}–{money.format(priceCeiling)}</b></legend><div className="price-visual-range"><div className="price-track" style={{ "--from": `${((priceFloor - 20) / 180) * 100}%`, "--to": `${100 - ((priceCeiling - 20) / 180) * 100}%` } as React.CSSProperties} /><input aria-label="Minimum price" type="range" min="20" max="190" step="10" value={priceFloor} onChange={(event) => setPriceFloor(Math.min(Number(event.target.value), priceCeiling - 10))} /><input aria-label="Maximum price" type="range" min="30" max="200" step="10" value={priceCeiling} onChange={(event) => setPriceCeiling(Math.max(Number(event.target.value), priceFloor + 10))} /></div><div className="range-labels"><span>$20</span><span>$200+</span></div></fieldset>
-            <fieldset><legend>Colour</legend><div className="color-swatches"><button className={selectedColor === "All" ? "selected" : ""} onClick={() => setSelectedColor("All")} aria-pressed={selectedColor === "All"} aria-label="All colours">All</button>{colorSwatches.map((swatch) => <button key={swatch.value} className={selectedColor === swatch.value ? "selected" : ""} onClick={() => setSelectedColor(swatch.value)} aria-pressed={selectedColor === swatch.value} aria-label={`Filter by ${swatch.value}`} title={swatch.value}><i style={{ background: swatch.color }} /></button>)}</div></fieldset>
-          </aside>
           <div className="product-results"><div className="product-rail" id="product-rail">
             {filteredProducts.map((product, index) => {
               const ratingSummary = ratingsByProductId.get(product.id);
