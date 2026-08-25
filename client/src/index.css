@@ -1574,3 +1574,21 @@ html:not(.dark) .market-shell.atelier-index {
   .atelier-index .vendors-section .vendor-rating { font-size: 11px; }
   .atelier-index .vendors-section .vendor-arrow { width: 19px; height: 19px; }
 }
+
+/* Right-led pricing and a larger product-card reading hierarchy. */
+.atelier-index .product-name { font-size: clamp(29px, 2.1vw, 35px); }
+.atelier-index .product-meta p { font-size: 16px; }
+.atelier-index .stock-note, .atelier-index .listing-rating { font-size: 14px; }
+.atelier-index .product-price-row strong { order: 2; margin-left: auto; font-size: 30px; }
+.atelier-index .product-price-row .circle-add { order: 1; }
+
+@media (min-width: 821px) {
+  .atelier-index .vendors-section .vendor-category { justify-self: start; transform: translateX(-34px); }
+}
+
+@media (max-width: 820px) {
+  .atelier-index .product-name { font-size: 23px; }
+  .atelier-index .product-meta p { font-size: 13px; }
+  .atelier-index .stock-note, .atelier-index .listing-rating { font-size: 12px; }
+  .atelier-index .product-price-row strong { font-size: 25px; }
+}
