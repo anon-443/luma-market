@@ -1461,18 +1461,18 @@ html:not(.dark) .market-shell.atelier-index[data-seasonal-palette] .hero-copy, h
 }
 
 .dark .atelier-index {
-  --paper: #101827;
-  --surface: #172335;
-  --soft-surface: #203149;
-  --ink: #f6f3e8;
+  --paper: #111b2d;
+  --surface: #17283d;
+  --soft-surface: #23364c;
+  --ink: #fff8ed;
   --line: rgba(246,243,232,.18);
-  --muted-foreground: #c1cad5;
-  --saffron: #f1bd4f;
-  --coral: #f08a7d;
-  --teal: #78c1b6;
-  --hero-visual: #213b48;
+  --muted-foreground: #c1cec8;
+  --saffron: #d99c73;
+  --coral: #ca7880;
+  --teal: #8ebdb0;
+  --hero-visual: #2b4a49;
 }
-.dark .atelier-index .hero-copy { background: radial-gradient(circle at 84% 80%, rgba(240,138,125,.24), transparent 31%), radial-gradient(circle at 14% 12%, rgba(241,189,79,.18), transparent 22%), linear-gradient(135deg, #0d1425 0%, #132644 64%, #163f47 142%) !important; }
+.dark .atelier-index .hero-copy { background: radial-gradient(circle at 84% 80%, rgba(202,120,128,.22), transparent 31%), radial-gradient(circle at 14% 12%, rgba(217,156,115,.18), transparent 22%), linear-gradient(135deg, #10192c 0%, #172d46 64%, #234a49 142%) !important; }
 .dark .atelier-index .hero-copy, .dark .atelier-index .hero h1 { color: #f6f3e8; }
 .dark .atelier-index .site-footer { background: #0d1425; }
 .dark .atelier-index .promo-copy h2 em { color: #f6f3e8; }
@@ -1513,4 +1513,40 @@ html:not(.dark) .market-shell.atelier-index .promo-copy .eyebrow span { backgrou
   .atelier-index .theme-toggle svg { width: 14px; height: 14px; }
   .atelier-index .theme-orbit { width: 15px; height: 15px; }
   .atelier-index .theme-orbit span { width: 6px; height: 6px; left: 4px; }
+}
+
+/* Compact shop entry and editorial product-card scale. */
+html:not(.dark) .market-shell.atelier-index {
+  --paper: #f7f2ea;
+  --surface: #fffdfa;
+  --soft-surface: #eee5d8;
+  --ink: #18243b;
+  --muted-foreground: #657273;
+  --saffron: #cf8b63;
+  --coral: #b85f66;
+  --teal: #8dbdb0;
+  --hero-visual: #b9ddcf;
+}
+.atelier-index .market-section { padding-top: 54px; }
+.atelier-index .market-section::before { top: 42px; }
+.atelier-index .market-section::after { top: 30px; }
+.atelier-index .product-meta { padding: 21px 8px 9px; }
+.atelier-index .product-name { font-size: clamp(25px, 1.85vw, 31px); line-height: 1.02; letter-spacing: -0.05em; }
+.atelier-index .product-meta p { margin: 8px 0 11px; font-size: 14px; line-height: 1.28; letter-spacing: .035em; }
+.atelier-index .stock-note, .atelier-index .listing-rating { font-size: 13px; }
+.atelier-index .product-price-row { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); align-items: center; }
+.atelier-index .product-price-row strong { font-family: "DM Serif Display", serif; font-size: 25px; line-height: 1; letter-spacing: -0.035em; }
+.atelier-index .circle-add { width: 42px; height: 42px; font-size: 20px; }
+
+@media (max-width: 820px) {
+  .atelier-index .market-section { padding-top: 42px; }
+  .atelier-index .market-section::before { top: 31px; }
+  .atelier-index .market-section::after { top: 24px; }
+  .atelier-index .product-meta { padding: 14px 4px 8px; }
+  .atelier-index .product-name { font-size: 20px; }
+  .atelier-index .product-meta p { font-size: 12px; margin: 6px 0 9px; }
+  .atelier-index .stock-note, .atelier-index .listing-rating { font-size: 11px; }
+  .atelier-index .product-price-row { margin-top: 10px; padding-top: 10px; }
+  .atelier-index .product-price-row strong { font-size: 21px; }
+  .atelier-index .circle-add { width: 34px; height: 34px; font-size: 17px; }
 }
