@@ -1658,3 +1658,7 @@ html:not(.dark) .market-shell.atelier-index {
   .atelier-index .hero-visual-index { top: 17px; left: 8%; }
   .atelier-index .hero-sticker { top: 106px; left: 8%; }
 }
+
+/* The hero now leads with a concise prompt, headline, qualities, and marketplace count only. */
+.atelier-index .hero-context { margin-top: 26px; }
+@media (max-width: 820px) { .atelier-index .hero-context { margin-top: 22px; } }

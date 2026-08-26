@@ -746,7 +746,6 @@ export default function Home() {
             <p className="eyebrow"><span /> LUMA / OBJECT INDEX</p>
             <p className="hero-prompt">A better way to browse the everyday</p>
             <h1 id="hero-heading">Useful objects <em>with a pulse</em></h1>
-            <p className="hero-description">Independent pieces for rooms, rituals, and the in-between moments</p>
             <div className="hero-context" aria-label="Marketplace qualities"><span>Hand-finished</span><i /><span>Small-run</span><i /><span>Made to keep</span></div>
             <div className="hero-stat"><strong>38</strong><span><b>independent studios</b><small>in the current edit</small></span></div>
             <div className="hero-cta-row">
