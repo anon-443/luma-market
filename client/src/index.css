@@ -1635,3 +1635,7 @@ html:not(.dark) .market-shell.atelier-index {
   .atelier-index .vendors-section .vendor-category { grid-column: 2; grid-row: 2; }
   .atelier-index .vendors-section .vendor-arrow { grid-column: 3; }
 }
+
+/* Keep the hero actions visually connected to the studio count instead of floating near the lower edge. */
+.atelier-index .hero-cta-row { margin-top: 16px; }
+@media (max-width: 820px) { .atelier-index .hero-cta-row { margin-top: 18px; } }
