@@ -1527,7 +1527,7 @@ html:not(.dark) .market-shell.atelier-index {
   --teal: #8dbdb0;
   --hero-visual: #b9ddcf;
 }
-.atelier-index .market-section { padding-top: 54px; }
+.atelier-index .market-section { padding-top: 22px; }
 .atelier-index .market-section::before { top: 42px; }
 .atelier-index .market-section::after { top: 30px; }
 .atelier-index .product-meta { padding: 21px 8px 9px; }
@@ -1539,7 +1539,7 @@ html:not(.dark) .market-shell.atelier-index {
 .atelier-index .circle-add { width: 42px; height: 42px; font-size: 20px; }
 
 @media (max-width: 820px) {
-  .atelier-index .market-section { padding-top: 42px; }
+  .atelier-index .market-section { padding-top: 22px; }
   .atelier-index .market-section::before { top: 31px; }
   .atelier-index .market-section::after { top: 24px; }
   .atelier-index .product-meta { padding: 14px 4px 8px; }
@@ -1549,6 +1549,18 @@ html:not(.dark) .market-shell.atelier-index {
   .atelier-index .product-price-row { margin-top: 10px; padding-top: 10px; }
   .atelier-index .product-price-row strong { font-size: 21px; }
   .atelier-index .circle-add { width: 34px; height: 34px; font-size: 17px; }
+}
+
+/* Bring the Market Floor label and title closer to the preceding hero while improving readability. */
+.atelier-index .market-section .section-kicker { gap: 10px; font-size: 13px; letter-spacing: .14em; }
+.atelier-index .market-section .section-kicker span { width: 30px; height: 30px; font-size: 12px; }
+.atelier-index .market-section .shop-heading-row { margin-top: 14px; }
+.atelier-index .market-section .shop-heading-row h2 { font-size: clamp(54px, 5.5vw, 86px); }
+@media (max-width: 820px) {
+  .atelier-index .market-section .section-kicker { font-size: 12px; }
+  .atelier-index .market-section .section-kicker span { width: 28px; height: 28px; font-size: 11px; }
+  .atelier-index .market-section .shop-heading-row { margin-top: 12px; }
+  .atelier-index .market-section .shop-heading-row h2 { font-size: clamp(48px, 13vw, 58px); }
 }
 
 /* Enlarged seller rows retain the fast maker-store handoff with clearer hierarchy. */
