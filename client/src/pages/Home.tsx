@@ -357,9 +357,27 @@ export function saveMotionPreference(storage: Pick<Storage, "setItem">, preferen
   return normalized;
 }
 
-export function completeFirstVisitTour(storage: Pick<Storage, "setItem">) {
+export function completeFirstVisitTour(storage: Pick<Storage, "setItem">, permanently = false) {
   storage.setItem("luma-tour-complete", "true");
+  if (permanently) storage.setItem("luma-tour-dismissed", "true");
   return null;
+}
+
+export type SavedComparisonSet = { id: string; name: string; productIds: number[]; createdAt: number };
+
+export function createSavedComparisonSet(productIds: number[], name: string, id = `set-${Date.now()}`, createdAt = Date.now()): SavedComparisonSet {
+  return { id, name: name.trim() || "Untitled comparison", productIds: Array.from(new Set(productIds)).slice(0, 3), createdAt };
+}
+
+export function normalizeSavedComparisonSets(value: unknown): SavedComparisonSet[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((set) => {
+    if (!set || typeof set !== "object") return [];
+    const candidate = set as Partial<SavedComparisonSet>;
+    if (typeof candidate.id !== "string" || typeof candidate.name !== "string" || !Array.isArray(candidate.productIds)) return [];
+    const productIds = candidate.productIds.filter((id): id is number => typeof id === "number" && products.some((product) => product.id === id)).slice(0, 3);
+    return productIds.length ? [{ id: candidate.id, name: candidate.name, productIds, createdAt: typeof candidate.createdAt === "number" ? candidate.createdAt : Date.now() }] : [];
+  }).slice(0, 12);
 }
 
 export function orderProducts(items: Product[], sort: string, ratingSummaries: RatingSummary[] = []) {
@@ -395,8 +413,8 @@ function ProductVisual({ product }: { product: Product }) {
   const secondary = gallery[1];
   return (
     <div className={`product-visual ${product.imageClass}`} aria-label={`${product.name} product artwork`}>
-      <img className="product-photo" src={product.image} style={{ objectPosition: product.imagePosition }} alt="" />
-      {secondary && <img className="product-photo product-photo-secondary" src={secondary.src} style={{ objectPosition: secondary.position }} alt="" />}
+      <img className="product-photo" src={product.image} style={{ objectPosition: product.imagePosition }} alt="" loading="lazy" decoding="async" />
+      {secondary && <img className="product-photo product-photo-secondary" src={secondary.src} style={{ objectPosition: secondary.position }} alt="" loading="lazy" decoding="async" />}
       <div className="photo-vignette" />
       <div className="visual-orbit" />
       <span className="product-icon-badge"><Icon aria-hidden="true" /></span>
@@ -413,7 +431,8 @@ function ProductDetailSkeleton() {
   return <div className="overlay product-overlay" role="presentation"><section className="product-modal product-modal-skeleton" aria-busy="true" aria-label="Loading product details"><div className="skeleton-block detail-skeleton-image" /><div className="detail-skeleton-copy"><span className="skeleton-block skeleton-kicker" /><span className="skeleton-block detail-skeleton-title" /><span className="skeleton-block detail-skeleton-price" /><span className="skeleton-block detail-skeleton-line" /><span className="skeleton-block detail-skeleton-line short" /><span className="skeleton-block detail-skeleton-button" /></div></section></div>;
 }
 
-function FirstVisitTour({ step, onAdvance, onDismiss, onOpenProfile }: { step: number; onAdvance: () => void; onDismiss: () => void; onOpenProfile: () => void }) {
+function FirstVisitTour({ step, onAdvance, onDismiss, onOpenProfile }: { step: number; onAdvance: () => void; onDismiss: (permanently: boolean) => void; onOpenProfile: () => void }) {
+  const [dontShowAgain, setDontShowAgain] = useState(false);
   const steps = [
     { number: "01", title: "Keep a good find close", body: "Tap the heart on any product to collect a private shortlist you can revisit from the header", feature: "Wishlist" },
     { number: "02", title: "Compare before you choose", body: "Use Compare on up to three product cards, then open the dock for a clear side-by-side view", feature: "Compare" },
@@ -421,7 +440,7 @@ function FirstVisitTour({ step, onAdvance, onDismiss, onOpenProfile }: { step: n
   ] as const;
   const active = steps[step] ?? steps[0];
   const finalStep = step === steps.length - 1;
-  return <aside className="first-visit-tour" role="dialog" aria-modal="false" aria-label="Discover Luma Market features"><div className="tour-progress" aria-label={`Step ${step + 1} of ${steps.length}`}><span>{active.number} / 0{steps.length}</span><i><b style={{ width: `${((step + 1) / steps.length) * 100}%` }} /></i></div><div className="tour-content"><span className="tour-feature">{active.feature}</span><h2>{active.title}</h2><p>{active.body}</p></div><div className="tour-actions"><button className="tour-skip" onClick={onDismiss}>Skip tour</button><button className="tour-next" onClick={() => { if (finalStep) { onOpenProfile(); onDismiss(); return; } onAdvance(); }}>{finalStep ? "Open profile" : "Next"} <ArrowRight size={15} /></button></div></aside>;
+  return <aside className="first-visit-tour" role="dialog" aria-modal="false" aria-label="Discover Luma Market features"><div className="tour-progress" aria-label={`Step ${step + 1} of ${steps.length}`}><span>{active.number} / 0{steps.length}</span><i><b style={{ width: `${((step + 1) / steps.length) * 100}%` }} /></i></div><div className="tour-content"><span className="tour-feature">{active.feature}</span><h2>{active.title}</h2><p>{active.body}</p></div><label className="tour-dismiss-option"><input type="checkbox" checked={dontShowAgain} onChange={(event) => setDontShowAgain(event.target.checked)} /> <span>Don’t show again</span></label><div className="tour-actions"><button className="tour-skip" onClick={() => onDismiss(dontShowAgain)}>Skip tour</button><button className="tour-next" onClick={() => { if (finalStep) { onOpenProfile(); onDismiss(dontShowAgain); return; } onAdvance(); }}>{finalStep ? "Open profile" : "Next"} <ArrowRight size={15} /></button></div></aside>;
 }
 
 function ProductGallery({ product, onOpenLightbox }: { product: Product; onOpenLightbox: (index: number) => void }) {
@@ -557,7 +576,7 @@ export default function Home() {
   const marketRef = useRef<HTMLDivElement>(null);
   const [motionReady, setMotionReady] = useState(false);
   const [catalogBooting, setCatalogBooting] = useState(true);
-  const [tourStep, setTourStep] = useState<number | null>(() => localStorage.getItem("luma-tour-complete") === "true" ? null : 0);
+  const [tourStep, setTourStep] = useState<number | null>(() => localStorage.getItem("luma-tour-complete") === "true" || localStorage.getItem("luma-tour-dismissed") === "true" ? null : 0);
   const [motionPreference, setMotionPreference] = useState<MotionPreference>(() => normalizeMotionPreference(localStorage.getItem("luma-motion-preference")));
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -952,7 +971,7 @@ export default function Home() {
             <h2>Room for the<br /><em>unexpected</em></h2>
             <button className="button dark-button" onClick={() => { setCategory("Accessories"); document.getElementById("shop")?.scrollIntoView({ behavior: "smooth" }); }}>See the edit <ArrowRight size={18} /></button>
           </div>
-          <div className="promo-image"><img src={lumaAsset("/manus-storage/luma-promo-arch_a2f778e9.jpg")} alt="Curated accessories styled within a cream architectural arch" /><span className="promo-sticker">SAVE<br /><b>15%</b></span></div>
+          <div className="promo-image"><img src={lumaAsset("/manus-storage/luma-promo-arch_a2f778e9.jpg")} alt="Curated accessories styled within a cream architectural arch" loading="lazy" decoding="async" /><span className="promo-sticker">SAVE<br /><b>15%</b></span></div>
         </section>
 
         <section className="vendors-section" id="makers" aria-labelledby="makers-heading">
@@ -965,7 +984,7 @@ export default function Home() {
               <button className={`vendor-card ${vendor.palette}`} data-reveal style={{ "--index": index } as React.CSSProperties} key={vendor.name} onClick={() => setLocation(`/makers/${vendor.slug}`)}>
                 <span className="vendor-number">0{index + 1}</span>
                 <span className="vendor-details"><b>{vendor.name}</b><small>{vendor.description}</small><span className="vendor-rating" aria-label={ratingSummary?.reviewCount ? `${ratingSummary.averageRating.toFixed(1)} out of 5 from ${ratingSummary.reviewCount} visitor reviews` : "No visitor ratings yet"}><Star size={12} fill={ratingSummary?.reviewCount ? "currentColor" : "transparent"} />{ratingSummary?.reviewCount ? <>{ratingSummary.averageRating.toFixed(1)} · {ratingSummary.reviewCount} note{ratingSummary.reviewCount === 1 ? "" : "s"}</> : "No ratings yet"}</span></span>
-                <span className="vendor-category"><img className="seller-portrait" src={vendor.portrait} alt={`${vendor.name} maker portrait`} /><span><b>{vendor.category}</b><small>{vendor.products} items</small></span></span>
+                <span className="vendor-category"><img className="seller-portrait" src={vendor.portrait} alt={`${vendor.name} maker portrait`} loading="lazy" decoding="async" /><span><b>{vendor.category}</b><small>{vendor.products} items</small></span></span>
                 <ArrowRight className="vendor-arrow" size={20} />
               </button>
               );
@@ -974,7 +993,7 @@ export default function Home() {
         </section>
 
         <section className="story-section" id="story" aria-labelledby="story-heading">
-          <div className="story-image" data-reveal><img src={lumaAsset("/manus-storage/luma-vendor-story_61e67283.jpg")} alt="A sunlit independent ceramic studio with handmade tableware" /><div className="story-stamp">CURIOUSLY<br />COLLECTED</div></div>
+          <div className="story-image" data-reveal><img src={lumaAsset("/manus-storage/luma-vendor-story_61e67283.jpg")} alt="A sunlit independent ceramic studio with handmade tableware" loading="lazy" decoding="async" /><div className="story-stamp">CURIOUSLY<br />COLLECTED</div></div>
           <div className="story-copy" data-reveal><p className="eyebrow"><span /> A DIFFERENT KIND OF CART</p><h2 id="story-heading">Good objects start with <em>good questions</em></h2><p>We build a calmer place to browse the things people make with intention. Every seller brings their own point of view. Your cart just lets the conversation continue.</p><a href="#shop" className="text-link">Take a look around <ArrowRight size={16} /></a></div>
         </section>
       </main>
@@ -1022,10 +1041,10 @@ export default function Home() {
                   <button className={motionPreference === "soft" ? "is-selected" : ""} onClick={() => setMotionPreference("soft")} aria-pressed={motionPreference === "soft"}><b>Soft</b><small>Quieter</small></button>
                   <button className={motionPreference === "off" ? "is-selected" : ""} onClick={() => setMotionPreference("off")} aria-pressed={motionPreference === "off"}><b>Still</b><small>No motion</small></button>
                 </div>
-                <button className="profile-tour-replay" onClick={() => { setTourStep(0); setShowProfile(false); }}>Replay first-visit guide <ArrowRight size={14} /></button>
+                <button className="profile-tour-replay" onClick={() => { localStorage.removeItem("luma-tour-dismissed"); setTourStep(0); setShowProfile(false); }}>Replay first-visit guide <ArrowRight size={14} /></button>
               </section>
               <section className="profile-card profile-orders"><div><p className="eyebrow"><span /> ORDER HISTORY</p><h4>Past requests</h4></div>{orderHistory.length ? <div className="order-history-list">{orderHistory.map((order) => <article key={order.id}><div><b>{order.id}</b><span>{new Date(order.createdAt).toLocaleDateString()} · {order.itemCount} item{order.itemCount === 1 ? "" : "s"}</span></div><strong>{money.format(order.total)}</strong><small>Simulated order request</small></article>)}</div> : <p className="profile-empty">No order requests yet — a completed simulated checkout will appear here</p>}</section>
-              <section className="profile-card profile-saves"><div><p className="eyebrow"><span /> SAVED FINDS</p><h4>Still thinking about</h4></div>{wishlistProducts.length ? <div className="profile-saves-list">{wishlistProducts.map((product) => <article key={product.id}><img src={product.image} alt="" /><div><b>{product.name}</b><span>{product.vendor} · {money.format(product.price)}</span></div><button onClick={() => toggleWishlist(product)} aria-label={`Remove ${product.name} from saved finds`}><Heart size={16} fill="currentColor" /></button></article>)}</div> : <p className="profile-empty">Save a piece from the market to keep it close here</p>}</section>
+              <section className="profile-card profile-saves"><div><p className="eyebrow"><span /> SAVED FINDS</p><h4>Still thinking about</h4></div>{wishlistProducts.length ? <div className="profile-saves-list">{wishlistProducts.map((product) => <article key={product.id}><img src={product.image} alt="" loading="lazy" decoding="async" /><div><b>{product.name}</b><span>{product.vendor} · {money.format(product.price)}</span></div><button onClick={() => toggleWishlist(product)} aria-label={`Remove ${product.name} from saved finds`}><Heart size={16} fill="currentColor" /></button></article>)}</div> : <p className="profile-empty">Save a piece from the market to keep it close here</p>}</section>
             </div>
           </section>
         </div>
@@ -1046,7 +1065,7 @@ export default function Home() {
 
       {comparisonProducts.length > 0 && <aside className="comparison-dock" aria-label="Selected products for comparison"><div><span className="comparison-count"><Scale size={15} /> Compare {comparisonProducts.length}/3</span><div className="comparison-mini-list">{comparisonProducts.map((product) => <button key={product.id} onClick={() => toggleComparison(product)} aria-label={`Remove ${product.name} from comparison`}><img src={product.image} alt="" /><span>{product.name}</span><X size={13} /></button>)}</div></div><button className="compare-now" onClick={() => setLocation("/compare")}>Compare now <ArrowRight size={16} /></button></aside>}
 
-      {tourStep !== null && !activeProduct && !quickViewProduct && !showCart && !showWishlist && !showCheckout && !showProfile && <FirstVisitTour step={tourStep} onAdvance={() => setTourStep((current) => current === null ? null : nextTourStep(current))} onDismiss={() => setTourStep(completeFirstVisitTour(localStorage))} onOpenProfile={() => setShowProfile(true)} />}
+      {tourStep !== null && !activeProduct && !quickViewProduct && !showCart && !showWishlist && !showCheckout && !showProfile && <FirstVisitTour step={tourStep} onAdvance={() => setTourStep((current) => current === null ? null : nextTourStep(current))} onDismiss={(permanently) => setTourStep(completeFirstVisitTour(localStorage, permanently))} onOpenProfile={() => setShowProfile(true)} />}
 
       {activeProduct && <ProductDetailModal product={activeProduct} onClose={() => setActiveProduct(null)} onAddToCart={addToCart} isWishlisted={wishlist.includes(activeProduct.id)} onToggleWishlist={toggleWishlist} onShare={shareProduct} onSelectProduct={setActiveProduct} searchHistory={searchHistory} wishlist={wishlist} />}
 

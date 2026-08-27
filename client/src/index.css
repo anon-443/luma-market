@@ -1746,3 +1746,22 @@ html:not(.dark) .market-shell.atelier-index {
 .atelier-index .first-visit-tour .tour-content h2 { color: #f7f3e9; }
 .atelier-index .first-visit-tour .tour-content p { color: rgba(247, 243, 233, .78); }
 .atelier-index .first-visit-tour .tour-skip { color: rgba(247, 243, 233, .76); }
+
+.tour-dismiss-option { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; color: rgba(247, 243, 233, .8); font: 700 10px "Space Grotesk", sans-serif; letter-spacing: .02em; cursor: pointer; }
+.tour-dismiss-option input { width: 15px; height: 15px; margin: 0; accent-color: var(--saffron); }
+.saved-comparison-sets { display: grid; gap: 17px; margin: 28px 0 34px; padding: clamp(18px, 3vw, 30px); border: 1px solid var(--line); border-radius: 18px; background: var(--soft-surface); }
+.saved-set-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+.saved-set-heading h2 { margin: 7px 0 0; font-size: clamp(25px, 3vw, 38px); line-height: .95; }
+.saved-set-heading > p { max-width: 280px; margin: 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.45; }
+.save-set-form { display: flex; gap: 9px; }
+.save-set-form input { flex: 1; min-height: 43px; min-width: 0; padding: 0 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font: 600 12px "Space Grotesk", sans-serif; }
+.save-set-form .button { min-height: 43px; padding: 0 15px; gap: 7px; font-size: 10px; }
+.saved-set-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 8px; }
+.saved-set-list article { display: flex; min-width: 0; border: 1px solid var(--line); border-radius: 11px; overflow: hidden; background: var(--surface); }
+.saved-set-load { flex: 1; min-width: 0; padding: 12px; border: 0; background: transparent; color: var(--ink); text-align: left; }
+.saved-set-load b, .saved-set-load span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.saved-set-load b { font-size: 12px; }
+.saved-set-load span { margin-top: 4px; color: var(--muted-foreground); font-size: 10px; }
+.saved-set-delete { display: grid; place-items: center; width: 39px; border: 0; border-left: 1px solid var(--line); background: transparent; color: var(--muted-foreground); transition: color 160ms var(--ease-out), background 160ms var(--ease-out); }
+.saved-set-delete:hover { color: var(--coral); background: color-mix(in srgb, var(--coral) 8%, transparent); }
+@media (max-width: 720px) { .saved-comparison-sets { margin: 20px 0 25px; padding: 16px; }.saved-set-heading { display: block; }.saved-set-heading h2 { font-size: 27px; }.saved-set-heading > p { margin-top: 9px; }.save-set-form .button { flex: 0 0 auto; }.saved-set-list { grid-template-columns: 1fr; } }

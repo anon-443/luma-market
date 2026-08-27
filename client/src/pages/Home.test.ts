@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { areImagesReady, availabilityLabel, completeFirstVisitTour, motionAllowed, nextComparisonIds, nextTourStep, normalizeMotionPreference, orderProducts, products, saveMotionPreference, seasonalPalettes, vendors } from "./Home";
+import { areImagesReady, availabilityLabel, completeFirstVisitTour, createSavedComparisonSet, motionAllowed, nextComparisonIds, nextTourStep, normalizeMotionPreference, normalizeSavedComparisonSets, orderProducts, products, saveMotionPreference, seasonalPalettes, vendors } from "./Home";
 
 describe("marketplace ordering and vendor metadata", () => {
   it("orders the catalog by popularity", () => {
@@ -58,5 +58,15 @@ describe("marketplace ordering and vendor metadata", () => {
     expect(writes).toEqual({ "luma-motion-preference": "off", "luma-tour-complete": "true" });
     expect(areImagesReady(2, 3)).toBe(false);
     expect(areImagesReady(3, 3)).toBe(true);
+  });
+
+  it("supports a permanent tour dismissal and reusable comparison-set data", () => {
+    const writes: Record<string, string> = {};
+    const storage = { setItem: (key: string, value: string) => { writes[key] = value; } };
+    expect(completeFirstVisitTour(storage, true)).toBeNull();
+    expect(writes).toEqual({ "luma-tour-complete": "true", "luma-tour-dismissed": "true" });
+    const set = createSavedComparisonSet([1, 2, 2, 99], "Desk choices", "desk", 123);
+    expect(set).toEqual({ id: "desk", name: "Desk choices", productIds: [1, 2, 99], createdAt: 123 });
+    expect(normalizeSavedComparisonSets([set, { id: "invalid", name: "None", productIds: [] }])).toEqual([{ id: "desk", name: "Desk choices", productIds: [1, 2], createdAt: 123 }]);
   });
 });
