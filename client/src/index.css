@@ -1823,3 +1823,23 @@ html:not(.dark) .market-shell.atelier-index {
   .atelier-index .site-footer > .footer-columns { display: contents; }
   .atelier-index .site-footer .footer-columns section { min-width: 0; }
 }
+
+/* Give the landing composition a fuller first-screen presence on wide, high-resolution desktops. */
+@media (min-width: 1500px) {
+  .atelier-index .site-header { height: 110px; padding-inline: clamp(52px, 5.5vw, 112px); }
+  .atelier-index .hero {
+    min-height: min(760px, calc(100vh - 110px));
+    grid-template-columns: minmax(620px, .98fr) minmax(820px, 1.28fr);
+  }
+  .atelier-index .hero-copy { padding: clamp(72px, 5vw, 108px) clamp(52px, 5vw, 104px) clamp(62px, 5vw, 92px); }
+  .atelier-index .hero h1 { max-width: 700px; font-size: clamp(82px, 5.85vw, 116px); }
+  .atelier-index .hero-prompt { font-size: 14px; }
+  .atelier-index .hero-context { font-size: 13px; }
+  .atelier-index .hero-stat { margin-top: clamp(34px, 4vh, 54px); }
+  .atelier-index .hero-stat strong { font-size: 70px; }
+  .atelier-index .hero-stat span { font-size: 14px; }
+  .atelier-index .hero-cta-row { margin-top: 28px; }
+  .atelier-index .hero-cta-row .button { min-height: 56px; padding-inline: 23px; font-size: 13px; }
+  .atelier-index .hero-visual { min-height: min(760px, calc(100vh - 110px)); }
+  .atelier-index .hero-image-frame { width: min(84%, 900px); height: 83%; right: 6%; top: 8%; }
+}
