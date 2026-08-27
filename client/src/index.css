@@ -1662,3 +1662,30 @@ html:not(.dark) .market-shell.atelier-index {
 /* The hero now leads with a concise prompt, headline, qualities, and marketplace count only. */
 .atelier-index .hero-context { margin-top: 26px; }
 @media (max-width: 820px) { .atelier-index .hero-context { margin-top: 22px; } }
+
+/* Original motion layer: staged market reveals, tactile object lifts, and a restrained pointer-responsive hero. */
+.atelier-index .hero-visual { --luma-pointer-x: 0px; --luma-pointer-y: 0px; }
+.atelier-index [data-reveal][data-motion="ready"] { opacity: 0; transform: translate3d(0, 24px, 0) scale(0.985); }
+.atelier-index [data-reveal][data-motion="in"] { opacity: 1; transform: translate3d(0, 0, 0) scale(1); transition: opacity 620ms var(--ease-out), transform 620ms var(--ease-out); }
+.atelier-index .product-card[data-reveal][data-motion="in"], .atelier-index .vendor-card[data-reveal][data-motion="in"] { transition-delay: calc(var(--index) * 42ms); }
+.atelier-index .product-card, .atelier-index .vendor-card, .atelier-index .promo-section, .atelier-index .story-image, .atelier-index .story-copy, .atelier-index .market-pulse, .atelier-index .shop-tools { will-change: transform, opacity; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .atelier-index .hero-image-frame { transition: transform 520ms var(--ease-out), box-shadow 520ms var(--ease-out); }
+  .atelier-index .hero-visual:hover .hero-image-frame { transform: translate3d(var(--luma-pointer-x), var(--luma-pointer-y), 0) rotate(-1.2deg) scale(1.012); box-shadow: 26px 26px 0 color-mix(in srgb, var(--ink) 76%, transparent); }
+  .atelier-index .hero-sticker, .atelier-index .hero-visual-index, .atelier-index .hero-ring { transition: transform 420ms var(--ease-out); }
+  .atelier-index .hero-visual:hover .hero-sticker { transform: translate3d(calc(var(--luma-pointer-x) * -0.55), calc(var(--luma-pointer-y) * -0.55), 0) rotate(7deg); }
+  .atelier-index .hero-visual:hover .hero-visual-index { transform: translate3d(calc(var(--luma-pointer-x) * 0.42), calc(var(--luma-pointer-y) * 0.42), 0); }
+  .atelier-index .hero-visual:hover .hero-ring { transform: translate3d(calc(var(--luma-pointer-x) * -0.32), calc(var(--luma-pointer-y) * -0.32), 0); }
+  .atelier-index .product-card { transition: transform 260ms var(--ease-out); }
+  .atelier-index .product-card:hover { transform: translateY(-8px); }
+  .atelier-index .product-card:hover .product-visual { transform: translateY(0) rotate(-1.2deg) scale(1.018); box-shadow: 0 18px 0 color-mix(in srgb, var(--ink) 12%, transparent); }
+  .atelier-index .product-card:hover .visual-orbit { transform: rotate(16deg) scale(1.06); }
+  .atelier-index .vendor-card { transition: background 240ms var(--ease-out), color 240ms var(--ease-out), transform 260ms var(--ease-out); }
+  .atelier-index .vendor-card:hover { padding-left: 12px; padding-right: 12px; transform: translateX(10px); }
+  .atelier-index .vendor-card:hover .seller-portrait { transform: rotate(-3deg) scale(1.08); }
+  .atelier-index .seller-portrait { transition: transform 260ms var(--ease-out), box-shadow 260ms var(--ease-out); }
+  .atelier-index .market-pulse a:hover svg, .atelier-index .text-link:hover svg { transform: translateX(5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atelier-index [data-reveal], .atelier-index .hero-image-frame, .atelier-index .hero-sticker, .atelier-index .hero-visual-index, .atelier-index .hero-ring, .atelier-index .product-card, .atelier-index .vendor-card, .atelier-index .seller-portrait { animation: none !important; opacity: 1 !important; transform: none !important; transition: none !important; }
+}

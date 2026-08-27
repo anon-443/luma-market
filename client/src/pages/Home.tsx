@@ -2,8 +2,8 @@
  * Solstice Arcade design reminder: make discovery feel like a lively editorial market promenade.
  * Use asymmetric sections, Luma Saffron price stickers, spectral arches, and tactile 160–260ms motion.
  */
-import { useEffect, useMemo, useState } from "react";
-import type { FormEvent, KeyboardEvent, TouchEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { FormEvent, KeyboardEvent, PointerEvent as ReactPointerEvent, TouchEvent } from "react";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -333,6 +333,10 @@ export function nextComparisonIds(selectedIds: number[], productId: number, limi
   return selectedIds.length >= limit ? selectedIds : [...selectedIds, productId];
 }
 
+export function motionAllowed(reducedMotion: boolean) {
+  return !reducedMotion;
+}
+
 export function orderProducts(items: Product[], sort: string, ratingSummaries: RatingSummary[] = []) {
   const ratingsByProductId = new Map(ratingSummaries.map((summary) => [summary.productId, summary]));
   return [...items].sort((a, b) => {
@@ -492,6 +496,8 @@ function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onTog
 export default function Home() {
   const [, setLocation] = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const marketRef = useRef<HTMLDivElement>(null);
+  const [motionReady, setMotionReady] = useState(false);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("featured");
@@ -555,6 +561,28 @@ export default function Home() {
   useEffect(() => {
     const productId = Number(new URLSearchParams(window.location.search).get("product"));
     if (productId) setActiveProduct(products.find((product) => product.id === productId) ?? null);
+  }, []);
+  useEffect(() => {
+    const root = marketRef.current;
+    if (!root || !motionAllowed(window.matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+    const targets = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
+    setMotionReady(true);
+    if (!("IntersectionObserver" in window)) {
+      targets.forEach((target) => target.dataset.motion = "in");
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        (entry.target as HTMLElement).dataset.motion = "in";
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8%" });
+    targets.forEach((target) => {
+      target.dataset.motion = "ready";
+      observer.observe(target);
+    });
+    return () => observer.disconnect();
   }, []);
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -707,8 +735,22 @@ export default function Home() {
     }
   };
 
+  const handleHeroPointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!motionReady || event.pointerType === "touch") return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 16;
+    const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 14;
+    event.currentTarget.style.setProperty("--luma-pointer-x", `${x.toFixed(2)}px`);
+    event.currentTarget.style.setProperty("--luma-pointer-y", `${y.toFixed(2)}px`);
+  };
+
+  const resetHeroPointer = (event: ReactPointerEvent<HTMLElement>) => {
+    event.currentTarget.style.setProperty("--luma-pointer-x", "0px");
+    event.currentTarget.style.setProperty("--luma-pointer-y", "0px");
+  };
+
   return (
-    <div className="market-shell atelier-index">
+    <div className="market-shell atelier-index" ref={marketRef}>
       <div className="market-grain" aria-hidden="true" />
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Luma Market home">
@@ -753,7 +795,7 @@ export default function Home() {
               <a className="text-link" href="#makers">Meet the studios <ArrowRight size={16} /></a>
             </div>
           </div>
-          <div className="hero-visual">
+          <div className="hero-visual" onPointerMove={handleHeroPointerMove} onPointerLeave={resetHeroPointer}>
             <div className="hero-ring ring-a" />
             <div className="hero-ring ring-b" />
             <div className="hero-visual-index"><span>OPEN MARKET</span><b>STUDIO EDIT / 01</b></div>
@@ -763,14 +805,14 @@ export default function Home() {
         </section>
 
         <section className="market-section" id="shop" aria-labelledby="shop-heading">
-            <div className="section-kicker"><span>01</span> THE MARKET FLOOR</div>
-            <div className="shop-heading-row">
+            <div className="section-kicker" data-reveal><span>01</span> THE MARKET FLOOR</div>
+            <div className="shop-heading-row" data-reveal>
               <div>
                 <h2 id="shop-heading">Made to become <em>yours</em></h2>
               </div>
           </div>
 
-          <div className="shop-tools">
+          <div className="shop-tools" data-reveal>
             <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button><button className="ai-search-button" onClick={submitNaturalSearch} disabled={aiSearch.isPending} aria-label="Ask the AI product finder"><Sparkles size={16} className={aiSearch.isPending ? "sparkle-spin" : ""} /></button></div>{searchHistory.length > 0 && <div className="recent-searches"><span>Recent</span><div>{searchHistory.map((item) => <button key={item} onClick={() => { setQuery(item); setAiSuggestion(null); runDiscovery(item); }}>{item}</button>)}<button className="clear-history" onClick={() => setSearchHistory([])} aria-label="Clear recent searches"><X size={12} /></button></div></div>}</div>
             <div className="filter-row">
               <div className="category-pills" aria-label="Filter by category">
@@ -787,7 +829,7 @@ export default function Home() {
             {filteredProducts.map((product, index) => {
               const ratingSummary = ratingsByProductId.get(product.id);
               return (
-              <article className="product-card" style={{ "--index": index } as React.CSSProperties} key={product.id}>
+              <article className="product-card" data-reveal style={{ "--index": index } as React.CSSProperties} key={product.id}>
                 <div className="product-visual-wrap">
                   <button className="product-visual-button" onClick={() => setActiveProduct(product)} aria-label={`View ${product.name}`}><ProductVisual product={product} /></button>
                   <span className={`availability-badge ${product.inventoryStatus}`}><i aria-hidden="true" />{availabilityLabel(product)}</span>
@@ -807,7 +849,7 @@ export default function Home() {
             })}
             {!filteredProducts.length && <div className="empty-products"><Search size={21} /><p>No market finds match that search yet.</p><button onClick={() => { setQuery(""); setCategory("All"); setPriceFloor(20); setPriceCeiling(200); setSelectedColor("All"); }}>Clear filters</button></div>}
           </div></div></div>
-          <div className="market-pulse" aria-label="Live marketplace signals">
+          <div className="market-pulse" data-reveal aria-label="Live marketplace signals">
             <span className="pulse-orbit"><i /></span>
             <p><b>Market radar</b> <span>Fresh drops from 7 studios today</span></p>
             <p><b>Fast finding</b> <span>13 low-stock pieces are moving</span></p>
@@ -815,7 +857,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="promo-section" aria-label="Marketplace promotion">
+        <section className="promo-section" data-reveal aria-label="Marketplace promotion">
           <div className="promo-copy">
             <p className="eyebrow"><span /> LUMA SELECTS</p>
             <h2>Room for the<br /><em>unexpected</em></h2>
@@ -825,13 +867,13 @@ export default function Home() {
         </section>
 
         <section className="vendors-section" id="makers" aria-labelledby="makers-heading">
-          <div className="section-kicker"><span>02</span> SELLER STALLS</div>
-          <div className="vendors-heading"><h2 id="makers-heading">The people behind <em>the good stuff</em></h2></div>
+          <div className="section-kicker" data-reveal><span>02</span> SELLER STALLS</div>
+          <div className="vendors-heading" data-reveal><h2 id="makers-heading">The people behind <em>the good stuff</em></h2></div>
           <div className="vendor-list">
             {vendors.map((vendor, index) => {
               const ratingSummary = ratingsByVendorName.get(vendor.name);
               return (
-              <button className={`vendor-card ${vendor.palette}`} key={vendor.name} onClick={() => setLocation(`/makers/${vendor.slug}`)}>
+              <button className={`vendor-card ${vendor.palette}`} data-reveal style={{ "--index": index } as React.CSSProperties} key={vendor.name} onClick={() => setLocation(`/makers/${vendor.slug}`)}>
                 <span className="vendor-number">0{index + 1}</span>
                 <span className="vendor-details"><b>{vendor.name}</b><small>{vendor.description}</small><span className="vendor-rating" aria-label={ratingSummary?.reviewCount ? `${ratingSummary.averageRating.toFixed(1)} out of 5 from ${ratingSummary.reviewCount} visitor reviews` : "No visitor ratings yet"}><Star size={12} fill={ratingSummary?.reviewCount ? "currentColor" : "transparent"} />{ratingSummary?.reviewCount ? <>{ratingSummary.averageRating.toFixed(1)} · {ratingSummary.reviewCount} note{ratingSummary.reviewCount === 1 ? "" : "s"}</> : "No ratings yet"}</span></span>
                 <span className="vendor-category"><img className="seller-portrait" src={vendor.portrait} alt={`${vendor.name} maker portrait`} /><span><b>{vendor.category}</b><small>{vendor.products} items</small></span></span>
@@ -843,8 +885,8 @@ export default function Home() {
         </section>
 
         <section className="story-section" id="story" aria-labelledby="story-heading">
-          <div className="story-image"><img src={lumaAsset("/manus-storage/luma-vendor-story_61e67283.jpg")} alt="A sunlit independent ceramic studio with handmade tableware" /><div className="story-stamp">CURIOUSLY<br />COLLECTED</div></div>
-          <div className="story-copy"><p className="eyebrow"><span /> A DIFFERENT KIND OF CART</p><h2 id="story-heading">Good objects start with <em>good questions</em></h2><p>We build a calmer place to browse the things people make with intention. Every seller brings their own point of view. Your cart just lets the conversation continue.</p><a href="#shop" className="text-link">Take a look around <ArrowRight size={16} /></a></div>
+          <div className="story-image" data-reveal><img src={lumaAsset("/manus-storage/luma-vendor-story_61e67283.jpg")} alt="A sunlit independent ceramic studio with handmade tableware" /><div className="story-stamp">CURIOUSLY<br />COLLECTED</div></div>
+          <div className="story-copy" data-reveal><p className="eyebrow"><span /> A DIFFERENT KIND OF CART</p><h2 id="story-heading">Good objects start with <em>good questions</em></h2><p>We build a calmer place to browse the things people make with intention. Every seller brings their own point of view. Your cart just lets the conversation continue.</p><a href="#shop" className="text-link">Take a look around <ArrowRight size={16} /></a></div>
         </section>
       </main>
 

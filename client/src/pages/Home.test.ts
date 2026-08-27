@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { availabilityLabel, nextComparisonIds, orderProducts, products, seasonalPalettes, vendors } from "./Home";
+import { availabilityLabel, motionAllowed, nextComparisonIds, orderProducts, products, seasonalPalettes, vendors } from "./Home";
 
 describe("marketplace ordering and vendor metadata", () => {
   it("orders the catalog by popularity", () => {
@@ -36,5 +36,10 @@ describe("marketplace ordering and vendor metadata", () => {
     expect(nextComparisonIds([1, 2], 3)).toEqual([1, 2, 3]);
     expect(nextComparisonIds([1, 2, 3], 4)).toEqual([1, 2, 3]);
     expect(nextComparisonIds([1, 2, 3], 2)).toEqual([1, 3]);
+  });
+
+  it("disables non-essential marketplace motion when reduced motion is requested", () => {
+    expect(motionAllowed(false)).toBe(true);
+    expect(motionAllowed(true)).toBe(false);
   });
 });
