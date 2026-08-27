@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { availabilityLabel, motionAllowed, nextComparisonIds, orderProducts, products, seasonalPalettes, vendors } from "./Home";
+import { areImagesReady, availabilityLabel, completeFirstVisitTour, motionAllowed, nextComparisonIds, nextTourStep, normalizeMotionPreference, orderProducts, products, saveMotionPreference, seasonalPalettes, vendors } from "./Home";
 
 describe("marketplace ordering and vendor metadata", () => {
   it("orders the catalog by popularity", () => {
@@ -41,5 +41,22 @@ describe("marketplace ordering and vendor metadata", () => {
   it("disables non-essential marketplace motion when reduced motion is requested", () => {
     expect(motionAllowed(false)).toBe(true);
     expect(motionAllowed(true)).toBe(false);
+  });
+
+  it("normalizes persisted motion preferences and advances the three-step discovery tour", () => {
+    expect(normalizeMotionPreference("soft")).toBe("soft");
+    expect(normalizeMotionPreference("still")).toBe("full");
+    expect(nextTourStep(0)).toBe(1);
+    expect(nextTourStep(2)).toBeNull();
+  });
+
+  it("persists accessibility preferences and only completes loading when product images are ready", () => {
+    const writes: Record<string, string> = {};
+    const storage = { setItem: (key: string, value: string) => { writes[key] = value; } };
+    expect(saveMotionPreference(storage, "off")).toBe("off");
+    expect(completeFirstVisitTour(storage)).toBeNull();
+    expect(writes).toEqual({ "luma-motion-preference": "off", "luma-tour-complete": "true" });
+    expect(areImagesReady(2, 3)).toBe(false);
+    expect(areImagesReady(3, 3)).toBe(true);
   });
 });
