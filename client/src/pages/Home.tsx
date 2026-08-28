@@ -28,7 +28,6 @@ import {
   Share2,
   ShoppingBag,
   SlidersHorizontal,
-  Sparkles,
   Star,
   Sun,
   X,
@@ -130,7 +129,7 @@ export const products: Product[] = [
     imagePosition: "center",
     description: "A hand-finished stoneware mug with a generous curve, designed for unhurried tea and ample weekend coffee.",
     specs: ["Stoneware", "350 ml capacity", "Dishwasher safe"],
-    Icon: Sparkles,
+    Icon: Package,
     inventoryStatus: "inStock",
     remaining: 27,
   },
@@ -286,7 +285,7 @@ export const products: Product[] = [
     imagePosition: "center",
     description: "A hand-glazed serving tray with a fluid edge, made for fruit, small rituals and slow breakfast gatherings.",
     specs: ["Hand-glazed stoneware", "Food safe", "28 cm diameter"],
-    Icon: Sparkles,
+    Icon: Package,
     badge: "Maker’s choice",
     inventoryStatus: "inStock",
     remaining: 14,
@@ -510,7 +509,7 @@ function ProductReviews({ product }: { product: Product }) {
   return (
     <section className="reviews-panel" aria-labelledby={`reviews-${product.id}`}>
       <div className="review-heading"><div><p className="eyebrow"><span /> VISITOR NOTES</p><h4 id={`reviews-${product.id}`}>Your take matters</h4></div><span>{reviews.length} note{reviews.length === 1 ? "" : "s"}</span></div>
-      <section className="review-summary" aria-label="AI review themes"><div><Sparkles size={16} /><strong>AI review themes</strong><span>Built only from visitor notes</span></div>{reviewSummaryQuery.isLoading && reviews.length > 0 && <p>Reading submitted themes…</p>}{reviewSummaryQuery.data?.status === "empty" && <p>No notes yet — no themes to summarize</p>}{reviewSummaryQuery.data?.status === "unavailable" && <p>Visitor notes are here but themes are temporarily unavailable</p>}{reviewSummaryQuery.data?.status === "ready" && <div className="theme-columns"><div><b>Often appreciated</b>{reviewSummaryQuery.data.positives.length ? <ul>{reviewSummaryQuery.data.positives.map((item) => <li key={item}><Check size={13} />{item}</li>)}</ul> : <p>No repeated praise is clear yet</p>}</div><div><b>Worth noting</b>{reviewSummaryQuery.data.considerations.length ? <ul>{reviewSummaryQuery.data.considerations.map((item) => <li key={item}><span>–</span>{item}</li>)}</ul> : <p>No recurring concerns are clear yet</p>}</div></div>}</section>
+      <section className="review-summary" aria-label="AI review themes"><div><strong>AI review themes</strong><span>Built only from visitor notes</span></div>{reviewSummaryQuery.isLoading && reviews.length > 0 && <p>Reading submitted themes…</p>}{reviewSummaryQuery.data?.status === "empty" && <p>No notes yet — no themes to summarize</p>}{reviewSummaryQuery.data?.status === "unavailable" && <p>Visitor notes are here but themes are temporarily unavailable</p>}{reviewSummaryQuery.data?.status === "ready" && <div className="theme-columns"><div><b>Often appreciated</b>{reviewSummaryQuery.data.positives.length ? <ul>{reviewSummaryQuery.data.positives.map((item) => <li key={item}><Check size={13} />{item}</li>)}</ul> : <p>No repeated praise is clear yet</p>}</div><div><b>Worth noting</b>{reviewSummaryQuery.data.considerations.length ? <ul>{reviewSummaryQuery.data.considerations.map((item) => <li key={item}><span>–</span>{item}</li>)}</ul> : <p>No recurring concerns are clear yet</p>}</div></div>}</section>
       <div className="review-list">
         {reviewsQuery.isLoading && <p className="review-status">Finding recent notes…</p>}
         {!reviewsQuery.isLoading && !reviews.length && <p className="review-status">No visitor notes yet — be the first to share a considered take</p>}
@@ -539,7 +538,7 @@ function RelatedProducts({ product, onSelect, onAddToCart, searchHistory, wishli
     return score(right) - score(left) || left.id - right.id;
   }).slice(0, 2);
 
-  return <section className="related-products" aria-labelledby={`related-${product.id}`}><div className="related-heading"><div><p className="eyebrow"><span /> FOR YOUR MARKET TRAIL</p><h4 id={`related-${product.id}`}>You may also like</h4></div><Sparkles size={18} /></div><p className="related-rationale">Matched from this find, your recent searches, and saved pieces</p><div className="related-grid">{related.map((item) => <article key={item.id}><button className="related-image" onClick={() => onSelect(item)} aria-label={`View ${item.name}`}><img src={item.image} alt="" style={{ objectPosition: item.imagePosition }} /></button><div><button onClick={() => onSelect(item)}>{item.name}</button><p>{item.vendor}</p><strong>{money.format(item.price)}</strong><button className="related-add" onClick={() => onAddToCart(item)} aria-label={`Add ${item.name} to cart`}><Plus size={14} /></button></div></article>)}</div></section>;
+  return <section className="related-products" aria-labelledby={`related-${product.id}`}><div className="related-heading"><div><p className="eyebrow"><span /> FOR YOUR MARKET TRAIL</p><h4 id={`related-${product.id}`}>You may also like</h4></div></div><p className="related-rationale">Matched from this find, your recent searches, and saved pieces</p><div className="related-grid">{related.map((item) => <article key={item.id}><button className="related-image" onClick={() => onSelect(item)} aria-label={`View ${item.name}`}><img src={item.image} alt="" style={{ objectPosition: item.imagePosition }} /></button><div><button onClick={() => onSelect(item)}>{item.name}</button><p>{item.vendor}</p><strong>{money.format(item.price)}</strong><button className="related-add" onClick={() => onAddToCart(item)} aria-label={`Add ${item.name} to cart`}><Plus size={14} /></button></div></article>)}</div></section>;
 }
 
 function QuickViewModal({ product, onClose, onAddToCart, onViewDetails }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; onViewDetails: (product: Product) => void }) {
@@ -921,7 +920,7 @@ export default function Home() {
           </div>
 
           <div className="shop-tools" data-reveal>
-            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button><button className="ai-search-button" onClick={submitNaturalSearch} disabled={aiSearch.isPending} aria-label="Ask the AI product finder"><Sparkles size={16} className={aiSearch.isPending ? "sparkle-spin" : ""} /></button></div>{searchHistory.length > 0 && <div className="recent-searches"><span>Recent</span><div>{searchHistory.map((item) => <button key={item} onClick={() => { setQuery(item); setAiSuggestion(null); runDiscovery(item); }}>{item}</button>)}<button className="clear-history" onClick={() => setSearchHistory([])} aria-label="Clear recent searches"><X size={12} /></button></div></div>}</div>
+            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button></div>{searchHistory.length > 0 && <div className="recent-searches"><span>Recent</span><div>{searchHistory.map((item) => <button key={item} onClick={() => { setQuery(item); setAiSuggestion(null); runDiscovery(item); }}>{item}</button>)}<button className="clear-history" onClick={() => setSearchHistory([])} aria-label="Clear recent searches"><X size={12} /></button></div></div>}</div>
             <div className="filter-row">
               <div className="category-pills" aria-label="Filter by category">
                 {categories.map((item) => <button className={category === item ? "selected" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}
@@ -929,7 +928,7 @@ export default function Home() {
               <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="popular">Most popular</option><option value="rating">Top rated</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
             </div>
           </div>
-          {aiSuggestion && <div className="ai-suggestion"><div><Sparkles size={17} /><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}<small>{aiSuggestion.inventoryNote}</small></span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
+          {aiSuggestion && <div className="ai-suggestion"><div><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}<small>{aiSuggestion.inventoryNote}</small></span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
           {matchingVendors.length > 0 && <section className="vendor-search-results" aria-label="Matching seller stores"><p className="eyebrow"><span /> SELLER MATCHES</p><div>{matchingVendors.map((vendor) => <button key={vendor.slug} onClick={() => setLocation(`/makers/${vendor.slug}`)}><span className={`vendor-search-mark ${vendor.palette}`}>{vendor.name.charAt(0)}</span><span><b>{vendor.name}</b><small>{vendor.category}</small></span><ArrowRight size={16} /></button>)}</div></section>}
 
           <div className="catalog-layout">

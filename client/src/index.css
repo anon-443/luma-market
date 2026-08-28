@@ -1158,8 +1158,6 @@ html:not(.dark) .market-shell[data-seasonal-palette="coastal"] .hero-visual { ba
 .atelier-index .ai-search-wrap { padding-right: 10px; border-right: 1px solid var(--line); }
 .atelier-index .search-field { height: 52px; border: 0; background: transparent; }
 .atelier-index .search-field input { font-size: 12px; }
-.atelier-index .ai-search-button { width: 38px; height: 38px; flex-basis: 38px; border-radius: 11px; background: var(--ink); color: var(--saffron); }
-.atelier-index .ai-search-button:hover { background: var(--coral); color: #fff9ef; }
 .atelier-index .filter-row { padding-left: 14px; }
 .atelier-index .category-pills { gap: 4px; }
 .atelier-index .category-pills button { border-radius: 9px; padding: 10px 11px; font-size: 10px; color: var(--muted-foreground); }
@@ -1211,7 +1209,7 @@ html:not(.dark) .market-shell[data-seasonal-palette="coastal"] .hero-visual { ba
 .atelier-index .story-section { max-width: none; margin: 0; min-height: 650px; grid-template-columns: .85fr 1.15fr; background: var(--soft-surface); }
 .atelier-index .story-image { min-height: 650px; }
 .atelier-index .story-image::after { content: "LUMA / STUDIO NOTES"; position: absolute; left: 5%; top: 7%; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .16em; writing-mode: vertical-rl; }
-.atelier-index .story-stamp { width: 136px; height: 136px; left: auto; right: -18px; bottom: 8%; border-radius: 20px; background: var(--saffron); font-size: 11px; transform: rotate(-8deg); }
+.atelier-index .story-stamp { width: 96px; height: 96px; left: auto; right: 7%; top: 8%; bottom: auto; border-radius: 16px; background: var(--saffron); font-size: 10px; transform: rotate(-5deg); }
 .atelier-index .story-copy { padding: clamp(72px, 10vw, 150px) clamp(24px, 7vw, 140px); }
 .atelier-index .story-copy h2 { max-width: 660px; font-size: clamp(56px, 6vw, 102px); line-height: .84; font-variation-settings: "SOFT" 55, "WONK" 1; }
 .atelier-index .story-copy p:not(.eyebrow) { max-width: 560px; font-size: 16px; }
@@ -1287,6 +1285,7 @@ html:not(.dark) .market-shell[data-seasonal-palette="coastal"] .hero-visual { ba
   .atelier-index .vendor-details b { font-size: 20px; }
   .atelier-index .story-section { grid-template-columns: 1fr; min-height: 0; }
   .atelier-index .story-image { min-height: 430px; }
+  .atelier-index .story-stamp { width: 82px; height: 82px; right: 7%; top: 7%; bottom: auto; font-size: 9px; }
   .atelier-index .story-copy { padding: 70px 24px 78px; }
   .atelier-index .story-copy h2 { font-size: clamp(56px, 16vw, 80px); }
   .atelier-index .site-footer { padding: 38px 24px; }
@@ -1358,7 +1357,7 @@ html:not(.dark) .market-shell.atelier-index[data-seasonal-palette] .hero-copy, h
 .atelier-index .shop-tools { margin: 28px 0 18px; min-height: 72px; }
 .atelier-index .search-field { height: 58px; }
 .atelier-index .search-field input { font-size: 13px; }
-.atelier-index .voice-search-button, .atelier-index .ai-search-button { width: 42px; height: 42px; flex-basis: 42px; }
+.atelier-index .voice-search-button { width: 42px; height: 42px; flex-basis: 42px; }
 .atelier-index .category-pills button { padding: 12px 13px; font-size: 11px; }
 .atelier-index .sort-select { min-width: 174px; height: 46px; font-size: 11px; }
 .atelier-index .filter-sidebar { margin-top: 4px; }
