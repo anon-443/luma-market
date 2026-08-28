@@ -19,6 +19,9 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/compare" component={CompareProducts} />
       <Route path="/makers/:slug" component={VendorStore} />
+      <Route path="/vendor/:slug" component={VendorStore} />
+      <Route path="/product/:id" component={Home} />
+      <Route path="/checkout" component={Home} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

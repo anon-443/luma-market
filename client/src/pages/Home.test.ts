@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { areImagesReady, availabilityLabel, completeFirstVisitTour, createSavedComparisonSet, motionAllowed, nextComparisonIds, nextTourStep, normalizeMotionPreference, normalizeSavedComparisonSets, orderProducts, products, saveMotionPreference, seasonalPalettes, vendors } from "./Home";
+import { areImagesReady, availabilityLabel, completeFirstVisitTour, createDemoOrderId, createSavedComparisonSet, filterCatalog, motionAllowed, nextComparisonIds, nextTourStep, normalizeMotionPreference, normalizeSavedComparisonSets, orderProducts, products, saveMotionPreference, seasonalPalettes, validateCheckoutDetails, vendors } from "./Home";
 
 describe("marketplace ordering and vendor metadata", () => {
   it("orders the catalog by popularity", () => {
@@ -68,5 +68,33 @@ describe("marketplace ordering and vendor metadata", () => {
     const set = createSavedComparisonSet([1, 2, 2, 99], "Desk choices", "desk", 123);
     expect(set).toEqual({ id: "desk", name: "Desk choices", productIds: [1, 2, 99], createdAt: 123 });
     expect(normalizeSavedComparisonSets([set, { id: "invalid", name: "None", productIds: [] }])).toEqual([{ id: "desk", name: "Desk choices", productIds: [1, 2], createdAt: 123 }]);
+  });
+
+  it("keeps reusable static catalog records complete without inventing ratings", () => {
+    expect(products).toHaveLength(12);
+    products.forEach((product) => {
+      expect(product.vendorId).toMatch(/^[a-z0-9-]+$/);
+      expect(product.images.length).toBeGreaterThan(0);
+      expect(product.specifications.material).toBeTruthy();
+      expect(product.rating).toBeNull();
+      expect(product.reviewCount).toBe(0);
+      expect(product.stock).toBe(product.remaining);
+    });
+    vendors.forEach((vendor) => {
+      expect(vendor.categories.length).toBeGreaterThan(0);
+      expect(vendor.totalProducts).toBe(vendor.products);
+      expect(vendor.rating).toBeNull();
+    });
+  });
+
+  it("filters objects and makers using category, price, colour, and text", () => {
+    expect(filterCatalog(products, { query: "Maison", category: "All", minPrice: 0, maxPrice: 200 }).map((product) => product.id)).toEqual([3, 12]);
+    expect(filterCatalog(products, { category: "Accessories", minPrice: 40, maxPrice: 90, color: "Persimmon" }).map((product) => product.id)).toEqual([2, 9]);
+  });
+
+  it("validates required demo checkout details and creates a stable local order ID", () => {
+    expect(validateCheckoutDetails({ name: "Jordan" })).toBe("Enter a valid email address");
+    expect(validateCheckoutDetails({ name: "Jordan Lee", email: "jordan@example.com", phone: "555", address: "1 Main Street", city: "Portland", postalCode: "97205" })).toBeNull();
+    expect(createDemoOrderId(Date.UTC(2026, 7, 28, 0, 0, 0, 123))).toMatch(/^LUMA-20260828-\d{4}$/);
   });
 });

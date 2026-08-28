@@ -37,10 +37,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { useLocation } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import { useTheme } from "@/contexts/ThemeContext";
+import { productGallery as productGalleryData, products as productData, type Product } from "@/data/products";
+import { vendors as vendorData, type Vendor } from "@/data/vendors";
 
-export type Product = {
+export type LegacyProduct = {
   id: number;
   name: string;
   vendor: string;
@@ -64,6 +66,7 @@ type VisitorReview = { id: number; authorName: string; rating: number; comment: 
 export type RatingSummary = { productId: number; reviewCount: number; averageRating: number };
 type GalleryImage = { src: string; alt: string; position?: string };
 type PastOrder = { id: string; createdAt: number; itemCount: number; total: number; items: Array<{ id: number; quantity: number }> };
+export type CheckoutDetails = { name: string; email: string; phone: string; address: string; city: string; postalCode: string };
 type WebSpeechEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
 type WebSpeechRecognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; onresult: ((event: WebSpeechEvent) => void) | null; onerror: (() => void) | null; onend: (() => void) | null };
 type WebSpeechConstructor = new () => WebSpeechRecognition;
@@ -79,7 +82,7 @@ export const seasonalPalettes = [
 ] as const;
 type SeasonalPalette = typeof seasonalPalettes[number]["id"];
 
-export const products: Product[] = [
+export const legacyProducts: LegacyProduct[] = [
   {
     id: 1,
     name: "Lumen Table Lamp",
@@ -292,13 +295,11 @@ export const products: Product[] = [
   },
 ];
 
-products.forEach((product) => { product.image = lumaAsset(product.image); });
-
-const productGallery: Record<number, GalleryImage[]> = Object.fromEntries(
-  products.map((product) => [product.id, [{ src: product.image, alt: `${product.name} product view`, position: product.imagePosition }]])
+export const legacyProductGallery: Record<number, GalleryImage[]> = Object.fromEntries(
+  legacyProducts.map((product) => [product.id, [{ src: product.image, alt: `${product.name} product view`, position: product.imagePosition }]])
 );
 
-export type Vendor = {
+export type LegacyVendor = {
   name: string;
   logo: string;
   portrait: string;
@@ -313,7 +314,7 @@ export type Vendor = {
   story: string;
 };
 
-export const vendors: Vendor[] = [
+export const legacyVendors: LegacyVendor[] = [
   { name: "Maison Sora", logo: "MS", portrait: "/manus-storage/luma-maker-maison-sora_33c0fb90.jpg", slug: "maison-sora", description: "Small rituals for the table", category: "Ceramics & home", products: 18, palette: "sora", location: "Portland, Oregon", contactEmail: "hello@maisonsora.studio", websiteLabel: "maisonsora.studio", story: "A small ceramics studio making quietly useful vessels for shared meals and slower mornings." },
   { name: "Field Theory", logo: "FT", portrait: "/manus-storage/luma-maker-field-theory_81f2f02f.jpg", slug: "field-theory", description: "Objects that hold a room together", category: "Lighting & furniture", products: 24, palette: "field", location: "Brooklyn, New York", contactEmail: "studio@fieldtheory.design", websiteLabel: "fieldtheory.design", story: "Field Theory makes practical room-scale objects with soft geometry, considered metals, and long repairable lives." },
   { name: "Onda Goods", logo: "OG", portrait: "/manus-storage/luma-maker-onda-goods_9a99d087.jpg", slug: "onda-goods", description: "Useful things with soft edges", category: "Textiles & accessories", products: 31, palette: "onda", location: "Los Angeles, California", contactEmail: "hello@ondagoods.studio", websiteLabel: "ondagoods.studio", story: "Onda Goods works with tactile textiles and everyday carry pieces designed to soften the sharper parts of a day." },
@@ -321,7 +322,9 @@ export const vendors: Vendor[] = [
   { name: "Paper Current", logo: "PC", portrait: "/manus-storage/luma-maker-paper-current_686daf69.jpg", slug: "paper-current", description: "Paper tools for thinking clearly", category: "Stationery & paper", products: 22, palette: "paper", location: "Chicago, Illinois", contactEmail: "hello@papercurrent.co", websiteLabel: "papercurrent.co", story: "Paper Current makes durable desk stationery that leaves room for plans, notes, lists, and a little drift." },
 ];
 
-vendors.forEach((vendor) => { vendor.portrait = lumaAsset(vendor.portrait); });
+export const products = productData;
+export const productGallery = productGalleryData;
+export const vendors = vendorData;
 
 export function availabilityLabel(product: Product) {
   return product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`;
@@ -362,6 +365,20 @@ export function completeFirstVisitTour(storage: Pick<Storage, "setItem">, perman
   return null;
 }
 
+export function validateCheckoutDetails(details: Partial<CheckoutDetails>) {
+  if (!details.name?.trim()) return "Add your full name to continue";
+  if (!/^\S+@\S+\.\S+$/.test(details.email?.trim() ?? "")) return "Enter a valid email address";
+  if (!details.phone?.trim()) return "Add a phone number for delivery updates";
+  if (!details.address?.trim()) return "Add your delivery address";
+  if (!details.city?.trim()) return "Add your city";
+  if (!details.postalCode?.trim()) return "Add your postal code";
+  return null;
+}
+
+export function createDemoOrderId(timestamp = Date.now()) {
+  return `LUMA-${new Date(timestamp).toISOString().slice(0, 10).replace(/-/g, "")}-${String(timestamp).slice(-4)}`;
+}
+
 export type SavedComparisonSet = { id: string; name: string; productIds: number[]; createdAt: number };
 
 export function createSavedComparisonSet(productIds: number[], name: string, id = `set-${Date.now()}`, createdAt = Date.now()): SavedComparisonSet {
@@ -391,6 +408,17 @@ export function orderProducts(items: Product[], sort: string, ratingSummaries: R
     if (sort === "price-low") return a.price - b.price;
     if (sort === "price-high") return b.price - a.price;
     return a.id - b.id;
+  });
+}
+
+export function filterCatalog(items: Product[], filters: { query?: string; category?: string; minPrice?: number; maxPrice?: number; color?: string }) {
+  const normalized = filters.query?.trim().toLowerCase() ?? "";
+  return items.filter((product) => {
+    const searchMatch = !normalized || [product.name, product.vendor, product.category, product.description].some((value) => value.toLowerCase().includes(normalized));
+    const categoryMatch = !filters.category || filters.category === "All" || product.category === filters.category;
+    const priceMatch = product.price >= (filters.minPrice ?? 0) && product.price <= (filters.maxPrice ?? Number.POSITIVE_INFINITY);
+    const colorMatch = !filters.color || filters.color === "All" || product.color === filters.color;
+    return searchMatch && categoryMatch && priceMatch && colorMatch;
   });
 }
 
@@ -550,9 +578,11 @@ function QuickViewModal({ product, onClose, onAddToCart, onViewDetails }: { prod
   return <div className={`overlay quick-view-overlay ${isLeaving ? "is-leaving" : ""}`} role="presentation" onMouseDown={() => closeWithMotion()}><section className="quick-view-modal" role="dialog" aria-modal="true" aria-label={`Quick view: ${product.name}`} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => closeWithMotion()} aria-label="Close quick view"><X size={20} /></button><div className="quick-view-image"><img src={product.image} alt={product.name} style={{ objectPosition: product.imagePosition }} /><span className={`stock-note ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`}</span></div><div className="quick-view-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><h3>{product.name}</h3><p className="detail-price">{money.format(product.price)}</p><p>{product.description}</p><ul>{product.specs.slice(0, 2).map((spec) => <li key={spec}><Check size={14} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); closeWithMotion(); }}>Add to bag <Plus size={17} /></button><button className="quick-view-details" onClick={() => closeWithMotion(() => onViewDetails(product))}>See full details <ArrowRight size={15} /></button></div></section></div>;
 }
 
-function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onToggleWishlist, onShare, onSelectProduct, searchHistory, wishlist }: { product: Product; onClose: () => void; onAddToCart: (product: Product) => void; isWishlisted: boolean; onToggleWishlist: (product: Product) => void; onShare: (product: Product) => void; onSelectProduct: (product: Product) => void; searchHistory: string[]; wishlist: number[] }) {
+function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onToggleWishlist, onShare, onSelectProduct, searchHistory, wishlist }: { product: Product; onClose: () => void; onAddToCart: (product: Product, options?: { openCart?: boolean; quantity?: number }) => void; isWishlisted: boolean; onToggleWishlist: (product: Product) => void; onShare: (product: Product) => void; onSelectProduct: (product: Product) => void; searchHistory: string[]; wishlist: number[] }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [isDetailReady, setIsDetailReady] = useState(false);
+  const [detailQuantity, setDetailQuantity] = useState(1);
+  useEffect(() => { setDetailQuantity(1); }, [product.id]);
   useEffect(() => {
     let active = true;
     let settled = false;
@@ -566,11 +596,33 @@ function ProductDetailModal({ product, onClose, onAddToCart, isWishlisted, onTog
     return () => { active = false; image.onload = null; image.onerror = null; };
   }, [product.image]);
   if (!isDetailReady) return <ProductDetailSkeleton />;
-  return <><div className="overlay product-overlay" role="presentation" onMouseDown={onClose}><section className="product-modal" role="dialog" aria-modal="true" aria-label={product.name} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={onClose} aria-label="Close product details"><X size={20} /></button><ProductGallery product={product} onOpenLightbox={setLightboxIndex} /><div className="product-detail-copy"><p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p><div className="detail-title-row"><h3>{product.name}</h3><div className="detail-actions"><button className="detail-share" onClick={() => onShare(product)} aria-label={`Share ${product.name}`}><Share2 size={18} /></button><button className={`detail-heart ${isWishlisted ? "is-saved" : ""}`} onClick={() => onToggleWishlist(product)} aria-pressed={isWishlisted} aria-label={`${isWishlisted ? "Remove" : "Save"} ${product.name} from wishlist`}><Heart size={19} fill={isWishlisted ? "currentColor" : "transparent"} /></button></div></div><p className="detail-price">{money.format(product.price)}</p><p className={`detail-stock ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Low stock · ${product.remaining} remaining` : `${product.remaining} ready to ship`}</p><p>{product.description}</p><ul>{product.specs.map((spec) => <li key={spec}><Check size={15} />{spec}</li>)}</ul><button className="button primary-button full-width" onClick={() => { onAddToCart(product); onClose(); }}>Add to bag <Plus size={18} /></button><ProductReviews product={product} /><RelatedProducts product={product} onSelect={(item) => { setLightboxIndex(null); setIsDetailReady(false); onSelectProduct(item); }} onAddToCart={onAddToCart} searchHistory={searchHistory} wishlist={wishlist} /></div></section></div>{lightboxIndex !== null && <ImageLightbox product={product} imageIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />}</>;
+  return <>
+    <div className="overlay product-overlay" role="presentation" onMouseDown={onClose}>
+      <section className="product-modal" role="dialog" aria-modal="true" aria-label={product.name} onMouseDown={(event) => event.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Close product details"><X size={20} /></button>
+        <ProductGallery product={product} onOpenLightbox={setLightboxIndex} />
+        <div className="product-detail-copy">
+          <p className="eyebrow"><span /> {product.vendor.toUpperCase()}</p>
+          <div className="detail-title-row"><h3>{product.name}</h3><div className="detail-actions"><button className="detail-share" onClick={() => onShare(product)} aria-label={`Share ${product.name}`}><Share2 size={18} /></button><button className={`detail-heart ${isWishlisted ? "is-saved" : ""}`} onClick={() => onToggleWishlist(product)} aria-pressed={isWishlisted} aria-label={`${isWishlisted ? "Remove" : "Save"} ${product.name} from wishlist`}><Heart size={19} fill={isWishlisted ? "currentColor" : "transparent"} /></button></div></div>
+          <p className="detail-price">{money.format(product.price)}</p>
+          <p className={`detail-stock ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Low stock · ${product.remaining} remaining` : `${product.remaining} ready to ship`}</p>
+          <p>{product.description}</p>
+          <ul>{product.specs.map((spec) => <li key={spec}><Check size={15} />{spec}</li>)}</ul>
+          <div className="detail-quantity"><span>Quantity</span><div className="quantity"><button onClick={() => setDetailQuantity((value) => Math.max(1, value - 1))} disabled={detailQuantity === 1} aria-label="Decrease product quantity"><Minus size={14} /></button><b>{detailQuantity}</b><button onClick={() => setDetailQuantity((value) => Math.min(99, value + 1))} aria-label="Increase product quantity"><Plus size={14} /></button></div></div>
+          <button className="button primary-button full-width" onClick={() => { onAddToCart(product, { quantity: detailQuantity }); onClose(); }}>Add {detailQuantity} to bag <Plus size={18} /></button>
+          <ProductReviews product={product} />
+          <RelatedProducts product={product} onSelect={(item) => { setLightboxIndex(null); setIsDetailReady(false); onSelectProduct(item); }} onAddToCart={onAddToCart} searchHistory={searchHistory} wishlist={wishlist} />
+        </div>
+      </section>
+    </div>
+    {lightboxIndex !== null && <ImageLightbox product={product} imageIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />}
+  </>;
 }
 
 export default function Home() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  const [, productRouteParams] = useRoute("/product/:id");
+  const [checkoutRouteActive] = useRoute("/checkout");
   const { theme, toggleTheme } = useTheme();
   const marketRef = useRef<HTMLDivElement>(null);
   const [motionReady, setMotionReady] = useState(false);
@@ -599,6 +651,8 @@ export default function Home() {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutStage, setCheckoutStage] = useState<"summary" | "processing" | "confirmed">("summary");
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [confirmedOrder, setConfirmedOrder] = useState<PastOrder | null>(null);
   const [showWishlist, setShowWishlist] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [wishlist, setWishlist] = useState<number[]>(() => {
@@ -665,6 +719,17 @@ export default function Home() {
     if (searchParams.get("profile") === "1") setShowProfile(true);
   }, []);
   useEffect(() => {
+    if (productRouteParams?.id) {
+      setActiveProduct(products.find((product) => product.id === Number(productRouteParams.id)) ?? null);
+    }
+    if (checkoutRouteActive) {
+      setShowCart(false);
+      setQuickViewProduct(null);
+      setShowCheckout(true);
+      setCheckoutStage("summary");
+    }
+  }, [checkoutRouteActive, productRouteParams?.id]);
+  useEffect(() => {
     const root = marketRef.current;
     if (!root) return;
     const targets = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]"));
@@ -715,14 +780,7 @@ export default function Home() {
 
   const filteredProducts = useMemo(() => {
     const candidates = aiSuggestion ? aiSuggestion.productIds.map((id) => products.find((product) => product.id === id)).filter((product): product is Product => Boolean(product)) : products;
-    const normalized = query.trim().toLowerCase();
-    const result = candidates.filter((product) => {
-      const searchMatch = !normalized || [product.name, product.vendor, product.category].some((value) => value.toLowerCase().includes(normalized));
-      const categoryMatch = category === "All" || product.category === category;
-      const priceMatch = product.price >= priceFloor && product.price <= priceCeiling;
-      const colorMatch = selectedColor === "All" || product.color === selectedColor;
-      return searchMatch && categoryMatch && priceMatch && colorMatch;
-    });
+    const result = filterCatalog(candidates, { query, category, minPrice: priceFloor, maxPrice: priceCeiling, color: selectedColor });
 
     return orderProducts(result, sort, reviewSummaries);
   }, [aiSuggestion, category, priceCeiling, priceFloor, query, reviewSummaries, selectedColor, sort]);
@@ -733,11 +791,12 @@ export default function Home() {
     return vendors.filter((vendor) => [vendor.name, vendor.category, vendor.description].some((value) => value.toLowerCase().includes(normalized)));
   }, [query]);
 
-  const addToCart = (product: Product, options: { openCart?: boolean } = {}) => {
+  const addToCart = (product: Product, options: { openCart?: boolean; quantity?: number } = {}) => {
+    const quantity = Math.max(1, Math.min(99, Math.floor(options.quantity ?? 1)));
     setCart((current) => {
       const line = current.find((item) => item.id === product.id);
-      if (line) return current.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item));
-      return [...current, { ...product, quantity: 1 }];
+      if (line) return current.map((item) => (item.id === product.id ? { ...item, quantity: Math.min(99, item.quantity + quantity) } : item));
+      return [...current, { ...product, quantity }];
     });
     if (options.openCart ?? true) setShowCart(true);
     toast.success("Added to your bag", { description: `${product.name} · ${money.format(product.price)}` });
@@ -753,24 +812,47 @@ export default function Home() {
 
   const beginPayment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!cart.length) return;
+    if (!cart.length) { setCheckoutError("Your bag is empty — add a find before checking out"); return; }
+    const details = Object.fromEntries(new FormData(event.currentTarget)) as Partial<CheckoutDetails>;
+    const validationError = validateCheckoutDetails(details);
+    if (validationError) { setCheckoutError(validationError); return; }
+    const createdAt = Date.now();
+    const completedOrder: PastOrder = { id: createDemoOrderId(createdAt), createdAt, itemCount: cartCount, total: cartGrandTotal, items: cart.map(({ id, quantity }) => ({ id, quantity })) };
+    setCheckoutError(null);
     setCheckoutStage("processing");
-    window.setTimeout(() => setCheckoutStage("confirmed"), 1400);
+    window.setTimeout(() => {
+      setOrderHistory((current) => [completedOrder, ...current].slice(0, 12));
+      setCart([]);
+      setConfirmedOrder(completedOrder);
+      setCheckoutStage("confirmed");
+    }, 1400);
   };
 
   const completeCheckout = () => {
-    const newOrder: PastOrder = { id: `LM-${Date.now().toString().slice(-6)}`, createdAt: Date.now(), itemCount: cartCount, total: cartGrandTotal, items: cart.map(({ id, quantity }) => ({ id, quantity })) };
-    setOrderHistory((current) => [newOrder, ...current].slice(0, 12));
-    setCart([]);
     setShowCheckout(false);
     setCheckoutStage("summary");
+    setCheckoutError(null);
+    setConfirmedOrder(null);
+    setLocation("/");
     toast.success("Order request confirmed", { description: "Your sellers will receive the preparation details next" });
   };
 
   const openCheckout = () => {
     setShowCart(false);
     setCheckoutStage("summary");
-    setShowCheckout(true);
+    setCheckoutError(null);
+    setConfirmedOrder(null);
+    setLocation("/checkout");
+  };
+
+  const openProduct = (product: Product) => {
+    setActiveProduct(product);
+    setLocation(`/product/${product.id}`);
+  };
+
+  const closeProduct = () => {
+    setActiveProduct(null);
+    if (productRouteParams?.id || location.startsWith("/product/")) setLocation("/");
   };
 
   const toggleWishlist = (product: Product) => {
@@ -830,7 +912,8 @@ export default function Home() {
   };
 
   const shareProduct = async (product: Product) => {
-    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
+    const base = import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL.replace(/\/$/, "");
+    const shareUrl = `${window.location.origin}${base}/product/${product.id}`;
     const shareData = { title: `${product.name} · Luma Market`, text: `A thoughtful find from ${product.vendor}: ${product.name}.`, url: shareUrl };
     try {
       if (navigator.share) { await navigator.share(shareData); toast.success("Share sheet opened"); return; }
@@ -912,7 +995,7 @@ export default function Home() {
         </section>
 
         <section className="market-section" id="shop" aria-labelledby="shop-heading">
-            <div className="section-kicker" data-reveal><span>01</span> THE MARKET FLOOR</div>
+            <div className="section-kicker" data-reveal><span>01</span> FEATURED PRODUCTS</div>
             <div className="shop-heading-row" data-reveal>
               <div>
                 <h2 id="shop-heading">Made to become <em>yours</em></h2>
@@ -920,16 +1003,16 @@ export default function Home() {
           </div>
 
           <div className="shop-tools" data-reveal>
-            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Try “a calm desk companion”" aria-label="Describe what you are looking for" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button></div>{searchHistory.length > 0 && <div className="recent-searches"><span>Recent</span><div>{searchHistory.map((item) => <button key={item} onClick={() => { setQuery(item); setAiSuggestion(null); runDiscovery(item); }}>{item}</button>)}<button className="clear-history" onClick={() => setSearchHistory([])} aria-label="Clear recent searches"><X size={12} /></button></div></div>}</div>
+            <div className="ai-search-wrap"><div className="search-field"><Search size={17} /><input value={query} onChange={(event) => { setQuery(event.target.value); setAiSuggestion(null); }} onKeyDown={handleSearchKeyDown} placeholder="Search objects or makers…" aria-label="Search objects or makers" /><button className={`voice-search-button ${isListening ? "is-listening" : ""}`} onClick={startVoiceSearch} disabled={!voiceSupported || isListening} aria-label={voiceSupported ? "Speak a product search" : "Voice search is unavailable in this browser"}>{voiceSupported ? <Mic size={15} /> : <MicOff size={15} />}</button></div>{searchHistory.length > 0 && <div className="recent-searches"><span>Recent</span><div>{searchHistory.map((item) => <button key={item} onClick={() => { setQuery(item); setAiSuggestion(null); runDiscovery(item); }}>{item}</button>)}<button className="clear-history" onClick={() => setSearchHistory([])} aria-label="Clear recent searches"><X size={12} /></button></div></div>}</div>
             <div className="filter-row">
               <div className="category-pills" aria-label="Filter by category">
                 {categories.map((item) => <button className={category === item ? "selected" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}
               </div>
-              <label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="popular">Most popular</option><option value="rating">Top rated</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
+              <div className="price-controls" aria-label="Filter by price range"><label>Min<input type="number" min="0" max={priceCeiling} value={priceFloor} onChange={(event) => setPriceFloor(Math.min(Math.max(0, Number(event.target.value) || 0), priceCeiling))} /></label><span>—</span><label>Max<input type="number" min={priceFloor} value={priceCeiling} onChange={(event) => setPriceCeiling(Math.max(priceFloor, Number(event.target.value) || priceFloor))} /></label></div><label className="sort-select"><SlidersHorizontal size={16} /><span className="sr-only">Sort products</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="popular">Most popular</option><option value="rating">Top rated</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
             </div>
           </div>
           {aiSuggestion && <div className="ai-suggestion"><div><span><b>{aiSuggestion.source === "ai" ? "Luma’s product finder" : "Catalog match"}</b>{aiSuggestion.shortReason}<small>{aiSuggestion.inventoryNote}</small></span></div><button onClick={() => { setAiSuggestion(null); setQuery(""); }}>Return to all finds <X size={15} /></button></div>}
-          {matchingVendors.length > 0 && <section className="vendor-search-results" aria-label="Matching seller stores"><p className="eyebrow"><span /> SELLER MATCHES</p><div>{matchingVendors.map((vendor) => <button key={vendor.slug} onClick={() => setLocation(`/makers/${vendor.slug}`)}><span className={`vendor-search-mark ${vendor.palette}`}>{vendor.name.charAt(0)}</span><span><b>{vendor.name}</b><small>{vendor.category}</small></span><ArrowRight size={16} /></button>)}</div></section>}
+          {matchingVendors.length > 0 && <section className="vendor-search-results" aria-label="Matching seller stores"><p className="eyebrow"><span /> SELLER MATCHES</p><div>{matchingVendors.map((vendor) => <button key={vendor.slug} onClick={() => setLocation(`/vendor/${vendor.slug}`)}><span className={`vendor-search-mark ${vendor.palette}`}>{vendor.name.charAt(0)}</span><span><b>{vendor.name}</b><small>{vendor.category}</small></span><ArrowRight size={16} /></button>)}</div></section>}
 
           <div className="catalog-layout">
           <div className="product-results"><div className="product-rail" id="product-rail">
@@ -938,7 +1021,7 @@ export default function Home() {
               return (
               <article className="product-card" data-reveal style={{ "--index": index } as React.CSSProperties} key={product.id}>
                 <div className="product-visual-wrap">
-                  <button className="product-visual-button" onClick={() => setActiveProduct(product)} aria-label={`View ${product.name}`}><ProductVisual product={product} /></button>
+                  <button className="product-visual-button" onClick={() => openProduct(product)} aria-label={`View ${product.name}`}><ProductVisual product={product} /></button>
                   <span className={`availability-badge ${product.inventoryStatus}`}><i aria-hidden="true" />{availabilityLabel(product)}</span>
                   <button className="card-quick-add" onClick={() => addToCart(product, { openCart: false })} aria-label={`Quick add ${product.name} to cart`}><Plus size={16} /><span>Quick add</span></button>
                   <button className="quick-view-trigger" onClick={() => setQuickViewProduct(product)} aria-label={`Quick view ${product.name}`}><Eye size={16} /><span>Quick view</span></button>
@@ -946,7 +1029,7 @@ export default function Home() {
                   <button className={`product-compare-toggle ${comparisonIds.includes(product.id) ? "is-selected" : ""}`} onClick={() => toggleComparison(product)} aria-label={`${comparisonIds.includes(product.id) ? "Remove" : "Add"} ${product.name} ${comparisonIds.includes(product.id) ? "from" : "to"} comparison`} aria-pressed={comparisonIds.includes(product.id)}><Scale size={14} /><span>{comparisonIds.includes(product.id) ? "Selected" : "Compare"}</span></button>
                 </div>
                 <div className="product-meta">
-                  <button className="product-name" onClick={() => setActiveProduct(product)}>{product.name}</button>
+                  <button className="product-name" onClick={() => openProduct(product)}>{product.name}</button>
                   <p>{product.vendor} <span>·</span> {product.category}</p><span className={`stock-note ${product.inventoryStatus}`}>{product.inventoryStatus === "lowStock" ? `Only ${product.remaining} left` : `${product.remaining} in stock`}</span><span className="listing-rating" aria-label={ratingSummary?.reviewCount ? `${ratingSummary.averageRating.toFixed(1)} out of 5 from ${ratingSummary.reviewCount} visitor reviews` : "No visitor ratings yet"}><Star size={13} fill={ratingSummary?.reviewCount ? "currentColor" : "transparent"} />{ratingSummary?.reviewCount ? <><b>{ratingSummary.averageRating.toFixed(1)}</b><small>{ratingSummary.reviewCount} note{ratingSummary.reviewCount === 1 ? "" : "s"}</small></> : <small>No ratings yet</small>}</span>
                   <div className="product-price-row"><strong>{money.format(product.price)}</strong><button onClick={() => addToCart(product)} className="circle-add" aria-label={`Add ${product.name} to cart`}><Plus size={17} /></button></div>
                 </div>
@@ -980,7 +1063,7 @@ export default function Home() {
             {vendors.map((vendor, index) => {
               const ratingSummary = ratingsByVendorName.get(vendor.name);
               return (
-              <button className={`vendor-card ${vendor.palette}`} data-reveal style={{ "--index": index } as React.CSSProperties} key={vendor.name} onClick={() => setLocation(`/makers/${vendor.slug}`)}>
+              <button className={`vendor-card ${vendor.palette}`} data-reveal style={{ "--index": index } as React.CSSProperties} key={vendor.name} onClick={() => setLocation(`/vendor/${vendor.slug}`)}>
                 <span className="vendor-number">0{index + 1}</span>
                 <span className="vendor-details"><b>{vendor.name}</b><small>{vendor.description}</small><span className="vendor-rating" aria-label={ratingSummary?.reviewCount ? `${ratingSummary.averageRating.toFixed(1)} out of 5 from ${ratingSummary.reviewCount} visitor reviews` : "No visitor ratings yet"}><Star size={12} fill={ratingSummary?.reviewCount ? "currentColor" : "transparent"} />{ratingSummary?.reviewCount ? <>{ratingSummary.averageRating.toFixed(1)} · {ratingSummary.reviewCount} note{ratingSummary.reviewCount === 1 ? "" : "s"}</> : "No ratings yet"}</span></span>
                 <span className="vendor-category"><img className="seller-portrait" src={vendor.portrait} alt={`${vendor.name} maker portrait`} loading="lazy" decoding="async" /><span><b>{vendor.category}</b><small>{vendor.products} items</small></span></span>
@@ -1054,10 +1137,10 @@ export default function Home() {
       {showCheckout && (
         <div className="overlay checkout-overlay" role="presentation">
           <section className={`checkout-modal checkout-${checkoutStage}`} role="dialog" aria-modal="true" aria-label="Checkout order summary">
-            {checkoutStage !== "processing" && <button className="modal-close" onClick={() => { setShowCheckout(false); setCheckoutStage("summary"); }} aria-label="Close checkout"><X size={20} /></button>}
-            {checkoutStage === "summary" && <><p className="eyebrow"><span /> ORDER SUMMARY</p><h3>Almost yours</h3><p className="checkout-intro">Review your small-run finds, then try the simulated payment step — no money moves in this experience</p><div className="checkout-lines">{cart.map((item) => <div key={item.id}><span>{item.quantity} × {item.name}</span><b>{money.format(item.price * item.quantity)}</b></div>)}</div><form onSubmit={beginPayment}><label>Full name<input required name="name" placeholder="Jordan Lee" /></label><label>Email address<input required type="email" name="email" placeholder="you@example.com" /></label><label>Delivery address<textarea required name="address" placeholder="Street, city, postal code" rows={3} /></label><div className="checkout-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><button className="button primary-button full-width" type="submit">Simulate payment <ArrowRight size={18} /></button></form></>}
+            {checkoutStage !== "processing" && <button className="modal-close" onClick={() => { setShowCheckout(false); setCheckoutStage("summary"); setCheckoutError(null); setConfirmedOrder(null); if (checkoutRouteActive) setLocation("/"); }} aria-label="Close checkout"><X size={20} /></button>}
+            {checkoutStage === "summary" && <><p className="eyebrow"><span /> DEMO ORDER FLOW</p><h3>Almost yours</h3><p className="checkout-intro">Review your small-run finds, then confirm this simulated order — no money moves in this experience</p><div className="checkout-lines">{cart.map((item) => <div key={item.id}><span>{item.quantity} × {item.name}</span><b>{money.format(item.price * item.quantity)}</b></div>)}</div><form noValidate onSubmit={beginPayment}>{checkoutError && <p className="checkout-error" role="alert">{checkoutError}</p>}<label>Full name<input required name="name" placeholder="Jordan Lee" /></label><label>Email address<input required type="email" name="email" placeholder="you@example.com" /></label><label>Phone number<input required type="tel" name="phone" placeholder="(555) 123-4567" /></label><label>Delivery address<input required name="address" placeholder="Street and number" /></label><div className="checkout-address-grid"><label>City<input required name="city" placeholder="Portland" /></label><label>Postal code<input required name="postalCode" placeholder="97205" /></label></div><div className="checkout-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><button className="button primary-button full-width" type="submit">Confirm demo order <ArrowRight size={18} /></button></form></>}
             {checkoutStage === "processing" && <div className="payment-state" aria-live="polite"><span className="payment-orbit"><Loader2 size={28} /></span><p className="eyebrow"><span /> PAYMENT SIMULATION</p><h3>Checking the light</h3><p>Simulating a secure approval for your order estimate of {money.format(cartGrandTotal)}</p></div>}
-            {checkoutStage === "confirmed" && <div className="payment-state confirmed" aria-live="polite"><span className="payment-orbit"><Check size={29} /></span><p className="eyebrow"><span /> SIMULATED APPROVAL</p><h3>It’s in motion</h3><p>Your order request is ready for sellers to review — no payment was taken</p><div className="checkout-total"><span>Order estimate</span><b>{money.format(cartGrandTotal)}</b></div><button className="button primary-button full-width" onClick={completeCheckout}>Back to the market <ArrowRight size={18} /></button></div>}
+            {checkoutStage === "confirmed" && <div className="payment-state confirmed" aria-live="polite"><span className="payment-orbit"><Check size={29} /></span><p className="eyebrow"><span /> SIMULATED APPROVAL</p><h3>It’s in motion</h3><p>Your order request is ready for sellers to review — no payment was taken</p><div className="checkout-total"><span>Order estimate</span><b>{money.format(confirmedOrder?.total ?? cartGrandTotal)}</b></div><button className="button primary-button full-width" onClick={completeCheckout}>Back to the market <ArrowRight size={18} /></button></div>}
           </section>
         </div>
       )}
@@ -1066,9 +1149,9 @@ export default function Home() {
 
       {tourStep !== null && !activeProduct && !quickViewProduct && !showCart && !showWishlist && !showCheckout && !showProfile && <FirstVisitTour step={tourStep} onAdvance={() => setTourStep((current) => current === null ? null : nextTourStep(current))} onDismiss={(permanently) => setTourStep(completeFirstVisitTour(localStorage, permanently))} onOpenProfile={() => setShowProfile(true)} />}
 
-      {activeProduct && <ProductDetailModal product={activeProduct} onClose={() => setActiveProduct(null)} onAddToCart={addToCart} isWishlisted={wishlist.includes(activeProduct.id)} onToggleWishlist={toggleWishlist} onShare={shareProduct} onSelectProduct={setActiveProduct} searchHistory={searchHistory} wishlist={wishlist} />}
+      {activeProduct && <ProductDetailModal product={activeProduct} onClose={closeProduct} onAddToCart={addToCart} isWishlisted={wishlist.includes(activeProduct.id)} onToggleWishlist={toggleWishlist} onShare={shareProduct} onSelectProduct={openProduct} searchHistory={searchHistory} wishlist={wishlist} />}
 
-      {quickViewProduct && <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onViewDetails={setActiveProduct} />}
+      {quickViewProduct && <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onViewDetails={openProduct} />}
 
     </div>
   );

@@ -1,7 +1,8 @@
 import { ArrowLeft, Check, Scale, Save, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import { availabilityLabel, createSavedComparisonSet, nextComparisonIds, normalizeSavedComparisonSets, products, type SavedComparisonSet } from "./Home";
+import { products } from "@/data/products";
+import { availabilityLabel, createSavedComparisonSet, nextComparisonIds, normalizeSavedComparisonSets, type SavedComparisonSet } from "./Home";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
