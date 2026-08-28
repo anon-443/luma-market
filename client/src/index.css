@@ -1916,3 +1916,48 @@ html:not(.dark) .market-shell.atelier-index {
   .atelier-index .price-controls input { width: 58px; height: 36px; }
   .atelier-index .checkout-address-grid { grid-template-columns: 1fr; }
 }
+
+/* One composed desktop discovery bar: search left, categories centred, controls right. */
+@media (min-width: 821px) {
+  .atelier-index .shop-tools {
+    display: grid;
+    grid-template-columns: minmax(290px, 390px) minmax(0, 1fr);
+    align-items: center;
+    gap: 0;
+    min-height: 74px;
+    margin: 28px 0 20px;
+    padding: 9px 12px;
+    border-radius: 18px;
+    background: var(--surface);
+  }
+  .atelier-index .ai-search-wrap {
+    min-width: 0;
+    padding-right: 12px;
+    border-right: 1px solid var(--line);
+  }
+  .atelier-index .search-field { height: 52px; gap: 0; }
+  .atelier-index .search-field .voice-search-button { flex: 0 0 40px; margin-left: 0; }
+  .atelier-index .filter-row {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(275px, 1fr) auto auto;
+    align-items: center;
+    gap: 10px;
+    padding-left: 12px;
+  }
+  .atelier-index .category-pills {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .atelier-index .category-pills::-webkit-scrollbar { display: none; }
+  .atelier-index .category-pills button { flex: 0 1 auto; min-width: 0; padding: 10px 8px; white-space: nowrap; }
+  .atelier-index .price-controls { flex: 0 0 auto; gap: 5px; padding: 0 8px 0 10px; border-left: 1px solid var(--line); white-space: nowrap; }
+  .atelier-index .price-controls label { gap: 4px; }
+  .atelier-index .price-controls input { width: 45px; height: 34px; }
+  .atelier-index .sort-select { flex: 0 0 158px; min-width: 158px; height: 42px; margin: 0; }
+}
