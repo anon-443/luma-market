@@ -1857,7 +1857,7 @@ html:not(.dark) .market-shell.atelier-index {
 }
 
 /* Seller and footer rhythm: retain hierarchy while removing unused vertical space. */
-.atelier-index .vendors-section { padding-top: clamp(46px, 3.8vw, 60px); padding-bottom: 28px; }
+.atelier-index .vendors-section { padding-top: 22px; padding-bottom: 28px; }
 .atelier-index .vendors-heading { margin: 8px 0 20px; }
 .atelier-index .vendors-section .section-kicker { gap: 10px; font-size: 13px; letter-spacing: .14em; }
 .atelier-index .vendors-section .section-kicker span { width: 30px; height: 30px; font-size: 12px; }
@@ -1887,7 +1887,7 @@ html:not(.dark) .market-shell.atelier-index {
 .atelier-index .cart-footer > p { margin: 7px 0 17px; font-size: 12px; line-height: 1.4; }
 
 @media (max-width: 820px) {
-  .atelier-index .vendors-section { padding-top: 52px; padding-bottom: 56px; }
+  .atelier-index .vendors-section { padding-top: 22px; padding-bottom: 56px; }
   .atelier-index .vendors-heading { margin-bottom: 24px; }
   .atelier-index .vendors-section .section-kicker { font-size: 12px; }
   .atelier-index .vendors-section .section-kicker span { width: 28px; height: 28px; font-size: 11px; }
